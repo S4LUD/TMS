@@ -2,16 +2,7 @@
 <button id="openCreateUserModal" class="font-semibold bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 hover:text-gray-100 transition duration-75">Create a user</button>
 
 <div class="bg-white p-4 mt-4 border rounded">
-    <!-- <form id="searchForm" onsubmit="return false;" class="flex">
-        <div class="flex flex-col">
-            <input type="text" id="searchAccount" name="searchAccount" placeholder="Search username, id" class="border rounded-md py-2 px-4 focus:outline-none focus:border-blue-500 transition duration-75">
-            <small class="pl-2 text-gray-500">Search is case-sensitive</small>
-        </div>
-        <button type="button" id="searchButton" class="h-fit ml-1 font-semibold bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 hover:text-gray-100 transition duration-75 min-w-50 max-w-50">Search</button>
-        <button type="button" id="clearButton" class="h-fit hidden ml-1 font-semibold bg-red-500 text-white py-2 px-4 rounded-md hover:bg-red-600 hover:text-gray-100 transition duration-75 min-w-50 max-w-50">Clear</button>
-    </form> -->
-
-    <form id="searchForm" onsubmit="return false;">
+    <form id="searchForm" onsubmit="return false;" class="select-none">
         <div class="flex flex-col sm:flex-row gap-1">
             <input type="text" id="searchAccount" name="searchAccount" placeholder="Search username, id" class="border rounded-md py-2 px-4 focus:outline-none focus:border-blue-500 transition duration-75">
             <button type="button" id="searchButton" class="font-semibold bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 hover:text-gray-100 transition duration-75 min-w-50 max-w-50">Search</button>
@@ -19,8 +10,6 @@
         </div>
         <small class="pl-2 text-gray-500 self-end">Search is case-sensitive</small>
     </form>
-
-
 
     <div class="overflow-x-auto mt-4 select-none">
         <div class="md:rounded-lg">
@@ -106,8 +95,9 @@
                             ${user.status}
                         </div>
                     </td>
-                    <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right font-medium sm:pr-6">
-                        <span class="text-blue-600 hover:text-blue-900" style="cursor: pointer">EDIT</span>
+                    <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right sm:pr-6">
+                        <span class="bg-blue-500 hover:bg-blue-600 text-white hover:text-gray-100 px-2 py-1 rounded" style="cursor: pointer">VIEW</span>
+                        <span class="bg-yellow-500 hover:bg-yellow-600 text-white hover:text-gray-100 px-2 py-1 rounded" style="cursor: pointer">EDIT</span>
                     </td>
                 `;
                     userTable.appendChild(row);
