@@ -114,10 +114,12 @@
 
         for (const file of files) {
             const allowedTypes = ['image/jpeg', 'image/png', 'video/mp4', 'application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'];
+
             if (!allowedTypes.includes(file.type)) {
                 alert(`File type not supported: ${file.name}`);
                 continue;
             }
+
             const preview = createFilePreview(file);
             filePreviewContainer.appendChild(preview);
         }
@@ -132,19 +134,26 @@
     function createFilePreview(file) {
         const preview = document.createElement('div');
         preview.className = 'file-preview flex items-center border rounded-md p-2 relative';
+
         const fileNameContainer = document.createElement('div');
-        const fileName = document.createElement('span');
+        fileNameContainer.className = 'w-40'; 
+
+        const fileName = document.createElement('div');
+        fileName.className = 'max-w-36 truncate';
         fileName.textContent = file.name;
+
         const removeButton = document.createElement('button');
         removeButton.className = 'remove-button text-gray-600 hover:text-red-600 cursor-pointer pl-1';
         removeButton.innerHTML = '<i class="fas fa-times"></i>';
         removeButton.addEventListener('click', () => {
             filePreviewContainer.removeChild(preview);
-            toggleFilePreviewVisibility(); 
+            toggleFilePreviewVisibility();
         });
+
         fileNameContainer.appendChild(fileName);
         preview.appendChild(fileNameContainer);
         preview.appendChild(removeButton);
+
         return preview;
     }
 
