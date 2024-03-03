@@ -1,0 +1,98 @@
+<?php
+session_start();
+
+if (!isset($_SESSION['user'])) {
+    header('Location: /tms/login/');
+    exit();
+}
+
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><?php echo $pageTitle; ?></title>
+    <script src="https://cdn.tailwindcss.com/3.4.1"></script>
+    <script src="https://kit.fontawesome.com/ece8d271f7.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <link rel="icon" href="/tms/src/image/logo.png" type="image/png">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+</head>
+
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Karla:ital,wght@0,200..800;1,200..800&display=swap');
+
+    * {
+        font-family: "Karla", sans-serif;
+        font-optical-sizing: auto;
+        font-style: normal;
+    }
+</style>
+
+<body>
+    <div id="main-container" class="flex flex-col h-screen bg-gray-100">
+        <div class="flex-grow flex">
+            <?php include($_SERVER['DOCUMENT_ROOT'] . '/tms/src/components/sidemenu.php'); ?>
+            <div id="contentContainer" class="flex-1 flex flex-col overflow-hidden">
+                <?php include($_SERVER['DOCUMENT_ROOT'] . '/tms/src/components/header.php'); ?>
+                <main class="flex-1 overflow-x-hidden overflow-y-auto bg-[#F4F6F9]">
+                    <div class="p-4 h-full">
+                        <?php include($_SERVER['DOCUMENT_ROOT'] . $contentView); ?>
+                    </div>
+                </main>
+                <?php include($_SERVER['DOCUMENT_ROOT'] . '/tms/src/components/footer.php'); ?>
+            </div>
+        </div>
+    </div>
+</body>
+<script>
+    const mediaQuery = gsap.matchMedia();
+
+    window.addEventListener('resize', function() {
+        (async () => {
+            var backdrop = document.getElementById('backdrop');
+            var isLargeScreen = window.matchMedia('(min-width: 640px)').matches;
+            var isBackdrop = !backdrop.classList.contains('hidden');
+
+            if (isBackdrop && isLargeScreen) {
+                toggleSideMenu();
+            }
+        })();
+    });
+
+    async function toggleSideMenu() {
+        const isMenu = await localStorage.getItem('isMenu');
+        var sideMenu = document.getElementById('sideMenu');
+        var backdrop = document.getElementById('backdrop');
+        var container = document.getElementById('main-container');
+
+        sideMenu.classList.toggle('hidden');
+        backdrop.classList.toggle('hidden');
+        container.classList.toggle('overflow-hidden');
+    }
+
+    const toggleFullscreenButton = document.getElementById("toggleFullscreen");
+
+    toggleFullscreenButton.addEventListener("click", () => {
+        if (document.fullscreenElement) {
+            document.exitFullscreen();
+        } else {
+            document.documentElement.requestFullscreen();
+        }
+    });
+
+    function openLogoutModal() {
+        document.getElementById('logoutModal').classList.remove('hidden');
+    }
+
+    function closeLogoutModal() {
+        document.getElementById('logoutModal').classList.add('hidden');
+    }
+</script>
+
+</html>
