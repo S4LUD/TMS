@@ -136,7 +136,7 @@
         preview.className = 'file-preview flex items-center border rounded-md p-2 relative';
 
         const fileNameContainer = document.createElement('div');
-        fileNameContainer.className = 'w-40'; 
+        fileNameContainer.className = 'w-40';
 
         const fileName = document.createElement('div');
         fileName.className = 'max-w-36 truncate';
@@ -168,6 +168,8 @@
     }
 
     function clearCreateInputs() {
+        filePreviewContainer.innerHTML = '';
+        fileInput.value = null;
         document.getElementById('task_title').value = "";
         document.getElementById('task_details').value = "";
     }
