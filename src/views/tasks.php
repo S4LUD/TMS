@@ -184,4 +184,63 @@
         document.getElementById('createTask').classList.add('hidden');
         clearCreateInputs();
     }
+
+    async function submitNewTask(event) {
+        event.preventDefault();
+
+        // Access form fields
+        const title = document.getElementById('task_title').value;
+        const details = document.getElementById('task_details').value;
+        const fileInput = document.getElementById('fileInput');
+        const files = fileInput.files;
+
+        // Check if the number of files exceeds the limit
+        if (files.length > 5) {
+            alert('Please select up to 5 files.');
+            return;
+        }
+
+        // Create FormData object
+        const formData = new FormData();
+
+        // Append form fields to FormData
+        formData.append('title', title);
+        formData.append('details', details);
+
+        let filesExceedSizeLimit = false;
+
+        // Check file size and append files to FormData
+        if (files.length !== 0) {
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+
+                // Check if file size is less than 5MB
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('File size should be less than 5MB.');
+                    filesExceedSizeLimit = true;
+                    break; // Exit the loop
+                }
+
+                formData.append('files[]', file);
+            }
+        }
+
+        if (filesExceedSizeLimit) {
+            return; // Don't proceed with the API request
+        }
+
+        // Perform API request using fetch
+        await fetch('http://localhost/tms/api/createtask/', {
+                method: 'POST',
+                body: formData,
+            })
+            .then(response => response.json())
+            .then(result => {
+                closeCreateTaskModal();
+            })
+            .catch(error => {
+                // Handle errors
+                console.error('Error:', error);
+            });
+    }
 </script>

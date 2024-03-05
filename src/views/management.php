@@ -115,8 +115,6 @@
 
             const url = `http://localhost/tms/api/register?username=${username}&password=${password}&department_id=${departmentId}&role_id=${roleId}`;
 
-            console.log(url);
-
             fetch(url)
                 .then(response => response.json())
                 .then(result => {

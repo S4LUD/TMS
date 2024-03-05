@@ -1,7 +1,7 @@
 <div id="createTask" class="select-none fixed inset-0 bg-gray-500 bg-opacity-50 flex items-center justify-center hidden z-50" onclick="closeCreateTaskModal()">
     <div class="bg-white p-8 rounded shadow-md w-96" onclick="event.stopPropagation();">
         <h2 class="text-2xl font-medium mb-4">Create Task</h2>
-        <form id="createTaskForm">
+        <form id="createTaskForm" method="POST" onsubmit="submitNewTask(event)">
             <div class="mb-4">
                 <label for="title" class="block text-gray-700">Title:</label>
                 <input type="text" id="task_title" name="title" class="w-full border rounded-md py-2 px-3 focus:outline-none focus:border-blue-500 transition duration-75" required>
