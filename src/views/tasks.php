@@ -27,16 +27,7 @@
                         <th scope="col" class="px-3 py-3.5 text-left font-semibold text-gray-900"></th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-200" id="userTable">
-                    <tr>
-                        <td class="whitespace-nowrap py-4 pl-4 pr-3 font-medium text-gray-900 sm:pl-6">Lorem ipsum dolor sit amet consectetur adipisicing elit.</td>
-                        <td class="whitespace-nowrap px-3 py-4 text-gray-500">03/03/2024</td>
-                        <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right sm:pr-6">
-                            <span class="bg-blue-500 hover:bg-blue-600 text-white hover:text-gray-100 px-2 py-1 rounded" style="cursor: pointer">VIEW</span>
-                            <span class="bg-yellow-500 hover:bg-yellow-600 text-white hover:text-gray-100 px-2 py-1 rounded" style="cursor: pointer">EDIT</span>
-                        </td>
-                    </tr>
-                </tbody>
+                <tbody class="divide-y divide-gray-200" id="taskTable"></tbody>
             </table>
         </div>
     </div>
@@ -45,9 +36,70 @@
 <?php include($_SERVER['DOCUMENT_ROOT'] . '/tms/src/components/modals/create_task_modal.php'); ?>
 
 <script>
+    const taskTable = document.getElementById('taskTable');
     const fileInput = document.getElementById('fileInput');
     const filePreviewContainer = document.getElementById('filePreview');
+    const filterButton = document.getElementById('filterButton');
+    const clearButton = document.getElementById('clearButton');
     const selectedFiles = [];
+
+    filterButton.addEventListener('click', function() {
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
+
+        // clearButton.classList.remove('hidden');
+        fetch(`http://localhost/tms/api/fetchalltasks?startDate=${startDate}&endDate=${endDate}`)
+            .then(response => response.json())
+            .then(users => updateTable(users));
+
+    });
+
+    function fetchTasks(params) {
+        fetch(`http://localhost/tms/api/fetchalltasks`)
+            .then(response => response.json())
+            .then(tasks => updateTable(tasks));
+    }
+
+    fetchTasks();
+
+    function updateTable(tasks) {
+        // Clear existing table content
+        taskTable.innerHTML = '';
+
+        if (tasks.length === 0) {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td class="py-3.5 pl-6 pr-3 text-left font-semibold text-red-900">NO TASK FOUND BETWEEN THE RANGED DATE</td>
+            `;
+            taskTable.appendChild(row);
+        } else {
+            for (const task of tasks) {
+                const dateTime = new Date(task.createdAt);
+                const options = {
+                    weekday: 'long',
+                    day: 'numeric',
+                    month: 'long',
+                    hour: 'numeric',
+                    minute: 'numeric',
+                    hour12: true
+                };
+                const formattedDate = new Intl.DateTimeFormat('en-PH', options).format(dateTime);
+                const row = document.createElement('tr');
+                row.id = `userRow_${task.id}`;
+                row.innerHTML = `
+                    <td class="whitespace-nowrap py-4 pl-4 pr-3 font-medium text-gray-900 sm:pl-6">
+                        ${task.title}
+                    </td>
+                    <td class="whitespace-nowrap px-3 py-4 text-gray-500">${formattedDate}</td>
+                    <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right sm:pr-6">
+                        <span class="bg-blue-500 hover:bg-blue-600 text-white hover:text-gray-100 px-2 py-1 rounded" style="cursor: pointer">VIEW</span>
+                        <span class="bg-yellow-500 hover:bg-yellow-600 text-white hover:text-gray-100 px-2 py-1 rounded" style="cursor: pointer">EDIT</span>
+                    </td>
+                `;
+                taskTable.appendChild(row);
+            }
+        }
+    }
 
     fileInput.addEventListener('change', () => handleFileSelection(fileInput.files));
     filePreviewContainer.addEventListener('dragover', (e) => handleDragOver(e));
@@ -262,7 +314,31 @@
             })
             .then(response => response.json())
             .then(result => {
-                closeCreateTaskModal();
+                if (result.message) {
+                    Toastify({
+                        text: result.message,
+                        duration: 5000,
+                        gravity: "top", // `top` or `bottom`
+                        position: "right", // `left`, `center` or `right`
+                        stopOnFocus: true, // Prevents dismissing of toast on hover
+                        style: {
+                            background: "#3CA2FA",
+                        },
+                    }).showToast();
+                    closeCreateTaskModal();
+                    fetchTasks();
+                } else if (result.error) {
+                    Toastify({
+                        text: result.error,
+                        duration: 5000,
+                        gravity: "top", // `top` or `bottom`
+                        position: "right", // `left`, `center` or `right`
+                        stopOnFocus: true, // Prevents dismissing of toast on hover
+                        style: {
+                            background: "#FA3636",
+                        },
+                    }).showToast();
+                }
             })
             .catch(error => {
                 // Handle errors
