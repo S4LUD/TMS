@@ -45,61 +45,6 @@
 <?php include($_SERVER['DOCUMENT_ROOT'] . '/tms/src/components/modals/create_task_modal.php'); ?>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const createTaskForm = document.getElementById('createTaskForm');
-        const clearButton = document.getElementById('clearButton');
-
-        createTaskForm.addEventListener('submit', function(event) {
-            event.preventDefault();
-
-            const title = document.getElementById('task_title').value;
-            const details = document.getElementById('task_details').value;
-
-            console.log({
-                title,
-                details
-            });
-
-            // const url = `http://localhost/tms/api/register?username=${username}&password=${password}&department_id=${departmentId}&role_id=${roleId}`;
-
-            // console.log(url);
-
-            // fetch(url)
-            //     .then(response => response.json())
-            //     .then(result => {
-            //         if (result.message) {
-            //             Toastify({
-            //                 text: result.message,
-            //                 duration: 5000,
-            //                 gravity: "top", // `top` or `bottom`
-            //                 position: "right", // `left`, `center` or `right`
-            //                 stopOnFocus: true, // Prevents dismissing of toast on hover
-            //                 style: {
-            //                     background: "#3CA2FA",
-            //                 },
-            //             }).showToast();
-            //             closeCreateUserModal();
-            //             clearCreateInputs();
-            //             fetchUsers();
-            //         } else if (result.error) {
-            //             Toastify({
-            //                 text: result.error,
-            //                 duration: 5000,
-            //                 gravity: "top", // `top` or `bottom`
-            //                 position: "right", // `left`, `center` or `right`
-            //                 stopOnFocus: true, // Prevents dismissing of toast on hover
-            //                 style: {
-            //                     background: "#FA3636",
-            //                 },
-            //             }).showToast();
-            //         }
-            //     })
-            //     .catch(error => {
-            //         console.error('Error:', error);
-            //     });
-        });
-    });
-
     const fileInput = document.getElementById('fileInput');
     const filePreviewContainer = document.getElementById('filePreview');
 
