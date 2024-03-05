@@ -61,7 +61,7 @@
         for (const file of files) {
             const allowedTypes = ['image/jpeg', 'image/png', 'video/mp4', 'application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'];
 
-            if (!allowedTypes.includes(file.type)) {
+            if (!isFileTypeAllowed(file.type)) {
                 alert(`File type not supported: ${file.name}`);
                 continue;
             }
@@ -97,9 +97,41 @@
         event.dataTransfer.dropEffect = 'copy';
     }
 
+    function isFileTypeAllowed(fileType) {
+        // Define the allowed file types
+        const allowedTypes = ['image/jpeg', 'image/png', 'video/mp4', 'application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'text/plain'];
+
+        // Check if the given file type is in the allowed types array
+        return allowedTypes.includes(fileType);
+    }
+
     function handleDrop(event) {
         event.preventDefault();
-        handleFileSelection(event.dataTransfer.files);
+
+        // Check if DataTransfer items are available
+        if (event.dataTransfer.items) {
+            // Use DataTransfer items to get dropped items
+            const droppedItems = event.dataTransfer.items;
+
+            // Check each dropped item for file type
+            for (let i = 0; i < droppedItems.length; i++) {
+                const droppedItem = droppedItems[i];
+
+                // Check if the item is a file
+                if (droppedItem.kind === 'file') {
+                    // Get the dropped file
+                    const file = droppedItem.getAsFile();
+
+                    // Check if the file type is allowed
+                    if (isFileTypeAllowed(file.type)) {
+                        // Handle the allowed file
+                        handleFileSelection([file]);
+                    } else {
+                        alert(`File type not supported: ${file.name}`);
+                    }
+                }
+            }
+        }
     }
 
     function createFilePreview(file) {

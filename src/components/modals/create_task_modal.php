@@ -16,7 +16,7 @@
                 <label for="fileInput" id="fileUploadText" class="text-gray-700 text-center p-4 cursor-pointer">
                     <p>Click to upload or drag & drop</p>
                 </label>
-                <input type="file" id="fileInput" onchange="handleFileSelection()" class="hidden" accept="image/*, video/mp4, application/pdf, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" multiple />
+                <input type="file" id="fileInput" onchange="handleFileSelection()" class="hidden" accept="image/*, video/mp4, application/pdf, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, text/plain" multiple />
             </div>
             <div id="filePreview" class="hidden flex gap-1 flex-row overflow-y-auto mt-1"></div>
 
