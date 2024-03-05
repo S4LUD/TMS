@@ -92,13 +92,28 @@
                     </td>
                     <td class="whitespace-nowrap px-3 py-4 text-gray-500">${formattedDate}</td>
                     <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right sm:pr-6">
-                        <span class="bg-blue-500 hover:bg-blue-600 text-white hover:text-gray-100 px-2 py-1 rounded" style="cursor: pointer">VIEW</span>
-                        <span class="bg-yellow-500 hover:bg-yellow-600 text-white hover:text-gray-100 px-2 py-1 rounded" style="cursor: pointer">EDIT</span>
+                        <span class="bg-blue-500 hover:bg-blue-600 text-white hover:text-gray-100 px-2 py-1 rounded view-btn" style="cursor: pointer">VIEW</span>
+                        <span class="bg-yellow-500 hover:bg-yellow-600 text-white hover:text-gray-100 px-2 py-1 rounded edit-btn" style="cursor: pointer">EDIT</span>
                     </td>
                 `;
                 taskTable.appendChild(row);
+
+
+                // Add event listeners to VIEW and EDIT buttons
+                row.querySelector('.view-btn').addEventListener('click', () => handleViewTask(task.id));
+                row.querySelector('.edit-btn').addEventListener('click', () => handleEditTask(task.id));
             }
         }
+    }
+
+    function handleViewTask(taskId) {
+        console.log('View task:', taskId);
+        // Add your logic to handle viewing the task
+    }
+
+    function handleEditTask(taskId) {
+        console.log('Edit task:', taskId);
+        // Add your logic to handle editing the task
     }
 
     fileInput.addEventListener('change', () => handleFileSelection(fileInput.files));
