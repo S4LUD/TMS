@@ -47,6 +47,7 @@
 <script>
     const fileInput = document.getElementById('fileInput');
     const filePreviewContainer = document.getElementById('filePreview');
+    const selectedFiles = [];
 
     fileInput.addEventListener('change', () => handleFileSelection(fileInput.files));
     filePreviewContainer.addEventListener('dragover', (e) => handleDragOver(e));
@@ -65,41 +66,30 @@
                 continue;
             }
 
+            // Check if the file is not already in the selectedFiles array
+            if (!selectedFiles.some(selectedFile => selectedFile.name === file.name)) {
+                selectedFiles.push(file);
+                updateFilePreview();
+            }
+        }
+    }
+
+    function updateFilePreview() {
+        // Clear existing preview
+        filePreviewContainer.innerHTML = '';
+
+        // Create preview for each selected file
+        for (const file of selectedFiles) {
             const preview = createFilePreview(file);
             filePreviewContainer.appendChild(preview);
         }
+
         toggleFilePreviewVisibility();
     }
 
     function toggleFilePreviewVisibility() {
-        const hasFiles = filePreviewContainer.children.length > 0;
+        const hasFiles = selectedFiles.length > 0;
         filePreviewContainer.classList.toggle('hidden', !hasFiles);
-    }
-
-    function createFilePreview(file) {
-        const preview = document.createElement('div');
-        preview.className = 'file-preview flex items-center border rounded-md p-2 relative';
-
-        const fileNameContainer = document.createElement('div');
-        fileNameContainer.className = 'w-40';
-
-        const fileName = document.createElement('div');
-        fileName.className = 'max-w-36 truncate';
-        fileName.textContent = file.name;
-
-        const removeButton = document.createElement('button');
-        removeButton.className = 'remove-button text-gray-600 hover:text-red-600 cursor-pointer pl-1';
-        removeButton.innerHTML = '<i class="fas fa-times"></i>';
-        removeButton.addEventListener('click', () => {
-            filePreviewContainer.removeChild(preview);
-            toggleFilePreviewVisibility();
-        });
-
-        fileNameContainer.appendChild(fileName);
-        preview.appendChild(fileNameContainer);
-        preview.appendChild(removeButton);
-
-        return preview;
     }
 
     function handleDragOver(event) {
@@ -112,9 +102,70 @@
         handleFileSelection(event.dataTransfer.files);
     }
 
+    function createFilePreview(file) {
+        const preview = document.createElement('div');
+        preview.className = 'file-preview flex items-center border rounded-md p-2 relative';
+
+        const fileNameContainer = document.createElement('div');
+        fileNameContainer.className = 'flex flex-col w-40';
+
+        const fileName = document.createElement('div');
+        fileName.className = 'max-w-36 truncate';
+        fileName.textContent = file.name;
+
+        const fileSize = document.createElement('div');
+        fileSize.className = 'text-gray-500';
+        fileSize.textContent = formatFileSize(file.size);
+
+        const removeButton = document.createElement('button');
+        removeButton.className = 'remove-button text-gray-600 hover:text-red-600 cursor-pointer pl-1';
+        removeButton.innerHTML = '<i class="fas fa-times"></i>';
+        removeButton.addEventListener('click', () => {
+            removeFile(file);
+            updateFilePreview();
+        });
+
+        fileNameContainer.appendChild(fileName);
+        fileNameContainer.appendChild(fileSize);
+        preview.appendChild(fileNameContainer);
+        preview.appendChild(removeButton);
+
+        // Change text color to red if file size is over 5MB
+        if (file.size > 5 * 1024 * 1024) {
+            fileName.classList = 'max-w-36 truncate text-red-500';
+            fileSize.classList = 'text-red-500';
+            removeButton.classList = 'remove-button text-red-500 hover:text-red-600 cursor-pointer pl-1';
+        }
+
+        return preview;
+    }
+
+    function removeFile(file) {
+        // Remove the file from the selectedFiles array
+        const index = selectedFiles.findIndex(selectedFile => selectedFile.name === file.name);
+        if (index !== -1) {
+            selectedFiles.splice(index, 1);
+        }
+    }
+
+    function formatFileSize(size) {
+        const kbSize = size / 1024;
+        if (kbSize < 1024) {
+            return kbSize.toFixed(2) + ' KB';
+        } else {
+            const mbSize = kbSize / 1024;
+            if (mbSize < 1024) {
+                return mbSize.toFixed(2) + ' MB';
+            } else {
+                const gbSize = mbSize / 1024;
+                return gbSize.toFixed(2) + ' GB';
+            }
+        }
+    }
+
     function clearCreateInputs() {
         filePreviewContainer.innerHTML = '';
-        fileInput.value = null;
+        selectedFiles.splice(0, selectedFiles.length);
         document.getElementById('task_title').value = "";
         document.getElementById('task_details').value = "";
     }
@@ -136,11 +187,9 @@
         // Access form fields
         const title = document.getElementById('task_title').value;
         const details = document.getElementById('task_details').value;
-        const fileInput = document.getElementById('fileInput');
-        const files = fileInput.files;
 
         // Check if the number of files exceeds the limit
-        if (files.length > 5) {
+        if (selectedFiles.length > 5) {
             alert('Please select up to 5 files.');
             return;
         }
@@ -155,9 +204,9 @@
         let filesExceedSizeLimit = false;
 
         // Check file size and append files to FormData
-        if (files.length !== 0) {
-            for (let i = 0; i < files.length; i++) {
-                const file = files[i];
+        if (selectedFiles.length !== 0) {
+            for (let i = 0; i < selectedFiles.length; i++) {
+                const file = selectedFiles[i];
 
                 // Check if file size is less than 5MB
                 if (file.size > 5 * 1024 * 1024) {
