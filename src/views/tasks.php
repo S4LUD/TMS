@@ -34,13 +34,16 @@
 </div>
 
 <?php include($_SERVER['DOCUMENT_ROOT'] . '/tms/src/components/modals/create_task_modal.php'); ?>
+<?php include($_SERVER['DOCUMENT_ROOT'] . '/tms/src/components/modals/view_task.php'); ?>
 
 <script>
     const taskTable = document.getElementById('taskTable');
     const fileInput = document.getElementById('fileInput');
     const filePreviewContainer = document.getElementById('filePreview');
+    const viewPreviewContainer = document.getElementById('viewFilePreview');
     const filterButton = document.getElementById('filterButton');
     const clearButton = document.getElementById('clearButton');
+    const viewTask = document.getElementById('viewTask');
     const selectedFiles = [];
 
     filterButton.addEventListener('click', function() {
@@ -69,7 +72,7 @@
         if (tasks.length === 0) {
             const row = document.createElement('tr');
             row.innerHTML = `
-                <td class="py-3.5 pl-6 pr-3 text-left font-semibold text-red-900">NO TASK FOUND BETWEEN THE RANGED DATE</td>
+                <td class="py-3.5 pl-6 pr-3 text-left font-semibold">NO TASK FOUND</td>
             `;
             taskTable.appendChild(row);
         } else {
@@ -106,9 +109,42 @@
         }
     }
 
-    function handleViewTask(taskId) {
-        console.log('View task:', taskId);
-        // Add your logic to handle viewing the task
+    async function handleViewTask(taskId) {
+        try {
+            const response = await fetch(`http://localhost/tms/api/viewtask?task_id=${taskId}`);
+            const tasks = await response.json();
+
+            if (tasks && tasks.length > 0) {
+                const task = tasks[0];
+
+                // Update modal elements with task data
+                const titleElement = document.getElementById('taskTitle');
+                const detailsElement = document.getElementById('taskDetailsContent');
+
+                if (titleElement && detailsElement) {
+                    titleElement.innerHTML = task.title;
+                    detailsElement.innerHTML = task.detail;
+                    // Update other modal elements as needed
+                }
+
+                if (!!task.files.length) {
+                    updateViewFilePreview(task.files)
+                }
+
+                // Show the modal
+                document.getElementById('viewTask').classList.remove('hidden');
+            } else {
+                console.log('No task data available.');
+            }
+        } catch (error) {
+            console.error('Error fetching task data:', error);
+        }
+    }
+
+    function closeViewTaskModal() {
+        viewPreviewContainer.innerHTML = '';
+        document.getElementById('viewFilePreview').classList.add('hidden');
+        document.getElementById('viewTask').classList.add('hidden');
     }
 
     function handleEditTask(taskId) {
@@ -152,6 +188,21 @@
         }
 
         toggleFilePreviewVisibility();
+    }
+
+    function updateViewFilePreview(viewFiles) {
+        // Clear existing preview
+        filePreviewContainer.innerHTML = '';
+
+        // Create preview for each selected file
+        for (const file of viewFiles) {
+            const preview = createviewFilePreview(file);
+            viewPreviewContainer.appendChild(preview);
+        }
+
+        if (!!viewFiles.length) {
+            document.getElementById('viewFilePreview').classList.remove('hidden');
+        }
     }
 
     function toggleFilePreviewVisibility() {
@@ -199,6 +250,28 @@
                 }
             }
         }
+    }
+
+    function createviewFilePreview(file) {
+        const preview = document.createElement('div');
+        preview.className = 'flex items-center border rounded-md p-2';
+
+        const fileNameContainer = document.createElement('div');
+        fileNameContainer.className = 'flex flex-col w-full';
+
+        const fileName = document.createElement('div');
+        fileName.className = 'w-full truncate';
+        fileName.textContent = file.filename;
+
+        const fileDetailsContainer = document.createElement('div');
+        fileDetailsContainer.className = 'flex items-center justify-between';
+        fileDetailsContainer.innerHTML = `<div class="text-gray-500">${formatFileSize(file.file_size)}</div><a class="text-blue-600" href="/tms/download?file=${file.file_destination}">Download</a>`;
+
+        fileNameContainer.appendChild(fileName);
+        fileNameContainer.appendChild(fileDetailsContainer);
+        preview.appendChild(fileNameContainer);
+
+        return preview;
     }
 
     function createFilePreview(file) {

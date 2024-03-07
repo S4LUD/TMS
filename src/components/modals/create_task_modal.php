@@ -1,5 +1,5 @@
 <div id="createTask" class="select-none fixed inset-0 bg-gray-500 bg-opacity-50 flex items-center justify-center hidden z-50" onclick="closeCreateTaskModal()">
-    <div class="bg-white p-8 rounded shadow-md w-96" onclick="event.stopPropagation();">
+    <div class="bg-white p-4 rounded shadow-md w-96" onclick="event.stopPropagation();">
         <h2 class="text-2xl font-medium mb-4">Create Task</h2>
         <form id="createTaskForm" method="POST" onsubmit="submitNewTask(event)">
             <div class="mb-4">

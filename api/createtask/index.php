@@ -33,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $destination = $uploadDirectory . $uniqueFilename;
 
                     // Attempt to insert data into the database
-                    $inserted = insertTaskFile($uniqueFilename, $destination, $result->id);
+                    $inserted = insertTaskFile($file_name, $file_size, $destination, $result->id);
 
                     if ($inserted) {
                         // If the insertion is successful, move the file to the destination directory
@@ -71,8 +71,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Function to insert data into the database
-function insertTaskFile($uniqueFilename, $destination, $task_id)
+function insertTaskFile($uniqueFilename, $file_size, $destination, $task_id)
 {
-    $result = Tasks::newFile($uniqueFilename, $destination, $task_id);
+    $result = Tasks::newFile($uniqueFilename, $file_size, $destination,  $task_id);
     return $result;
 }
