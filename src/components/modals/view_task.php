@@ -6,6 +6,14 @@
             </div>
             <i onclick="closeViewTaskModal()" class="fa-solid fa-xmark text-white bg-gray-300 hover:bg-gray-400 py-1 px-1.5 rounded-full cursor-pointer"></i>
         </div>
+        <div>
+            <div>
+                Status
+            </div>
+            <div>
+                Due Date
+            </div>
+        </div>
         <div class="flex flex-col gap-2">
             <?php $tabs = array("Description", "Attachments"); ?>
             <div class="flex gap-3">
@@ -20,7 +28,7 @@
             <?php
             foreach ($tabs as $index => $tab) {
                 $tabDisplay = $index === 0 ? 'block' : 'hidden'; // Set the active tab's display property
-                $contentClass = $index === 0 ? 'text-gray-600 overflow-y-auto h-52' : 'flex flex-col gap-2 overflow-y-auto h-52'; // Set the content class based on the active tab
+                $contentClass = $index === 0 ? 'text-gray-600 overflow-y-auto max-h-52' : 'flex flex-col gap-2 overflow-y-auto max-h-52'; // Set the content class based on the active tab
                 echo '<div id="tab' . ($index + 1) . '" class="tab-content ' . $tabDisplay . '">';
                 if ($index === 0) {
                     echo '<p id="taskDetailsContent" class="' . $contentClass . '"></p>';
