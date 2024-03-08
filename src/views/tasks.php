@@ -67,19 +67,6 @@
         underline.style.display = "block";
     }
 
-    function resetTabs() {
-        var tabLinks = document.getElementsByClassName("tab");
-        for (var i = 0; i < tabLinks.length; i++) {
-            tabLinks[i].classList.remove("text-black", "relative", "font-semibold");
-            tabLinks[i].classList.add("text-gray-500");
-            var underline = tabLinks[i].getElementsByTagName("div")[0];
-            underline.style.display = "none";
-        }
-
-        // Display the "Description" tab content
-        document.getElementById("tab1").style.display = "block";
-    }
-
     filterButton.addEventListener('click', function() {
         const startDate = document.getElementById('startDate').value;
         const endDate = document.getElementById('endDate').value;
@@ -163,6 +150,22 @@
 
                 updateViewFilePreview(task.files)
 
+                var tabLinks = document.getElementsByClassName("tab");
+                var tabContent = document.getElementsByClassName("tab-content");
+                var defaultactive = document.getElementById('tab1')
+                var underline = tabLinks[1].getElementsByTagName("div")[0];
+
+                tabContent[1].style.display = "none";
+
+                tabLinks[1].classList.remove("text-black", "relative", "font-semibold");
+                tabLinks[1].classList.add("text-gray-500");
+                underline.style.display = "none";
+
+                defaultactive.style.display = "block";
+                tabLinks[0].classList.remove("text-gray-500");
+                tabLinks[0].classList.add("text-black", "relative", "font-semibold");
+                tabLinks[0].getElementsByTagName("div")[0].style.display = "block";
+
                 // Show the modal
                 document.getElementById('viewTask').classList.remove('hidden');
             } else {
@@ -177,8 +180,6 @@
         viewPreviewContainer.innerHTML = '';
         document.getElementById('viewFilePreview').classList.add('hidden');
         document.getElementById('viewTask').classList.add('hidden');
-        // Reset the tabs to "Description"
-        resetTabs();
     }
 
     function handleEditTask(taskId) {

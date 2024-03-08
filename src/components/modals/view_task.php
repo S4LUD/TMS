@@ -13,7 +13,7 @@
                 foreach ($tabs as $index => $tab) {
                     $tabClass = $index === 0 ? 'text-black relative font-semibold' : 'text-gray-500'; // Set the active tab's text style
                     $underlineClass = $index === 0 ? 'border-b-2 border-blue-500 absolute bottom-0 left-0 right-0' : 'border-b-2 border-blue-500 absolute bottom-0 left-0 right-0'; // Set the active tab's underline style
-                    echo '<div class="tab cursor-pointer pb-0.5 ' . $tabClass . '" onclick="openTab(event, \'tab' . ($index + 1) . '\')">' . $tab . '<div class="' . $underlineClass . '"></div></div>';
+                    echo '<div class="tab cursor-pointer pb-0.5 ' . $tabClass . '" onclick="openTab(event, \'tab' . ($index + 1) . '\')">' . $tab . '<div id="underlineClass" class="' . $underlineClass . '"></div></div>';
                 }
                 ?>
             </div>
