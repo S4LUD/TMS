@@ -44,7 +44,41 @@
     const filterButton = document.getElementById('filterButton');
     const clearButton = document.getElementById('clearButton');
     const viewTask = document.getElementById('viewTask');
+    const attachmentCount = document.getElementById('attachmentCount ');
     const selectedFiles = [];
+
+    function openTab(evt, tabName) {
+        var i, tabContent, tabLinks;
+        tabContent = document.getElementsByClassName("tab-content");
+        for (i = 0; i < tabContent.length; i++) {
+            tabContent[i].style.display = "none";
+        }
+        tabLinks = document.getElementsByClassName("tab");
+        for (i = 0; i < tabLinks.length; i++) {
+            tabLinks[i].classList.remove("text-black", "relative", "font-semibold");
+            tabLinks[i].classList.add("text-gray-500");
+            var underline = tabLinks[i].getElementsByTagName("div")[0];
+            underline.style.display = "none";
+        }
+        document.getElementById(tabName).style.display = "block";
+        evt.currentTarget.classList.remove("text-gray-500");
+        evt.currentTarget.classList.add("text-black", "relative", "font-semibold");
+        var underline = evt.currentTarget.getElementsByTagName("div")[0];
+        underline.style.display = "block";
+    }
+
+    function resetTabs() {
+        var tabLinks = document.getElementsByClassName("tab");
+        for (var i = 0; i < tabLinks.length; i++) {
+            tabLinks[i].classList.remove("text-black", "relative", "font-semibold");
+            tabLinks[i].classList.add("text-gray-500");
+            var underline = tabLinks[i].getElementsByTagName("div")[0];
+            underline.style.display = "none";
+        }
+
+        // Display the "Description" tab content
+        document.getElementById("tab1").style.display = "block";
+    }
 
     filterButton.addEventListener('click', function() {
         const startDate = document.getElementById('startDate').value;
@@ -127,9 +161,7 @@
                     // Update other modal elements as needed
                 }
 
-                if (!!task.files.length) {
-                    updateViewFilePreview(task.files)
-                }
+                updateViewFilePreview(task.files)
 
                 // Show the modal
                 document.getElementById('viewTask').classList.remove('hidden');
@@ -145,6 +177,8 @@
         viewPreviewContainer.innerHTML = '';
         document.getElementById('viewFilePreview').classList.add('hidden');
         document.getElementById('viewTask').classList.add('hidden');
+        // Reset the tabs to "Description"
+        resetTabs();
     }
 
     function handleEditTask(taskId) {
@@ -200,9 +234,15 @@
             viewPreviewContainer.appendChild(preview);
         }
 
-        if (!!viewFiles.length) {
-            document.getElementById('viewFilePreview').classList.remove('hidden');
+        if (viewFiles.length === 0) {
+            // If no files, create a preview indicating no files uploaded
+            const noFilePreview = document.createElement('div');
+            noFilePreview.classList = "flex text-gray-600 items-center justify-center h-full";
+            noFilePreview.textContent = 'No files uploaded.';
+            viewPreviewContainer.appendChild(noFilePreview);
         }
+
+        document.getElementById('viewFilePreview').classList.remove('hidden');
     }
 
     function toggleFilePreviewVisibility() {
@@ -260,7 +300,7 @@
         fileNameContainer.className = 'flex flex-col w-full';
 
         const fileName = document.createElement('div');
-        fileName.className = 'w-full truncate';
+        fileName.className = 'w-full text-gray-600 truncate';
         fileName.textContent = file.filename;
 
         const fileDetailsContainer = document.createElement('div');
