@@ -8,7 +8,7 @@ $departments = json_decode($departmentsJson, true);
 ?>
 
 <div id="createUserModalOverlay" class="select-none fixed inset-0 bg-gray-500 bg-opacity-50 flex items-center justify-center hidden z-50" onclick="closeCreateUserModal()">
-    <div class="bg-white p-8 rounded shadow-md w-96" onclick="event.stopPropagation();">
+    <div class="bg-white p-4 rounded shadow-md w-96" onclick="event.stopPropagation();">
         <h2 class="text-2xl mb-4">Create User</h2>
         <form id="createUserForm">
             <div class="mb-4">
