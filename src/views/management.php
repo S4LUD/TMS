@@ -2,7 +2,7 @@
 <button id="openCreateUserModal" class="font-semibold bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 hover:text-gray-100 transition duration-75">Create a user</button>
 
 <div class="bg-white p-4 mt-4 border rounded">
-    <form id="searchForm" onsubmit="return false;" class="select-none">
+    <form onsubmit="return false;" class="select-none">
         <div class="flex flex-col sm:flex-row gap-1">
             <input type="text" id="searchAccount" name="searchAccount" placeholder="Search username, id" class="border rounded-md py-2 px-4 focus:outline-none focus:border-blue-500 transition duration-75">
             <button type="button" id="searchButton" class="font-semibold bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 hover:text-gray-100 transition duration-75 min-w-50 max-w-50">Search</button>
@@ -33,7 +33,6 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const searchForm = document.getElementById('searchForm');
         const createUserForm = document.getElementById('createUserForm');
         const searchButton = document.getElementById('searchButton');
         const clearButton = document.getElementById('clearButton');

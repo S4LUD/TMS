@@ -49,11 +49,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $pdo->commit();
 
             echo json_encode([
-                'message' => 'Data received and inserted successfully',
+                'message' => 'Successfully created task',
             ]);
         } else {
-            // Handle task creation failure
-            throw new Exception('Task creation failed.');
+            echo json_encode([
+                'message' => 'Task creation failed',
+            ]);
         }
     } catch (Exception $e) {
         // An error occurred, rollback the transaction
