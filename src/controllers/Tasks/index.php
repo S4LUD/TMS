@@ -69,10 +69,27 @@ class Tasks
     {
         global $db;
 
-        $stmt = $db->prepare("SELECT tasks.title, tasks.detail, tasks.createdAt, tasks.updatedAt, tasks.startedAt, tasks.endedAt, files.filename, files.file_size, files.file_destination
-                        FROM tasks LEFT JOIN files
-                        ON tasks.id = files.task_id
-                        WHERE tasks.id = :task_id");
+        $stmt = $db->prepare(
+            "SELECT 
+                tasks.title, 
+                tasks.detail, 
+                CASE WHEN tasks.dueAt IS NULL THEN 'Not Set' ELSE tasks.dueAt END AS dueAt,
+                COALESCE(users.username, 'N/A') AS assigned,
+                tasks.createdAt, 
+                tasks.updatedAt, 
+                tasks.startedAt, 
+                tasks.endedAt, 
+                files.filename, 
+                files.file_size, 
+                files.file_destination,
+                task_status.status
+            FROM 
+                tasks 
+                LEFT JOIN files ON tasks.id = files.task_id 
+                JOIN task_status ON tasks.status_id = task_status.id 
+                LEFT JOIN users ON tasks.user_id = users.id
+            WHERE tasks.id = :task_id"
+        );
         $stmt->bindParam(':task_id', $task_id);
         $stmt->execute();
         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -84,6 +101,9 @@ class Tasks
         $formattedResult = [
             'title' => $results[0]['title'],
             'detail' => $results[0]['detail'],
+            'assigned' => $results[0]['assigned'],
+            'status' => $results[0]['status'],
+            'dueAt' => $results[0]['dueAt'],
             'createdAt' => $results[0]['createdAt'],
             'updatedAt' => $results[0]['updatedAt'],
             'startedAt' => $results[0]['startedAt'],
