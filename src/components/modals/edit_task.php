@@ -27,7 +27,7 @@
                 </div>
                 <div id="fileEditPreview" class="flex gap-1 flex-row overflow-y-auto mt-1"></div>
             </div>
-            <div id="fileDBEditPreviewContainer" class="hidden mt-4">
+            <div id="fileDBEditPreviewContainer" class="mt-4 hidden">
                 <div>
                     Uploaded Files
                 </div>

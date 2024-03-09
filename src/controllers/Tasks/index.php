@@ -125,38 +125,21 @@ class Tasks
         return json_encode([$formattedResult]);
     }
 
-    // public static function viewTask($task_id)
-    // {
-    //     global $db;
+    public static function updateTask($taskId, $title, $details)
+    {
+        global $db;
 
-    //     $stmt = $db->prepare("SELECT tasks.title, tasks.detail, tasks.createdAt, tasks.updatedAt, tasks.startedAt, tasks.endedAt, files.filename, files.file_size, files.file_destination
-    //                     FROM tasks JOIN files
-    //                     ON tasks.id = files.task_id
-    //                     WHERE tasks.id = :task_id");
-    //     $stmt->bindParam(':task_id', $task_id);
-    //     $stmt->execute();
-    //     $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $stmt = $db->prepare("UPDATE `tasks` SET `title` = :title, `detail` = :details WHERE `id` = :taskId");
+        $stmt->bindParam(':taskId', $taskId);
+        $stmt->bindParam(':title', $title);
+        $stmt->bindParam(':details', $details);
+        $stmt->execute();
 
-    //     if (empty($results)) {
-    //         return json_encode([]); // No task found
-    //     }
-
-    //     $formattedResult = [
-    //         'title' => $results[0]['title'],
-    //         'detail' => $results[0]['detail'],
-    //         'createdAt' => $results[0]['createdAt'],
-    //         'updatedAt' => $results[0]['updatedAt'],
-    //         'startedAt' => $results[0]['startedAt'],
-    //         'endedAt' => $results[0]['endedAt'],
-    //         'files' => array_map(function ($file) {
-    //             return [
-    //                 'filename' => $file['filename'],
-    //                 'file_size' => $file['file_size'],
-    //                 'file_destination' => $file['file_destination'],
-    //             ];
-    //         }, $results),
-    //     ];
-
-    //     return json_encode([$formattedResult]);
-    // }
+        // Check if any rows were affected (to ensure the task with the given ID exists)
+        if ($stmt->rowCount() > 0) {
+            return true; // Update successful
+        } else {
+            return false; // Task with the given ID not found
+        }
+    }
 }

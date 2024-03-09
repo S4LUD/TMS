@@ -10,6 +10,7 @@ fileEditPreview.addEventListener("dragover", (e) => handleEditDragOver(e));
 fileEditPreview.addEventListener("drop", (e) => handleEditDrop(e));
 
 async function handleEditTask(taskId) {
+  localStorage.setItem("taskId", taskId);
   try {
     const response = await fetch(
       `http://localhost/tms/api/viewtask?task_id=${taskId}`
@@ -48,6 +49,7 @@ function clearEditInputs() {
   document.getElementById("edit_task_title").value = "";
   document.getElementById("edit_task_details").value = "";
   document.getElementById("fileEditPreviewContainer").classList.add("hidden");
+  document.getElementById("fileDBEditPreviewContainer").classList.add("hidden");
 }
 
 function removeEditFile(file) {
@@ -217,6 +219,7 @@ async function submitEditTask(event) {
   // Access form fields
   const title = document.getElementById("edit_task_title").value;
   const details = document.getElementById("edit_task_details").value;
+  const taskId = localStorage.getItem("taskId");
 
   // Check if the number of files exceeds the limit
   if (selectedEditFiles.length > 5) {
@@ -230,6 +233,7 @@ async function submitEditTask(event) {
   // Append form fields to FormData
   formData.append("title", title);
   formData.append("details", details);
+  formData.append("taskId", taskId);
 
   let filesExceedSizeLimit = false;
 
@@ -254,40 +258,40 @@ async function submitEditTask(event) {
   }
 
   // Perform API request using fetch
-  // await fetch("http://localhost/tms/api/createtask/", {
-  //   method: "POST",
-  //   body: formData,
-  // })
-  //   .then((response) => response.json())
-  //   .then((result) => {
-  //     if (result.message) {
-  //       Toastify({
-  //         text: result.message,
-  //         duration: 5000,
-  //         gravity: "top", // `top` or `bottom`
-  //         position: "right", // `left`, `center` or `right`
-  //         stopOnFocus: true, // Prevents dismissing of toast on hover
-  //         style: {
-  //           background: "#3CA2FA",
-  //         },
-  //       }).showToast();
-  //       closeCreateTaskModal();
-  //       fetchTasks();
-  //     } else if (result.error) {
-  //       Toastify({
-  //         text: result.error,
-  //         duration: 5000,
-  //         gravity: "top", // `top` or `bottom`
-  //         position: "right", // `left`, `center` or `right`
-  //         stopOnFocus: true, // Prevents dismissing of toast on hover
-  //         style: {
-  //           background: "#FA3636",
-  //         },
-  //       }).showToast();
-  //     }
-  //   })
-  //   .catch((error) => {
-  //     // Handle errors
-  //     console.error("Error:", error);
-  //   });
+  await fetch("http://localhost/tms/api/updatetask/", {
+    method: "POST",
+    body: formData,
+  })
+    .then((response) => response.json())
+    .then((result) => {
+      if (result.message) {
+        Toastify({
+          text: result.message,
+          duration: 5000,
+          gravity: "top", // `top` or `bottom`
+          position: "right", // `left`, `center` or `right`
+          stopOnFocus: true, // Prevents dismissing of toast on hover
+          style: {
+            background: "#3CA2FA",
+          },
+        }).showToast();
+        closeCreateTaskModal();
+        fetchTasks();
+      } else if (result.error) {
+        Toastify({
+          text: result.error,
+          duration: 5000,
+          gravity: "top", // `top` or `bottom`
+          position: "right", // `left`, `center` or `right`
+          stopOnFocus: true, // Prevents dismissing of toast on hover
+          style: {
+            background: "#FA3636",
+          },
+        }).showToast();
+      }
+    })
+    .catch((error) => {
+      // Handle errors
+      console.error("Error:", error);
+    });
 }
