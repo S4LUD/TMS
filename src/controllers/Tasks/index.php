@@ -78,7 +78,8 @@ class Tasks
                 tasks.createdAt, 
                 tasks.updatedAt, 
                 tasks.startedAt, 
-                tasks.endedAt, 
+                tasks.endedAt,
+                files.id AS file_id,
                 files.filename, 
                 files.file_size, 
                 files.file_destination,
@@ -113,6 +114,7 @@ class Tasks
         if (!empty($results[0]['filename'])) {
             $formattedResult['files'] = array_map(function ($file) {
                 return [
+                    'file_id' => $file['file_id'],
                     'filename' => $file['filename'],
                     'file_size' => $file['file_size'],
                     'file_destination' => $file['file_destination'],
@@ -129,17 +131,46 @@ class Tasks
     {
         global $db;
 
-        $stmt = $db->prepare("UPDATE `tasks` SET `title` = :title, `detail` = :details WHERE `id` = :taskId");
-        $stmt->bindParam(':taskId', $taskId);
+        $stmt = $db->prepare("UPDATE tasks SET title = :title, detail = :details WHERE id = :taskId");
         $stmt->bindParam(':title', $title);
         $stmt->bindParam(':details', $details);
+        $stmt->bindParam(':taskId', $taskId, PDO::PARAM_INT);
+
+        return $stmt->execute();
+    }
+
+    public static function removeFile($file_id)
+    {
+        global $db;
+
+        // Retrieve file information from the database
+        $stmt = $db->prepare("SELECT * FROM `files` WHERE `id` = :file_id");
+        $stmt->bindParam(':file_id', $file_id, PDO::PARAM_INT);
         $stmt->execute();
 
-        // Check if any rows were affected (to ensure the task with the given ID exists)
-        if ($stmt->rowCount() > 0) {
-            return true; // Update successful
-        } else {
-            return false; // Task with the given ID not found
+        $file = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($file) {
+            // Decode the JSON-encoded string to an array
+            if ($file['file_destination'] !== null) {
+                $filePath = $file['file_destination'];
+                // Use the decoded array to get the file destination
+                unlink($filePath);
+
+                // Delete the file record from the database
+                $deleteStmt = $db->prepare("DELETE FROM `files` WHERE `id` = :file_id");
+                $deleteStmt->bindParam(':file_id', $file_id, PDO::PARAM_INT);
+                $deleteStmt->execute();
+
+                // Check if any rows were affected
+                $rowCount = $deleteStmt->rowCount();
+
+                if ($rowCount > 0) {
+                    return ['message' => "file removed successfully"];; // Returns true if the file was removed successfully
+                }
+            }
         }
+
+        return ['error' => "File not found in the database"]; // File not found in the database
     }
 }

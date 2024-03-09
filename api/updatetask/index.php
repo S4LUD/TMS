@@ -4,10 +4,6 @@ require_once '../../src/controllers/Tasks/index.php';
 header('Content-Type: application/json');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Access form fields
-    $title = $_POST['title'];
-    $details = $_POST['details'];
-    $taskId = $_POST['taskId'];
 
     $uploadDirectory = $_SERVER['DOCUMENT_ROOT'] . '/tms/src/assets/uploads/';
 
@@ -16,41 +12,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $pdo->beginTransaction();
 
     try {
-        // Attempt to create a new task
-        $result = Tasks::updateTask($taskId, $title, $details);
+        if (isset($_POST['title']) && isset($_POST['details']) && isset($_POST['taskId'])) {
+            // Access form fields
+            $title = $_POST['title'];
+            $details = $_POST['details'];
+            $taskId = $_POST['taskId'];
 
-        if ($result) {
+            $result = Tasks::updateTask($taskId, $title, $details);
 
-            if (isset($_FILES['files'])) {
-                $files = $_FILES['files'];
+            if ($result) {
+                if (isset($_FILES['files'])) {
+                    $files = $_FILES['files'];
 
-                foreach ($files['tmp_name'] as $key => $tmp_name) {
-                    $file_name = $files['name'][$key];
-                    $file_size = $files['size'][$key];
-                    $file_type = $files['type'][$key];
+                    foreach ($files['tmp_name'] as $key => $tmp_name) {
+                        $file_name = $files['name'][$key];
+                        $file_size = $files['size'][$key];
+                        $file_type = $files['type'][$key];
 
-                    $uniqueFilename = time() . '_' . md5(uniqid()) . '_' . str_replace(' ', '_', $file_name);
-                    $destination = $uploadDirectory . $uniqueFilename;
+                        $uniqueFilename = time() . '_' . md5(uniqid()) . '_' . str_replace(' ', '_', $file_name);
+                        $destination = $uploadDirectory . $uniqueFilename;
 
-                    // Attempt to insert data into the database
-                    $inserted = insertTaskFile($file_name, $file_size, $destination, $taskId);
+                        // Attempt to insert data into the database
+                        $inserted = insertTaskFile($file_name, $file_size, $destination, $taskId);
 
-                    if ($inserted) {
-                        // If the insertion is successful, move the file to the destination directory
-                        move_uploaded_file($tmp_name, $destination);
-                    } else {
-                        // Handle database insertion failure
-                        throw new Exception('Updating database failed for file.');
+                        if ($inserted) {
+                            // If the insertion is successful, move the file to the destination directory
+                            move_uploaded_file($tmp_name, $destination);
+                        } else {
+                            // Handle database insertion failure
+                            throw new Exception('Updating database failed for file.');
+                        }
                     }
                 }
             }
 
-            // Commit the transaction if everything is successful
             $pdo->commit();
-
-            echo json_encode([
-                'message' => 'Successfully updated task',
-            ]);
+            echo json_encode(['message' => 'Successfully updated task']);
         } else {
             echo json_encode([
                 'message' => 'Updating task failed',

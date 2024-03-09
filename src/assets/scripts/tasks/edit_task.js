@@ -111,6 +111,83 @@ function updateDBFilePreview(viewFiles) {
   }
 }
 
+async function onRefresh() {
+  const taskId = localStorage.getItem("taskId");
+  try {
+    const response = await fetch(
+      `http://localhost/tms/api/viewtask?task_id=${taskId}`
+    );
+    const tasks = await response.json();
+
+    if (tasks && tasks.length > 0) {
+      const task = tasks[0];
+
+      const titleElement = document.getElementById("edit_task_title");
+      const detailsElement = document.getElementById("edit_task_details");
+
+      if (titleElement && detailsElement) {
+        titleElement.value = task.title;
+        detailsElement.value = task.detail;
+      }
+
+      updateDBFilePreview(task.files);
+
+      document.getElementById("editTask").classList.remove("hidden");
+    }
+  } catch (error) {
+    console.error("Error fetching task data:", error);
+  }
+}
+
+async function removeOnDB(file) {
+  // Ask for confirmation using window.confirm
+  const isConfirmed = window.confirm(
+    `Are you sure you want to remove ${file.filename}?`
+  );
+
+  // Check user's confirmation
+  if (isConfirmed) {
+    // User confirmed, proceed with removal
+    console.log(`Removing ${file.filename}...`);
+
+    await fetch(`http://localhost/tms/api/removefile?file_id=${file.file_id}`, {
+      method: "GET",
+      redirect: "follow",
+    })
+      .then((response) => response.json())
+      .then((result) => {
+        if (result.message) {
+          Toastify({
+            text: result.message,
+            duration: 5000,
+            gravity: "top", // `top` or `bottom`
+            position: "right", // `left`, `center` or `right`
+            stopOnFocus: true, // Prevents dismissing of toast on hover
+            style: {
+              background: "#3CA2FA",
+            },
+          }).showToast();
+          onRefresh();
+        } else if (result.error) {
+          Toastify({
+            text: result.error,
+            duration: 5000,
+            gravity: "top", // `top` or `bottom`
+            position: "right", // `left`, `center` or `right`
+            stopOnFocus: true, // Prevents dismissing of toast on hover
+            style: {
+              background: "#FA3636",
+            },
+          }).showToast();
+        }
+      })
+      .catch((error) => console.error(error));
+  } else {
+    // User canceled, do nothing
+    console.log("Removal canceled.");
+  }
+}
+
 function createDBEditFilePreview(file) {
   const preview = document.createElement("div");
   preview.className = "flex items-center border rounded-md p-2";
@@ -124,9 +201,18 @@ function createDBEditFilePreview(file) {
 
   const fileDetailsContainer = document.createElement("div");
   fileDetailsContainer.className = "flex items-center justify-between";
-  fileDetailsContainer.innerHTML = `<div class="text-gray-500">${formatFileSize(
-    file.file_size
-  )}</div><a class="cursor-pointer text-red-600">Remove</a>`;
+
+  const fileSizeElement = document.createElement("div");
+  fileSizeElement.className = "text-gray-500";
+  fileSizeElement.textContent = formatFileSize(file.file_size);
+
+  const removeButton = document.createElement("div");
+  removeButton.className = "cursor-pointer text-red-600";
+  removeButton.textContent = "Remove";
+  removeButton.addEventListener("click", () => removeOnDB(file));
+
+  fileDetailsContainer.appendChild(fileSizeElement);
+  fileDetailsContainer.appendChild(removeButton);
 
   fileNameContainer.appendChild(fileName);
   fileNameContainer.appendChild(fileDetailsContainer);
@@ -275,7 +361,7 @@ async function submitEditTask(event) {
             background: "#3CA2FA",
           },
         }).showToast();
-        closeCreateTaskModal();
+        closeEditTaskModal();
         fetchTasks();
       } else if (result.error) {
         Toastify({
