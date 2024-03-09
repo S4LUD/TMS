@@ -47,6 +47,24 @@
     const attachmentCount = document.getElementById('attachmentCount ');
     const selectedFiles = [];
 
+    function getStatusColor(status) {
+        switch (status.toUpperCase()) {
+            case 'DONE':
+                return 'bg-green-100 text-green-600 px-2 rounded text-sm'; // Green background for 'DONE'
+            case 'FAILED':
+            case 'REJECTED':
+            case 'LATE':
+                return 'bg-red-100 text-red-600 px-2 rounded text-sm'; // Red background for 'FAILED', 'REJECTED', 'LATE'
+            case 'PENDING':
+                return 'bg-yellow-100 text-yellow-600 px-2 rounded text-sm'; // Yellow background for 'PENDING'
+            case 'IN REVIEW':
+            case 'IN PROGRESS':
+                return 'bg-blue-100 text-blue-600 px-2 rounded text-sm'; // Blue background for 'IN REVIEW', 'IN PROGRESS'
+            default:
+                return 'bg-gray-100 text-gray-600 px-2 rounded text-sm'; // Default gray background
+        }
+    }
+
     function openTab(evt, tabName) {
         var i, tabContent, tabLinks;
         tabContent = document.getElementsByClassName("tab-content");
@@ -130,6 +148,21 @@
         }
     }
 
+    function formatReadableDate(dateString) {
+        const date = new Date(dateString);
+
+        const options = {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: 'numeric',
+            minute: 'numeric',
+            hour12: true
+        };
+
+        return date.toLocaleDateString('en-PH', options);
+    }
+
     async function handleViewTask(taskId) {
         try {
             const response = await fetch(`http://localhost/tms/api/viewtask?task_id=${taskId}`);
@@ -149,6 +182,18 @@
                 }
 
                 updateViewFilePreview(task.files)
+
+                var task_status = document.getElementById('task_status');
+                task_status.className = getStatusColor(task?.status);
+                task_status.innerText = task?.status;
+
+                var task_assigned = document.getElementById('task_assigned');
+                task_assigned.className = 'text-sm';
+                task_assigned.innerText = task?.assigned;
+
+                var due_date = document.getElementById('due_date');
+                due_date.className = 'text-sm';
+                due_date.innerText = task?.dueAt === "Not Set" ? "Not Set" : formatReadableDate(task?.dueAt);
 
                 var tabLinks = document.getElementsByClassName("tab");
                 var tabContent = document.getElementsByClassName("tab-content");
