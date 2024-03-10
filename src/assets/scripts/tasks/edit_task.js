@@ -17,18 +17,16 @@ async function handleEditTask(taskId) {
     );
     const tasks = await response.json();
 
-    if (tasks && tasks.length > 0) {
-      const task = tasks[0];
-
+    if (tasks) {
       const titleElement = document.getElementById("edit_task_title");
       const detailsElement = document.getElementById("edit_task_details");
 
       if (titleElement && detailsElement) {
-        titleElement.value = task.title;
-        detailsElement.value = task.detail;
+        titleElement.value = tasks.title;
+        detailsElement.value = tasks.detail;
       }
 
-      updateDBFilePreview(task.files);
+      updateDBFilePreview(tasks.files);
 
       document.getElementById("editTask").classList.remove("hidden");
     }
@@ -119,20 +117,18 @@ async function onRefresh() {
     );
     const tasks = await response.json();
 
-    if (tasks && tasks.length > 0) {
-      const task = tasks[0];
-
+    if (tasks) {
       const titleElement = document.getElementById("edit_task_title");
       const detailsElement = document.getElementById("edit_task_details");
 
       if (titleElement && detailsElement) {
-        titleElement.value = task.title;
-        detailsElement.value = task.detail;
+        titleElement.value = tasks.title;
+        detailsElement.value = tasks.detail;
       }
 
-      updateDBFilePreview(task.files);
+      updateDBFilePreview(tasks.files);
 
-      if (!task.files.length) {
+      if (!tasks.files.length) {
         fileDBEditPreview.innerHTML = "";
         document
           .getElementById("fileDBEditPreviewContainer")

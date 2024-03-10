@@ -51,13 +51,17 @@ function updateTable(tasks) {
                 </td>
                 <td class="whitespace-nowrap px-3 py-4 text-gray-500">${formattedDate}</td>
                 <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right sm:pr-6">
-                    <span class="bg-blue-500 hover:bg-blue-600 text-white hover:text-gray-100 px-2 py-1 rounded view-btn" style="cursor: pointer">VIEW</span>
-                    <span class="bg-yellow-500 hover:bg-yellow-600 text-white hover:text-gray-100 px-2 py-1 rounded edit-btn" style="cursor: pointer">EDIT</span>
+                    <span class="bg-red-500 hover:bg-red-600 text-white hover:text-gray-100 px-2 py-1 rounded delete-btn" style="cursor: pointer"><i class="fa-solid fa-trash-can"></i></span>
+                    <span class="bg-blue-500 hover:bg-blue-600 text-white hover:text-gray-100 px-2 py-1 rounded view-btn" style="cursor: pointer"><i class="fa-solid fa-eye"></i></span>
+                    <span class="bg-yellow-500 hover:bg-yellow-600 text-white hover:text-gray-100 px-2 py-1 rounded edit-btn" style="cursor: pointer"><i class="fa-solid fa-pen-to-square"></i></span>
                 </td>
             `;
       taskTable.appendChild(row);
 
       // Add event listeners to VIEW and EDIT buttons
+      row
+        .querySelector(".delete-btn")
+        .addEventListener("click", () => handleDeleteTask(task.id));
       row
         .querySelector(".view-btn")
         .addEventListener("click", () => handleViewTask(task.id));

@@ -23,33 +23,33 @@ async function handleViewTask(taskId) {
     );
     const tasks = await response.json();
 
-    if (tasks && tasks.length > 0) {
-      const task = tasks[0];
-
+    if (tasks) {
       // Update modal elements with task data
       const titleElement = document.getElementById("taskTitle");
       const detailsElement = document.getElementById("taskDetailsContent");
 
       if (titleElement && detailsElement) {
-        titleElement.innerHTML = task.title;
-        detailsElement.innerHTML = task.detail;
+        titleElement.innerHTML = tasks.title;
+        detailsElement.innerHTML = tasks.detail;
         // Update other modal elements as needed
       }
 
-      updateViewFilePreview(task.files);
+      updateViewFilePreview(tasks.files);
 
       var task_status = document.getElementById("task_status");
-      task_status.className = getStatusColor(task?.status);
-      task_status.innerText = task?.status;
+      task_status.className = getStatusColor(tasks?.status);
+      task_status.innerText = tasks?.status;
 
       var task_assigned = document.getElementById("task_assigned");
       task_assigned.className = "text-sm";
-      task_assigned.innerText = task?.assigned;
+      task_assigned.innerText = tasks?.assigned;
 
       var due_date = document.getElementById("due_date");
       due_date.className = "text-sm";
       due_date.innerText =
-        task?.dueAt === "Not Set" ? "Not Set" : formatReadableDate(task?.dueAt);
+        tasks?.dueAt === "Not Set"
+          ? "Not Set"
+          : formatReadableDate(tasks?.dueAt);
 
       var tabLinks = document.getElementsByClassName("tab");
       var tabContent = document.getElementsByClassName("tab-content");
