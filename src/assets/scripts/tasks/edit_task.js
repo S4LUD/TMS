@@ -152,9 +152,6 @@ async function removeOnDB(file) {
 
   // Check user's confirmation
   if (isConfirmed) {
-    // User confirmed, proceed with removal
-    console.log(`Removing ${file.filename}...`);
-
     await fetch(`http://localhost/tms/api/removefile?file_id=${file.file_id}`, {
       method: "GET",
       redirect: "follow",
