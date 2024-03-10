@@ -4,13 +4,13 @@ require_once '../../src/controllers/Tasks/index.php';
 
 header('Content-Type: application/json');
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $pdo = Tasks::getPDO();
     $pdo->beginTransaction();
 
     try {
-        if (isset($_POST['task_id']) && !empty($_POST['task_id'])) {
-            $task_id = $_POST['task_id'];
+        if (isset($_GET['task_id']) && !empty($_GET['task_id'])) {
+            $task_id = $_GET['task_id'];
 
             $result = Tasks::viewTask($task_id);
             $resultArray = json_decode($result, true);
