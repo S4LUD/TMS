@@ -6,12 +6,12 @@
         </div>
         <form id="createTaskForm" method="POST" onsubmit="submitEditTask(event)">
             <div class="mb-4">
-                <label for="title" class="block text-gray-700">Title:</label>
+                <label for="edit_task_title" class="block text-gray-700">Title:</label>
                 <input type="text" id="edit_task_title" name="title" class="w-full border rounded-md py-2 px-3 focus:outline-none focus:border-blue-500 transition duration-75" required>
             </div>
 
             <div class="mb-4">
-                <label for="details" class="block text-gray-700">Details:</label>
+                <label for="edit_task_details" class="block text-gray-700">Details:</label>
                 <textarea id="edit_task_details" name="details" class="w-full border rounded-md py-2 px-3 focus:outline-none focus:border-blue-500 transition duration-75" required></textarea>
             </div>
 
@@ -27,7 +27,7 @@
                 </div>
                 <div id="fileEditPreview" class="flex gap-1 flex-row overflow-y-auto mt-1"></div>
             </div>
-            <div id="fileDBEditPreviewContainer" class="hidden mt-4">
+            <div id="fileDBEditPreviewContainer" class="mt-4 hidden">
                 <div>
                     Uploaded Files
                 </div>

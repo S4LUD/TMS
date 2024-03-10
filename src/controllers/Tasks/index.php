@@ -78,7 +78,8 @@ class Tasks
                 tasks.createdAt, 
                 tasks.updatedAt, 
                 tasks.startedAt, 
-                tasks.endedAt, 
+                tasks.endedAt,
+                files.id AS file_id,
                 files.filename, 
                 files.file_size, 
                 files.file_destination,
@@ -113,6 +114,7 @@ class Tasks
         if (!empty($results[0]['filename'])) {
             $formattedResult['files'] = array_map(function ($file) {
                 return [
+                    'file_id' => $file['file_id'],
                     'filename' => $file['filename'],
                     'file_size' => $file['file_size'],
                     'file_destination' => $file['file_destination'],
@@ -125,38 +127,50 @@ class Tasks
         return json_encode([$formattedResult]);
     }
 
-    // public static function viewTask($task_id)
-    // {
-    //     global $db;
+    public static function updateTask($taskId, $title, $details)
+    {
+        global $db;
 
-    //     $stmt = $db->prepare("SELECT tasks.title, tasks.detail, tasks.createdAt, tasks.updatedAt, tasks.startedAt, tasks.endedAt, files.filename, files.file_size, files.file_destination
-    //                     FROM tasks JOIN files
-    //                     ON tasks.id = files.task_id
-    //                     WHERE tasks.id = :task_id");
-    //     $stmt->bindParam(':task_id', $task_id);
-    //     $stmt->execute();
-    //     $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $stmt = $db->prepare("UPDATE tasks SET title = :title, detail = :details WHERE id = :taskId");
+        $stmt->bindParam(':title', $title);
+        $stmt->bindParam(':details', $details);
+        $stmt->bindParam(':taskId', $taskId, PDO::PARAM_INT);
 
-    //     if (empty($results)) {
-    //         return json_encode([]); // No task found
-    //     }
+        return $stmt->execute();
+    }
 
-    //     $formattedResult = [
-    //         'title' => $results[0]['title'],
-    //         'detail' => $results[0]['detail'],
-    //         'createdAt' => $results[0]['createdAt'],
-    //         'updatedAt' => $results[0]['updatedAt'],
-    //         'startedAt' => $results[0]['startedAt'],
-    //         'endedAt' => $results[0]['endedAt'],
-    //         'files' => array_map(function ($file) {
-    //             return [
-    //                 'filename' => $file['filename'],
-    //                 'file_size' => $file['file_size'],
-    //                 'file_destination' => $file['file_destination'],
-    //             ];
-    //         }, $results),
-    //     ];
+    public static function removeFile($file_id)
+    {
+        global $db;
 
-    //     return json_encode([$formattedResult]);
-    // }
+        // Retrieve file information from the database
+        $stmt = $db->prepare("SELECT * FROM `files` WHERE `id` = :file_id");
+        $stmt->bindParam(':file_id', $file_id, PDO::PARAM_INT);
+        $stmt->execute();
+
+        $file = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($file) {
+            // Decode the JSON-encoded string to an array
+            if ($file['file_destination'] !== null) {
+                $filePath = $file['file_destination'];
+                // Use the decoded array to get the file destination
+                unlink($filePath);
+
+                // Delete the file record from the database
+                $deleteStmt = $db->prepare("DELETE FROM `files` WHERE `id` = :file_id");
+                $deleteStmt->bindParam(':file_id', $file_id, PDO::PARAM_INT);
+                $deleteStmt->execute();
+
+                // Check if any rows were affected
+                $rowCount = $deleteStmt->rowCount();
+
+                if ($rowCount > 0) {
+                    return ['message' => "file removed successfully"];; // Returns true if the file was removed successfully
+                }
+            }
+        }
+
+        return ['error' => "File not found in the database"]; // File not found in the database
+    }
 }
