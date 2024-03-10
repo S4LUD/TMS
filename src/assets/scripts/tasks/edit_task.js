@@ -132,7 +132,12 @@ async function onRefresh() {
 
       updateDBFilePreview(task.files);
 
-      document.getElementById("editTask").classList.remove("hidden");
+      if (!task.files.length) {
+        fileDBEditPreview.innerHTML = "";
+        document
+          .getElementById("fileDBEditPreviewContainer")
+          .classList.add("hidden");
+      }
     }
   } catch (error) {
     console.error("Error fetching task data:", error);
@@ -167,7 +172,6 @@ async function removeOnDB(file) {
               background: "#3CA2FA",
             },
           }).showToast();
-          onRefresh();
         } else if (result.error) {
           Toastify({
             text: result.error,
@@ -181,7 +185,8 @@ async function removeOnDB(file) {
           }).showToast();
         }
       })
-      .catch((error) => console.error(error));
+      .catch((error) => console.error(error))
+      .finally(() => onRefresh());
   } else {
     // User canceled, do nothing
     console.log("Removal canceled.");
