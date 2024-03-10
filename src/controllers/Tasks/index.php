@@ -124,7 +124,7 @@ class Tasks
             $formattedResult['files'] = []; // No files associated with the task
         }
 
-        return json_encode([$formattedResult]);
+        return json_encode($formattedResult);
     }
 
     public static function updateTask($taskId, $title, $details)
@@ -172,5 +172,20 @@ class Tasks
         }
 
         return ['error' => "File not found in the database"]; // File not found in the database
+    }
+
+    public static function deleteTask($task_id)
+    {
+        global $db;
+
+        // Delete task from the database
+        $stmt = $db->prepare("DELETE FROM tasks WHERE id = :task_id");
+        $stmt->bindParam(':task_id', $task_id, PDO::PARAM_INT);
+        $stmt->execute();
+
+        // Check if any rows were affected
+        $rowCount = $stmt->rowCount();
+
+        return $rowCount > 0; // Returns true if the task was deleted successfully
     }
 }

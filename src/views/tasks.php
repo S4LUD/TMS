@@ -36,3 +36,4 @@
 <script src="/tms/src/assets/scripts/tasks/create_task.js"></script>
 <script src="/tms/src/assets/scripts/tasks/view_task.js"></script>
 <script src="/tms/src/assets/scripts/tasks/edit_task.js"></script>
+<script src="/tms/src/assets/scripts/tasks/delete_task.js"></script>
