@@ -1,72 +1,73 @@
 <?php
 
-// Assume you have fetched the weekly report and user performance data
-$weeklyReportData = getWeeklyReport(); // Replace with the actual function or method to fetch weekly report data
-$usersPerformanceData = getUsersPerformance(); // Replace with the actual function or method to fetch user performance data
+// Import the necessary controller classes
+require_once '../../src/controllers/Users/index.php';
+require_once '../../src/controllers/Tasks/index.php';
 
-$response = [
-    "weekly_report" => formatWeeklyReport($weeklyReportData),
-    "users_performance" => formatUsersPerformance($usersPerformanceData),
-];
 
-echo json_encode($response);
 
-function formatWeeklyReport($weeklyReportData)
+// Define the endpoint function
+function fetchPerformance()
 {
-    $formattedWeeklyReport = [];
+    function getCurrentWeekDates()
+    {
+        // Get the current date
+        $currentDate = new DateTime();
 
-    foreach ($weeklyReportData as $week) {
-        $formattedWeeklyReport[] = [
-            "from_date" => $week["from_date"],
-            "to_date" => $week["to_date"],
-            "status_score" => [
-                "done" => $week["status"] === "DONE" ? $week["status_count"] : 0,
-                "failed" => $week["status"] === "FAILED" ? $week["status_count"] : 0,
-                "rejected" => $week["status"] === "REJECTED" ? $week["status_count"] : 0,
-                "pending" => $week["status"] === "PENDING" ? $week["status_count"] : 0,
-                "late" => $week["status"] === "LATE" ? $week["status_count"] : 0,
-                "in_review" => $week["status"] === "IN REVIEW" ? $week["status_count"] : 0,
-                "in_progress" => $week["status"] === "IN PROGRESS" ? $week["status_count"] : 0,
-            ],
+        // Set the current date to the start of the week (Monday)
+        $currentDate->modify('this week');
+
+        // Get the Monday of the current week
+        $mondayDate = $currentDate->format('Y-m-d');
+
+        // Set the current date to the end of the week (Sunday)
+        $currentDate->modify('this week +6 days');
+
+        // Get the Sunday of the current week
+        $sundayDate = $currentDate->format('Y-m-d');
+
+        return array('monday' => $mondayDate, 'sunday' => $sundayDate);
+    }
+
+    // Call the fetchPerformance function from the Users controller
+    $usersPerformance = Users::fetchPerformance();
+
+    // Call the fetchPerformance function from the Tasks controller
+    $tasksPerformance = Tasks::fetchPerformance();
+
+    $tasksCount = Tasks::fetchAllTasks(getCurrentWeekDates()['monday'], getCurrentWeekDates()['sunday']);
+
+    // Combine the results into a single response
+    if (is_array(json_decode($tasksCount, true))) {
+        $response = [
+            'tasks_count' => count(json_decode($tasksCount, true)),
+            'users_performance' => json_decode($usersPerformance, true),
+            'tasks_performance' => json_decode($tasksPerformance, true)
+        ];
+    } else {
+        // Handle the case where $tasksCount is not an array
+        // For example, you can set 'tasks_count' to 0 or display an error message
+        $response = [
+            'tasks_count' => 0,
+            'users_performance' => json_decode($usersPerformance, true),
+            'tasks_performance' => json_decode($tasksPerformance, true)
+            // You can add additional error handling here if needed
         ];
     }
 
-    return $formattedWeeklyReport;
+    // Return the combined response
+    return json_encode($response);
 }
 
-function formatUsersPerformance($usersPerformanceData)
-{
-    $formattedUsersPerformance = [];
+// Handle the request
+if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+    // Set the HTTP response header to indicate JSON content
+    header('Content-Type: application/json');
 
-    foreach ($usersPerformanceData as $user) {
-        $formattedUsersPerformance[] = [
-            "username" => $user["username"],
-            "done" => $user["done"],
-            "failed" => $user["failed"],
-            "in_progress" => $user["in_progress"],
-        ];
-    }
-
-    return $formattedUsersPerformance;
-}
-
-// Replace these functions with your actual database queries or API calls
-function getWeeklyReport()
-{
-    // Your logic to fetch weekly report data from the database or API
-    // Example data for illustration purposes
-    return [
-        ["from_date" => "2024-03-03 00:00:00", "to_date" => "2024-03-09 23:59:59", "status" => "DONE", "status_count" => 0],
-        ["from_date" => "2024-03-10 00:00:00", "to_date" => "2024-03-16 23:59:59", "status" => "IN PROGRESS", "status_count" => 0],
-    ];
-}
-
-function getUsersPerformance()
-{
-    // Your logic to fetch user performance data from the database or API
-    // Example data for illustration purposes
-    return [
-        ["username" => "User1", "done" => 0, "failed" => 0, "in_progress" => 0],
-        ["username" => "User2", "done" => 0, "failed" => 0, "in_progress" => 0],
-    ];
+    // Call the fetchPerformance function and echo the result
+    echo fetchPerformance();
+} else {
+    // If the request method is not GET, return a 405 Method Not Allowed error
+    http_response_code(405);
+    echo json_encode(['error' => 'Method Not Allowed']);
 }

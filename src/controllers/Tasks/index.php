@@ -188,4 +188,56 @@ class Tasks
 
         return $rowCount > 0; // Returns true if the task was deleted successfully
     }
+
+    public static function fetchPerformance()
+    {
+        global $db;
+
+        // Initialize status counts
+        $statuses = [
+            "DONE" => 0,
+            "FAILED" => 0,
+            "REJECTED" => 0,
+            "PENDING" => 0,
+            "LATE" => 0,
+            "IN_REVIEW" => 0,
+            "IN_PROGRESS" => 0
+        ];
+
+        try {
+            $weekDates = getCurrentWeekDates();
+
+            $stmt = $db->prepare("SELECT
+            task_status.status,
+            COUNT(*) AS status_count
+        FROM
+            tasks
+        LEFT JOIN
+            task_status ON tasks.status_id = task_status.id
+        WHERE
+            DATE(tasks.createdAt) BETWEEN :start_date AND :end_date
+        GROUP BY
+            task_status.status
+        ORDER BY
+            task_status.status");
+
+            $stmt->bindParam(':start_date', $weekDates['monday']);
+            $stmt->bindParam(':end_date', $weekDates['sunday']);
+            $stmt->execute();
+            $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            // Update status counts
+            foreach ($results as $row) {
+                $status = strtoupper($row['status']);
+                $statuses[$status] = $row['status_count'];
+            }
+
+            // Return the statuses
+            return json_encode($statuses);
+        } catch (PDOException $e) {
+            // Handle database connection error
+            http_response_code(500); // Internal Server Error
+            return json_encode(['error' => $e->getMessage()]);
+        }
+    }
 }
