@@ -49,7 +49,9 @@ function getCurrentWeekDates()
                 <div id="completion-data" class="flex items-center h-20">
                 </div>
             </div>
-            <div class="flex justify-center w-full h-fit lg:h-96 mt-3"><canvas id="tasksChart"></canvas></div>
+            <div class="w-full h-full mt-3">
+                <canvas id="tasksChart"></canvas>
+            </div>
         </div>
         <div class="flex-1 p-8">
             <div id="users_list"></div>

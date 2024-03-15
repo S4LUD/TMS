@@ -88,6 +88,9 @@ function calculateStars(userPerformance, totalTasks) {
     stars.push({
       username: user.username,
       stars: performanceRating,
+      done: user.done,
+      late: user.late,
+      failed: user.failed,
     });
   });
   return stars;
@@ -129,9 +132,25 @@ fetchDataFromAPI(apiUrl, function (apiData) {
 
   // Function to generate HTML for user stars
   function generateUserStarsHTML(usersStars) {
-    let html = '<ul class="list-none">';
+    let html = '<ul class="list-none flex flex-col gap-2">';
     usersStars.forEach((user) => {
-      html += `<li class="flex flex-col"><span>${user.username}</span><div>${displayStars(user.stars)}</div></li>`;
+      html += `<li class="flex flex-row justify-between lg:w-full min-w-72">
+        <div class="flex flex-col">
+          <span>${user.username}</span>
+          <div>${displayStars(user.stars)}</div>
+        </div>
+        <div class="flex gap-1">
+          <div class="flex justify-center items-center bg-green-500 h-fit w-6 h-5 text-sm text-white rounded">
+          ${user.done}
+          </div>
+          <div class="flex justify-center items-center bg-yellow-500 h-fit w-6 h-5 text-sm text-white rounded">
+          ${user.late}
+          </div>
+          <div class="flex justify-center items-center bg-red-500 h-fit w-6 h-5 text-sm text-white rounded">
+          ${user.failed}
+          </div>
+        </div>
+      </li>`;
     });
     html += "</ul>";
     return html;
