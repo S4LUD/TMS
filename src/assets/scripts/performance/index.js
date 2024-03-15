@@ -43,9 +43,10 @@ function calculateCompletionRate(apiData) {
 function renderCompletionData(completionData) {
   const completionDiv = document.getElementById("completion-data");
   completionDiv.innerHTML = `
-        <p>Total Tasks: ${completionData.totalTasks}</p>
-        <p>Total Completed: ${completionData.totalCompleted}</p>
-        <p>Completion Rate: ${completionData.completionRate}</p>
+        <div class="flex flex-col">
+        <p class="font-medium text-lg">Completion Rate</p>
+        <p class="font-medium text-sm text-gray-500">${completionData.totalCompleted} / ${completionData.totalTasks} tasks</p>
+        </div>
     `;
 }
 
@@ -73,12 +74,71 @@ const statusColors = {
   "IN PROGRESS": ["rgba(54, 162, 235, 0.5)", "rgba(54, 162, 235, 1)"], // Blue
 };
 
+function calculateStars(userPerformance, totalTasks) {
+  const stars = [];
+  userPerformance.forEach((user) => {
+    const totalCompletedTasks = parseInt(user.done);
+    const completedTasksScore = totalCompletedTasks * 2;
+    // Calculate performance rating based on total score and total tasks
+    const performanceRating = calculatePerformanceRating(
+      completedTasksScore,
+      parseInt(totalTasks)
+    );
+
+    stars.push({
+      username: user.username,
+      stars: performanceRating,
+    });
+  });
+  return stars;
+}
+
+function calculatePerformanceRating(totalScore, totalTasks) {
+  // Calculate percentage based on total score and total tasks
+  const percentage = (totalScore / (totalTasks * 2)) * 100; // Assuming each task has a weight of 2
+  // Assuming percentage is out of 100, mapping it to 1 to 5 stars
+  const rating = Math.ceil(percentage / 20);
+  return rating;
+}
+
+// Function to display stars based on the rating
+function displayStars(rating) {
+  let stars = "";
+  for (let i = 0; i < 5; i++) {
+    if (i < rating) {
+      stars += '<i class="fas fa-star text-yellow-500"></i>'; // Filled star
+    } else {
+      stars += '<i class="far fa-star text-gray-300"></i>'; // Empty star
+    }
+  }
+  return stars;
+}
+
 // Fetch data from the API
 fetchDataFromAPI(apiUrl, function (apiData) {
-  // Extract tasks performance data
-
   const completionData = calculateCompletionRate(apiData);
   renderCompletionRate(completionData.completionRate);
+  renderCompletionData(completionData);
+
+  const usersStars = calculateStars(
+    apiData.users_performance,
+    apiData.tasks_count
+  );
+
+  const userListDiv = document.getElementById("users_list");
+
+  // Function to generate HTML for user stars
+  function generateUserStarsHTML(usersStars) {
+    let html = '<ul class="list-none">';
+    usersStars.forEach((user) => {
+      html += `<li class="flex flex-col"><span>${user.username}</span><div>${displayStars(user.stars)}</div></li>`;
+    });
+    html += "</ul>";
+    return html;
+  }
+
+  // Update the users_list div with the generated HTML
+  userListDiv.innerHTML = generateUserStarsHTML(usersStars);
 
   var tasksPerformance = apiData.tasks_performance || {};
 
@@ -108,13 +168,13 @@ fetchDataFromAPI(apiUrl, function (apiData) {
             statusColors["IN PROGRESS"][0],
           ],
           borderColor: [
-            "rgba(75, 192, 192, 1)",
-            "rgba(255, 99, 132, 1)",
-            "rgba(255, 206, 86, 1)",
-            "rgba(54, 162, 235, 1)",
-            "rgba(153, 102, 255, 1)",
-            "rgba(255, 159, 64, 1)",
-            "rgba(231,233,237, 1)",
+            "rgba(0, 0, 0, 0)",
+            "rgba(0, 0, 0, 0)",
+            "rgba(0, 0, 0, 0)",
+            "rgba(0, 0, 0, 0)",
+            "rgba(0, 0, 0, 0)",
+            "rgba(0, 0, 0, 0)",
+            "rgba(0, 0, 0, 0)",
           ],
           borderWidth: 1,
         },
@@ -122,6 +182,11 @@ fetchDataFromAPI(apiUrl, function (apiData) {
     },
     options: {
       responsive: true,
+      plugins: {
+        legend: {
+          display: false,
+        },
+      },
       scales: {
         y: {
           ticks: {

@@ -163,8 +163,6 @@ class Users
         return json_encode($results);
     }
 
-
-
     public static function fetchPerformance()
     {
         global $db;
@@ -175,18 +173,20 @@ class Users
 
             // Prepare the SQL query with placeholders for start_date and end_date
             $sql = "SELECT
-                    users.username,
-                    SUM(CASE WHEN task_status.status = 'DONE' THEN 1 ELSE 0 END) AS done,
-                    SUM(CASE WHEN task_status.status = 'FAILED' THEN 1 ELSE 0 END) AS failed,
-                    SUM(CASE WHEN task_status.status = 'IN PROGRESS' THEN 1 ELSE 0 END) AS in_progress
-                FROM
-                    users
-                LEFT JOIN
-                    tasks ON users.id = tasks.user_id
-                LEFT JOIN task_status ON tasks.status_id = task_status.id
-                WHERE DATE(tasks.createdAt) BETWEEN :start_date AND :end_date
-                GROUP BY
-                    users.username";
+                users.username,
+                SUM(CASE WHEN task_status.status = 'DONE' THEN 1 ELSE 0 END) AS done,
+                SUM(CASE WHEN task_status.status = 'LATE' THEN 1 ELSE 0 END) AS late,
+                SUM(CASE WHEN task_status.status = 'FAILED' THEN 1 ELSE 0 END) AS failed
+            FROM
+                users
+            LEFT JOIN
+                tasks ON users.id = tasks.user_id
+            LEFT JOIN task_status ON tasks.status_id = task_status.id
+            WHERE DATE(tasks.createdAt) BETWEEN :start_date AND :end_date
+            GROUP BY
+                users.username
+            ORDER BY done DESC
+            LIMIT 10"; // Add LIMIT and OFFSET clauses
 
             // Prepare the statement
             $stmt = $db->prepare($sql);
