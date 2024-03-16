@@ -186,7 +186,7 @@ class Users
             GROUP BY
                 users.username
             ORDER BY done DESC
-            LIMIT 10"; // Add LIMIT and OFFSET clauses
+            LIMIT 5"; // Add LIMIT and OFFSET clauses
 
             // Prepare the statement
             $stmt = $db->prepare($sql);
