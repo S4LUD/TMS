@@ -1,14 +1,25 @@
-<h1 class="text-xl font-bold mb-4">Tasks</h1>
+<?php
+// Get the first day of the current month
+$firstDayOfMonth = new DateTime('first day of this month');
+
+// Get the last day of the current month
+$lastDayOfMonth = new DateTime('last day of this month');
+
+// Format the dates as required (Y-m-d)
+$firstDayOfMonthFormatted = $firstDayOfMonth->format('Y-m-d');
+$lastDayOfMonthFormatted = $lastDayOfMonth->format('Y-m-d');
+?>
+
 <button id="openCreateTaskModal" class="font-semibold bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 hover:text-gray-100 transition duration-75">Create task</button>
 <div class="bg-white p-4 mt-4 border rounded">
     <form id="searchForm" onsubmit="return false;" class="flex flex-col md:flex-row gap-1 select-none">
         <div class="flex flex-col">
             <label for="startDate">From Date:</label>
-            <input type="date" id="startDate" name="startDate" class="border rounded-md py-2 px-4 focus:outline-none focus:border-blue-500 transition duration-75">
+            <input value="<?= $firstDayOfMonthFormatted ?>" type="date" id="startDate" name="startDate" class="border rounded-md py-2 px-4 focus:outline-none focus:border-blue-500 transition duration-75">
         </div>
         <div class="flex flex-col">
             <label for="endDate">To Date:</label>
-            <input type="date" id="endDate" name="endDate" class="border rounded-md py-2 px-4 focus:outline-none focus:border-blue-500 transition duration-75">
+            <input value="<?= $lastDayOfMonthFormatted ?>" type="date" id="endDate" name="endDate" class="border rounded-md py-2 px-4 focus:outline-none focus:border-blue-500 transition duration-75">
         </div>
         <div class="flex flex-col gap-1 sm:flex-row justify-end">
             <button type="button" id="filterButton" class="h-fit font-semibold bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 hover:text-gray-100 transition duration-75 min-w-50 max-w-50 sm:self-end">Filter</button>

@@ -23,9 +23,8 @@ function getCurrentWeekDates()
 }
 ?>
 
-<h1 class="text-2xl font-bold">Employees Performance</h1>
-<div class="h-fit">
-    <div class="flex flex-col bg-white mt-4">
+<div class="h-fit bg-white border rounded mt-4">
+    <div class="flex flex-col">
         <div class="text-xl font-semibold border-b p-8">
             Weekly Performance for
             <?= getCurrentWeekDates()['monday'] ?>

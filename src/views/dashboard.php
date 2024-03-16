@@ -1,4 +1,3 @@
-<h1 class="text-2xl font-bold">Dashboard</h1>
 <div class="grid grid-cols-4 gap-4 py-5">
     <div class="flex items-center justify-between py-2 px-6 bg-gray-600 rounded">
         <div class="flex items-center">

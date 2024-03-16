@@ -32,16 +32,16 @@ $userData = json_decode($_SESSION['user'], true);
                 <span class="text-gray-200">Tasks</span>
             </a>
         </li>
-        <li class="hover:bg-gray-600 cursor-pointer rounded-md transition duration-75 <?php echo isCurrentPage('performance'); ?>">
-            <a href="/tms/performance" class="flex py-2 pl-2.5 whitespace-nowrap">
-                <div class="min-w-7 flex justify-center items-center mr-1.5"><i class="fas fa-chart-line text-lg text-gray-200"></i></div>
-                <span class="text-gray-200">Employees Performance</span>
-            </a>
-        </li>
         <li class="hover:bg-gray-600 cursor-pointer rounded-md transition duration-75 <?php echo isCurrentPage('distribution'); ?>">
             <a href="/tms/distribution" class="flex py-2 pl-2.5 whitespace-nowrap">
                 <div class="min-w-7 flex justify-center items-center mr-1.5"><i class="fas fa-people-arrows text-lg text-gray-200"></i></div>
                 <span class="text-gray-200">Distribute Task</span>
+            </a>
+        </li>
+        <li class="hover:bg-gray-600 cursor-pointer rounded-md transition duration-75 <?php echo isCurrentPage('performance'); ?>">
+            <a href="/tms/performance" class="flex py-2 pl-2.5 whitespace-nowrap">
+                <div class="min-w-7 flex justify-center items-center mr-1.5"><i class="fas fa-chart-line text-lg text-gray-200"></i></div>
+                <span class="text-gray-200">Employees Performance</span>
             </a>
         </li>
         <li class="hover:bg-gray-600 cursor-pointer rounded-md transition duration-75 <?php echo isCurrentPage('report'); ?>">
