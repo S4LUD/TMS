@@ -11,6 +11,9 @@ function fetchPerformance()
 {
     function getCurrentWeekDates()
     {
+        // Set the timezone to your desired timezone
+        date_default_timezone_set('Asia/Manila');
+        
         // Get the current date
         $currentDate = new DateTime();
 
