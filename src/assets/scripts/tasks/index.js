@@ -1,18 +1,20 @@
 const taskTable = document.getElementById("taskTable");
 const filterButton = document.getElementById("filterButton");
 
-filterButton.addEventListener("click", function () {
+filterButton.addEventListener("click", filterTask());
+
+function filterTask() {
   const startDate = document.getElementById("startDate").value;
   const endDate = document.getElementById("endDate").value;
   fetch(
-    `http://localhost/tms/api/fetchalltasks?startDate=${startDate}&endDate=${endDate}`
+    `http://localhost/tms/api/fetchalltasks?startDate=${startDate}&endDate=${endDate}&limit=${10}&offset=${1}`
   )
     .then((response) => response.json())
     .then((users) => updateTable(users));
-});
+}
 
-function fetchTasks(params) {
-  fetch(`http://localhost/tms/api/fetchalltasks`)
+function fetchTasks() {
+  fetch(`http://localhost/tms/api/fetchalltasks?limit=${10}&offset=${1}`)
     .then((response) => response.json())
     .then((tasks) => updateTable(tasks));
 }

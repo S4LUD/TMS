@@ -132,7 +132,8 @@ fetchDataFromAPI(apiUrl, function (apiData) {
 
   // Function to generate HTML for user stars
   function generateUserStarsHTML(usersStars) {
-    let html = '<ul class="list-none flex flex-col gap-2 divide-y divide-gray-200">';
+    let html =
+      '<ul class="list-none flex flex-col gap-2 divide-y divide-gray-200">';
     usersStars.forEach((user) => {
       html += `<li class="flex flex-row justify-between lg:w-full min-w-72 py-2">
         <div class="flex flex-col">
@@ -208,9 +209,7 @@ fetchDataFromAPI(apiUrl, function (apiData) {
       },
       scales: {
         y: {
-          ticks: {
-            stepSize: 1,
-          },
+          ticks: { stepSize: 5 },
         },
       },
     },

@@ -21,7 +21,6 @@ function updateTable(users) {
   } else {
     for (const user of users) {
       const row = document.createElement("tr");
-      row.id = `userRow_${user.id}`;
       row.innerHTML = `
             <td class="whitespace-nowrap py-4 pl-4 pr-3 font-medium text-gray-900 sm:pl-6">
                 ${user.username}

@@ -9,29 +9,56 @@ class Tasks
         return $db;
     }
 
+    // public static function countTaskPages($limit)
+    // {
+    //     global $db;
+    //     try {
+    //         $stmt = $db->prepare("SELECT CEIL(COUNT(*) / :limit) AS total_pages FROM tasks");
+    //         $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
+    //         $stmt->execute();
+    //         $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    //         return $result;
+    //     } catch (PDOException $e) {
+    //         return ['error' => 'Database error: ' . $e->getMessage()];
+    //     }
+    // }
+
     public static function fetchAllTasks($startDate, $endDate)
     {
         global $db;
 
-        // Initial query without WHERE clause
-        $query = "SELECT id, title, createdAt FROM tasks";
+        try {
+            $query = "SELECT id, title, createdAt, user_id FROM tasks";
 
-        if (!empty($startDate) && !empty($endDate)) {
-            // Append WHERE clause for specific date range
-            $query .= " WHERE createdAt BETWEEN :startDate AND :endDate";
+            // Check if date range is provided
+            if (!empty($startDate) && !empty($endDate)) {
+                $query .= " WHERE createdAt BETWEEN :startDate AND :endDate";
+            }
+
+            // Prepare the statement
             $stmt = $db->prepare($query);
-            $startDate .= " 00:00:00";
-            $endDate .= " 23:59:59";
-            $stmt->bindParam(':startDate', $startDate, PDO::PARAM_STR);
-            $stmt->bindParam(':endDate', $endDate, PDO::PARAM_STR);
-        } else {
-            $stmt = $db->query($query);
+
+            // Bind parameters if date range is provided
+            if (!empty($startDate) && !empty($endDate)) {
+                $startDate .= " 00:00:00";
+                $endDate .= " 23:59:59";
+                $stmt->bindParam(':startDate', $startDate, PDO::PARAM_STR);
+                $stmt->bindParam(':endDate', $endDate, PDO::PARAM_STR);
+            }
+
+            // Execute the statement
+            $stmt->execute();
+
+            // Fetch the results
+            $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            // Return JSON-encoded results
+            return json_encode($results);
+        } catch (PDOException $e) {
+            // Handle database error
+            http_response_code(500); // Internal Server Error
+            return json_encode(['error' => $e->getMessage()]);
         }
-
-        $stmt->execute();
-        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-        return json_encode($results);
     }
 
     public static function newFile($filename, $file_size, $destination,  $task_id)

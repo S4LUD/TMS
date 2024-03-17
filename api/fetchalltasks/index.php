@@ -1,19 +1,27 @@
 <?php
 require_once '../../src/controllers/Tasks/index.php';
 
-if (isset($_GET['startDate']) && isset($_GET['endDate'])) {
-    $startDate = $_GET['startDate'];
-    $endDate = $_GET['endDate'];
-
-    $result = Tasks::fetchAllTasks($startDate, $endDate);
-
+// Function to send JSON response
+function sendResponse($data)
+{
     header('Content-Type: application/json');
+    echo $data;
+    exit;
+}
 
-    echo $result;
-} else {
-    $result = Tasks::fetchAllTasks(null, null);
+// Validate and sanitize input parameters
+$startDate = isset($_GET['startDate']) ? $_GET['startDate'] : null;
+$endDate = isset($_GET['endDate']) ? $_GET['endDate'] : null;
 
-    header('Content-Type: application/json');
+try {
+    // Fetch tasks based on parameters
+    if ($startDate !== null && $endDate !== null) {
+        $result = Tasks::fetchAllTasks($startDate, $endDate);
+    } else {
+        $result = Tasks::fetchAllTasks(null, null);
+    }
 
-    echo $result;
+    sendResponse($result);
+} catch (Exception $e) {
+    sendResponse(['error' => $e->getMessage()]);
 }
