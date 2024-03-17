@@ -1,4 +1,7 @@
 <?php
+// Set the timezone to your desired timezone
+date_default_timezone_set('Asia/Manila');
+
 // Get the first day of the current month
 $firstDayOfMonth = new DateTime('first day of this month');
 
