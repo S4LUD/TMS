@@ -54,9 +54,6 @@ function formatDate(date) {
     weekday: "long",
     day: "numeric",
     month: "long",
-    hour: "numeric",
-    minute: "numeric",
-    hour12: true,
   };
   return new Intl.DateTimeFormat("en-PH", options).format(date);
 }
