@@ -28,7 +28,7 @@ class Tasks
         global $db;
 
         try {
-            $query = "SELECT id, title, createdAt, user_id FROM tasks";
+            $query = "SELECT id, title, createdAt, task_type, dueAt, user_id, startedAt, endedAt FROM tasks";
 
             // Check if date range is provided
             if (!empty($startDate) && !empty($endDate)) {

@@ -70,7 +70,6 @@ async function fetchUserData(userId) {
   return userData[0].username; // Assuming username is needed
 }
 
-// Function to update the table with tasks
 async function updateTable(tasks) {
   // Clear existing table content
   taskTable.innerHTML = "";
@@ -83,22 +82,45 @@ async function updateTable(tasks) {
   } else {
     // Iterate over tasks and populate the table rows
     for (const task of tasks) {
-      const formattedDate = formatDate(new Date(task.createdAt));
+      const dateCreated = formatDate(new Date(task.createdAt));
       let userData = "N/A"; // Default value if user_id is null or undefined
+      let dueDate = "N/A";
+      let startedAt = "N/A";
+      let endedAt = "N/A";
+      if (task?.dueAt) {
+        dueDate = formatDate(new Date(task?.dueAt));
+      }
+      if (task?.startedAt) {
+        startedAt = formatDate(new Date(task?.startedAt));
+      }
+      if (task?.endedAt) {
+        endedAt = formatDate(new Date(task?.endedAt));
+      }
       if (task.user_id) {
-        // Fetch user data only if user_id is available
         userData = await fetchUserData(task.user_id);
       }
       const row = document.createElement("tr");
       row.innerHTML = `
-                <td class="whitespace-nowrap py-4 pl-4 pr-3 font-medium text-gray-900 sm:pl-6">${task.title}</td>
+                <td class="whitespace-nowrap py-4 pl-4 pr-3 font-medium text-gray-900 sm:pl-6">${
+                  task.title
+                }</td>
                 <td class="whitespace-nowrap px-3 py-4 text-gray-500">${userData}</td>
-                <td class="whitespace-nowrap px-3 py-4 text-gray-500">${formattedDate}</td>
+                <td class="whitespace-nowrap px-3 py-4 text-gray-500">${
+                  task?.task_type ? task?.task_type : "N/A"
+                }</td>
+                <td class="whitespace-nowrap px-3 py-4 text-gray-500">${dateCreated}</td>
+                <td class="whitespace-nowrap px-3 py-4 text-gray-500">${dueDate}</td>
+                <td class="whitespace-nowrap px-3 py-4 text-gray-500">${startedAt}</td>
+                <td class="whitespace-nowrap px-3 py-4 text-gray-500">${endedAt}</td>
                 <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right sm:pr-6">
-                    <span class="bg-blue-500 hover:bg-blue-600 text-white hover:text-gray-100 px-2 py-1 rounded view-btn" style="cursor: pointer"><i class="fas fa-people-arrows"></i></span>
+                    <span class="bg-blue-500 hover:bg-blue-600 text-white hover:text-gray-100 px-2 py-1 rounded assign-btn" style="cursor: pointer"><i class="fas fa-people-arrows"></i></span>
                 </td>
             `;
       taskTable.appendChild(row);
+
+      row
+        .querySelector(".assign-btn")
+        .addEventListener("click", () => assignTask(task.id));
     }
   }
 }

@@ -28,6 +28,10 @@ async function handleEditTask(taskId) {
 
       updateDBFilePreview(tasks.files);
 
+      tasks = await fetchTasks();
+      taskCount.innerText = Math.ceil(tasks.length / itemsPerPage);
+      await updateTableForCurrentPage();
+
       document.getElementById("editTask").classList.remove("hidden");
     }
   } catch (error) {

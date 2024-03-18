@@ -140,7 +140,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   try {
     // Fetch tasks without filtering initially
     tasks = await fetchTasks();
-    taskCount.innerText = tasks.length / itemsPerPage;
+    taskCount.innerText = Math.ceil(tasks.length / itemsPerPage);
     await updateTableForCurrentPage();
   } catch (error) {
     console.error("Error fetching tasks:", error.message);

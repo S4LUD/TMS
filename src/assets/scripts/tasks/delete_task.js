@@ -36,7 +36,11 @@ async function handleDeleteTask(taskId) {
         }
       })
       .catch((error) => console.error(error))
-      .finally(() => fetchTasks());
+      .finally(async () => {
+        tasks = await fetchTasks();
+        taskCount.innerText = Math.ceil(tasks.length / itemsPerPage);
+        await updateTableForCurrentPage();
+      });
   } else {
     // User canceled, do nothing
     console.log("Task Deletion Canceled");
