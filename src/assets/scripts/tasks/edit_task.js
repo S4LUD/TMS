@@ -28,10 +28,6 @@ async function handleEditTask(taskId) {
 
       updateDBFilePreview(tasks.files);
 
-      tasks = await fetchTasks();
-      taskCount.innerText = Math.ceil(tasks.length / itemsPerPage);
-      await updateTableForCurrentPage();
-
       document.getElementById("editTask").classList.remove("hidden");
     }
   } catch (error) {
@@ -52,6 +48,7 @@ function clearEditInputs() {
   document.getElementById("edit_task_details").value = "";
   document.getElementById("fileEditPreviewContainer").classList.add("hidden");
   document.getElementById("fileDBEditPreviewContainer").classList.add("hidden");
+  localStorage.removeItem("taskId");
 }
 
 function removeEditFile(file) {

@@ -4,7 +4,7 @@
             <h2 class="text-md font-medium text-gray-500">Distribute Task</h2>
             <i onclick="closeDistribute()" class="fa-solid fa-xmark text-white bg-gray-300 hover:bg-gray-400 py-1 px-1.5 rounded-full cursor-pointer"></i>
         </div>
-        <form>
+        <form onsubmit="assigntask(event)">
             <div class="mb-4">
                 <label for="taskType" class="block text-gray-700">
                     Task Type:
@@ -20,8 +20,8 @@
                 <label for="assignTo" class="block text-gray-700">
                     Assign To:
                 </label>
-                <input onclick="openUserDropdown()" placeholder="Click to choose employee" type="text" id="assignTo" name="assignTo" class="cursor-pointer w-full border rounded-md py-2 px-3 focus:outline-none focus:border-blue-500 transition duration-75" required>
-                <div id="userdropdown" class="relative bg-red-500 hidden"> <!-- This should be hidden -->
+                <input onclick="openUserDropdown()" placeholder="Click to choose employee" type="text" id="assignTo" name="assignTo" class="cursor-pointer w-full border rounded-md py-2 px-3 focus:outline-none focus:border-blue-500 transition duration-75" required onfocus="this.blur()">
+                <div id="userdropdown" class="relative bg-red-500 hidden">
                     <div class="z-10 flex flex-col p-2 gap-2 absolute bg-white top-1 border rounded-md w-full">
                         <input type="text" id="searchUser" name="searchUser" class="w-full border rounded-md py-2 px-3 focus:outline-none focus:border-blue-500 transition duration-75" placeholder="Select employee">
                         <div id="user_list_container" class="flex flex-col gap-2">

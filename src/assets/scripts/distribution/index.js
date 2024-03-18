@@ -120,7 +120,7 @@ async function updateTable(tasks) {
 
       row
         .querySelector(".assign-btn")
-        .addEventListener("click", () => assignTask(task.id));
+        .addEventListener("click", () => openDistribute(task.id));
     }
   }
 }
