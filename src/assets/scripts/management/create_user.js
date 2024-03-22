@@ -8,7 +8,7 @@ createUserForm.addEventListener("submit", function (event) {
   const departmentId = document.getElementById("createDepartment").value;
   const roleId = document.getElementById("createRole").value;
 
-  const url = `http://localhost/tms/api/register?username=${username}&password=${password}&department_id=${departmentId}&role_id=${roleId}`;
+  const url = `https://tms-project.000webhostapp.com/api/register?username=${username}&password=${password}&department_id=${departmentId}&role_id=${roleId}`;
 
   fetch(url)
     .then((response) => response.json())

@@ -7,7 +7,7 @@ function fetchDataFromAPI(url, callback) {
 }
 
 // API URL
-var apiUrl = "http://localhost/tms/api/fetchperformance/";
+var apiUrl = "https://tms-project.000webhostapp.com/api/fetchperformance/";
 
 function calculateCompletionRate(apiData) {
   // Get the total number of tasks

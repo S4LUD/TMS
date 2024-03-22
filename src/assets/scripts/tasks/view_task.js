@@ -19,7 +19,7 @@ function formatReadableDate(dateString) {
 async function handleViewTask(taskId) {
   try {
     const response = await fetch(
-      `http://localhost/tms/api/viewtask?task_id=${taskId}`
+      `https://tms-project.000webhostapp.com/api/viewtask?task_id=${taskId}`
     );
     const tasks = await response.json();
 

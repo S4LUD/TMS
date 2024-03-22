@@ -10,7 +10,7 @@ const itemsPerPage = 10; // Number of tasks per page
 
 // Function to fetch tasks from the API
 async function fetchTasks(startDate = "", endDate = "") {
-  let url = "http://localhost/tms/api/fetchalltasks";
+  let url = "https://tms-project.000webhostapp.com/api/fetchalltasks";
 
   // Construct query parameters
   const params = new URLSearchParams();
@@ -63,7 +63,7 @@ function formatDate(date) {
 // Function to fetch user data from the API
 async function fetchUserData(userId) {
   const response = await fetch(
-    `http://localhost/tms/api/fetchallusers?searchaccount=${userId}`
+    `https://tms-project.000webhostapp.com/api/fetchallusers?searchaccount=${userId}`
   );
   if (!response.ok) {
     throw new Error(`Failed to fetch user data: ${response.statusText}`);

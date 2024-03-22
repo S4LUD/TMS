@@ -5,7 +5,7 @@ async function handleDeleteTask(taskId) {
   );
 
   if (isConfirmed) {
-    await fetch(`http://localhost/tms/api/deletetask?task_id=${taskId}`, {
+    await fetch(`https://tms-project.000webhostapp.com/api/deletetask?task_id=${taskId}`, {
       method: "POST",
       redirect: "follow",
     })

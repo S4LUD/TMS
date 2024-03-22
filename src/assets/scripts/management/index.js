@@ -1,7 +1,7 @@
 const userTable = document.getElementById("userTable");
 
 function fetchUsers() {
-  fetch(`http://localhost/tms/api/fetchallusers`)
+  fetch(`https://tms-project.000webhostapp.com/api/fetchallusers`)
     .then((response) => response.json())
     .then((users) => updateTable(users));
 }

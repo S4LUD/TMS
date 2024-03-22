@@ -13,7 +13,7 @@ async function handleEditTask(taskId) {
   localStorage.setItem("taskId", taskId);
   try {
     const response = await fetch(
-      `http://localhost/tms/api/viewtask?task_id=${taskId}`
+      `https://tms-project.000webhostapp.com/api/viewtask?task_id=${taskId}`
     );
     const tasks = await response.json();
 
@@ -114,7 +114,7 @@ async function onRefresh() {
   const taskId = localStorage.getItem("taskId");
   try {
     const response = await fetch(
-      `http://localhost/tms/api/viewtask?task_id=${taskId}`
+      `https://tms-project.000webhostapp.com/api/viewtask?task_id=${taskId}`
     );
     const tasks = await response.json();
 
@@ -149,7 +149,7 @@ async function removeOnDB(file) {
 
   // Check user's confirmation
   if (isConfirmed) {
-    await fetch(`http://localhost/tms/api/removefile?file_id=${file.file_id}`, {
+    await fetch(`https://tms-project.000webhostapp.com/api/removefile?file_id=${file.file_id}`, {
       method: "GET",
       redirect: "follow",
     })
@@ -343,7 +343,7 @@ async function submitEditTask(event) {
   }
 
   // Perform API request using fetch
-  await fetch("http://localhost/tms/api/updatetask/", {
+  await fetch("https://tms-project.000webhostapp.com/api/updatetask/", {
     method: "POST",
     body: formData,
   })
