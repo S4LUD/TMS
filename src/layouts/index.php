@@ -2,7 +2,7 @@
 session_start();
 
 if (!isset($_SESSION['user'])) {
-    header('Location: /tms/login/');
+    header("Location: /login.php");
     exit();
 }
 
@@ -20,7 +20,7 @@ if (!isset($_SESSION['user'])) {
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
-    <link rel="icon" href="/tms/src/image/logo.png" type="image/png">
+    <link rel="icon" href="/src/image/logo.png" type="image/png">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -38,19 +38,19 @@ if (!isset($_SESSION['user'])) {
 <body>
     <div id="main-container" class="flex flex-col h-screen bg-gray-100">
         <div class="flex-grow flex">
-            <?php include($_SERVER['DOCUMENT_ROOT'] . '/tms/src/components/sidemenu.php'); ?>
+            <?php include($_SERVER['DOCUMENT_ROOT'] . '/src/components/sidemenu.php'); ?>
             <div id="contentContainer" class="flex-1 flex flex-col overflow-hidden">
-                <?php include($_SERVER['DOCUMENT_ROOT'] . '/tms/src/components/header.php'); ?>
+                <?php include($_SERVER['DOCUMENT_ROOT'] . '/src/components/header.php'); ?>
                 <main class="flex-1 overflow-x-hidden overflow-y-auto bg-[#F4F6F9]">
                     <div class="p-4 h-full">
                         <?php include($_SERVER['DOCUMENT_ROOT'] . $contentView); ?>
                     </div>
                 </main>
-                <?php include($_SERVER['DOCUMENT_ROOT'] . '/tms/src/components/footer.php'); ?>
+                <?php include($_SERVER['DOCUMENT_ROOT'] . '/src/components/footer.php'); ?>
             </div>
         </div>
     </div>
-    <script src="/tms/src/assets/scripts/layout/index.js"></script>
+    <script src="/src/assets/scripts/layout/index.js"></script>
 </body>
 
 </html>

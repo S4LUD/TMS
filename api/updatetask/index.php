@@ -5,7 +5,7 @@ header('Content-Type: application/json');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-    $uploadDirectory = $_SERVER['DOCUMENT_ROOT'] . '/tms/src/assets/uploads/';
+    $uploadDirectory = $_SERVER['DOCUMENT_ROOT'] . '/src/assets/uploads/';
 
     // Start a database transaction
     $pdo = Tasks::getPDO(); // Replace with your actual method for getting a PDO instance

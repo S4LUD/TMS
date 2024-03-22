@@ -63,4 +63,4 @@ function getCurrentWeekDates()
     </div>
 </div>
 
-<script src="/tms/src/assets/scripts/performance/index.js"></script>
+<script src="/src/assets/scripts/performance/index.js"></script>

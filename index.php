@@ -1,3 +1,3 @@
 <?php
 
-header("Location: /tms/login");
+header("Location: /login.php");

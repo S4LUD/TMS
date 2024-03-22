@@ -5,7 +5,7 @@
         <p class="mb-4">Are you sure you want to logout?</p>
         <div class="flex justify-end">
             <button class=" bg-gray-500 text-white py-2 px-4 rounded-md hover:bg-gray-600 hover:text-gray-100 transition duration-75 mr-2" onclick="closeLogoutModal()">Cancel</button>
-            <a href="/tms/logout" class="bg-red-500 text-white py-2 px-4 rounded-md hover:bg-red-600 hover:text-gray-100 transition duration-75">Logout</a>
+            <a href="/logout.php" class="bg-red-500 text-white py-2 px-4 rounded-md hover:bg-red-600 hover:text-gray-100 transition duration-75">Logout</a>
         </div>
     </div>
 </div>

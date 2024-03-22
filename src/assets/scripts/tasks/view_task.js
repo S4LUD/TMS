@@ -118,7 +118,7 @@ function createviewFilePreview(file) {
   fileDetailsContainer.className = "flex items-center justify-between";
   fileDetailsContainer.innerHTML = `<div class="text-gray-500">${formatFileSize(
     file.file_size
-  )}</div><a class="text-blue-600" href="/tms/download?file=${
+  )}</div><a class="text-blue-600" href="/download.php?file=${
     file.file_destination
   }">Download</a>`;
 

@@ -37,7 +37,7 @@
             </div>
             <div class="mt-4 flex justify-end gap-2">
                 <button type="button" id="cancelButton" class="font-semibold bg-gray-500 text-white py-2 px-4 rounded-md hover:bg-gray-600 hover:text-gray-100 transition duration-75 min-w-50 max-w-50" onclick="closeDistribute()">Cancel</button>
-                <button type="submit" class="font-semibold bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 hover:text-gray-100 transition duration-75 min-w-50 max-w-50">Submit</button>
+                <button type="submit" class="font-semibold bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 hover:text-gray-100 transition duration-75 min-w-50 max-w-50">Save</button>
             </div>
         </form>
     </div>

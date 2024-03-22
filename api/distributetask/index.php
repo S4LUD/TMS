@@ -3,55 +3,27 @@ require_once '../../src/controllers/Tasks/index.php';
 
 header('Content-Type: application/json');
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-
-    $uploadDirectory = $_SERVER['DOCUMENT_ROOT'] . '/tms/src/assets/uploads/';
+if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
     // Start a database transaction
     $pdo = Tasks::getPDO(); // Replace with your actual method for getting a PDO instance
     $pdo->beginTransaction();
 
     try {
-        if (isset($_POST['task_id']) && isset($_POST['task_type']) && isset($_POST['user_id']) && isset($_POST['dueAt'])) {
+        if (isset($_GET['task_id']) && isset($_GET['task_type']) && isset($_GET['user_id']) && isset($_GET['dueAt'])) {
             // Access form fields
-            $task_type = $_POST['task_type'];
-            $user_id = $_POST['user_id'];
-            $dueAt = $_POST['dueAt'];
-            $task_id = $_POST['task_id'];
+            $task_type = $_GET['task_type'];
+            $user_id = $_GET['user_id'];
+            $dueAt = $_GET['dueAt'];
+            $task_id = $_GET['task_id'];
 
-            $result = Tasks::updateTask($task_id, $title, $details);
-
-            if ($result) {
-                if (isset($_FILES['files'])) {
-                    $files = $_FILES['files'];
-
-                    foreach ($files['tmp_name'] as $key => $tmp_name) {
-                        $file_name = $files['name'][$key];
-                        $file_size = $files['size'][$key];
-                        $file_type = $files['type'][$key];
-
-                        $uniqueFilename = time() . '_' . md5(uniqid()) . '_' . str_replace(' ', '_', $file_name);
-                        $destination = $uploadDirectory . $uniqueFilename;
-
-                        // Attempt to insert data into the database
-                        $inserted = insertTaskFile($file_name, $file_size, $destination, $taskId);
-
-                        if ($inserted) {
-                            // If the insertion is successful, move the file to the destination directory
-                            move_uploaded_file($tmp_name, $destination);
-                        } else {
-                            // Handle database insertion failure
-                            throw new Exception('Updating database failed for file.');
-                        }
-                    }
-                }
-            }
+            Tasks::distributeTask($task_id, $task_type, $user_id, $dueAt);
 
             $pdo->commit();
-            echo json_encode(['message' => 'Successfully updated task']);
+            echo json_encode(['message' => 'Successfully distributed task']);
         } else {
             echo json_encode([
-                'message' => 'Updating task failed',
+                'message' => 'Distributing task failed',
             ]);
         }
     } catch (Exception $e) {
