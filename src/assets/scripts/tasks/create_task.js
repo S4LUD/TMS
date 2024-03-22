@@ -88,8 +88,6 @@ async function submitNewTask(event) {
             background: "#3CA2FA",
           },
         }).showToast();
-        closeCreateTaskModal();
-        fetchTasks();
       } else if (result.error) {
         Toastify({
           text: result.error,
@@ -106,6 +104,12 @@ async function submitNewTask(event) {
     .catch((error) => {
       // Handle errors
       console.error("Error:", error);
+    })
+    .finally(async () => {
+      tasks = await fetchTasks();
+      taskCount.innerText = Math.ceil(tasks.length / itemsPerPage);
+      await updateTableForCurrentPage();
+      closeCreateTaskModal();
     });
 }
 

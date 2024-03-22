@@ -38,7 +38,7 @@ async function handleViewTask(taskId) {
 
       var task_status = document.getElementById("task_status");
       task_status.className = getStatusColor(tasks?.status);
-      task_status.innerText = tasks?.status;
+      task_status.innerText = formatStatus(tasks?.status);
 
       var task_assigned = document.getElementById("task_assigned");
       task_assigned.className = "text-sm";
@@ -174,10 +174,23 @@ function getStatusColor(status) {
       return "bg-red-100 text-red-600 px-2 rounded text-sm"; // Red background for 'FAILED', 'REJECTED', 'LATE'
     case "PENDING":
       return "bg-yellow-100 text-yellow-600 px-2 rounded text-sm"; // Yellow background for 'PENDING'
-    case "IN REVIEW":
-    case "IN PROGRESS":
+    case "IN_REVIEW":
+    case "IN_PROGRESS":
       return "bg-blue-100 text-blue-600 px-2 rounded text-sm"; // Blue background for 'IN REVIEW', 'IN PROGRESS'
     default:
       return "bg-gray-100 text-gray-600 px-2 rounded text-sm"; // Default gray background
+  }
+}
+
+function formatStatus(status) {
+  // Check if the status has an underscore character
+  if (status.includes("_")) {
+    // Remove the underscore character and capitalize the words
+    return status
+      .split("_")
+      .map((word) => word.charAt(0) + word.slice(1))
+      .join(" ");
+  } else {
+    return status;
   }
 }

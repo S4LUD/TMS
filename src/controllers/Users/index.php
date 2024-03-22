@@ -9,6 +9,8 @@ class Users
     public $role;
     public $status;
 
+
+
     public function __construct($id, $username, $department, $role, $status)
     {
         $this->id = $id;
@@ -57,7 +59,6 @@ class Users
 
         return json_encode($users);
     }
-
 
     public static function countUsersByRole()
     {
@@ -160,5 +161,52 @@ class Users
         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         return json_encode($results);
+    }
+
+    public static function fetchPerformance()
+    {
+        global $db;
+
+        try {
+            // Get the current week's start and end dates
+            $weekDates = getCurrentWeekDates();
+
+            // Prepare the SQL query with placeholders for start_date and end_date
+            $sql = "SELECT
+                users.username,
+                SUM(CASE WHEN task_status.status = 'DONE' THEN 1 ELSE 0 END) AS done,
+                SUM(CASE WHEN task_status.status = 'LATE' THEN 1 ELSE 0 END) AS late,
+                SUM(CASE WHEN task_status.status = 'FAILED' THEN 1 ELSE 0 END) AS failed
+            FROM
+                users
+            LEFT JOIN
+                tasks ON users.id = tasks.user_id
+            LEFT JOIN task_status ON tasks.status_id = task_status.id
+            WHERE DATE(tasks.createdAt) BETWEEN :start_date AND :end_date
+            GROUP BY
+                users.username
+            ORDER BY done DESC
+            LIMIT 5"; // Add LIMIT and OFFSET clauses
+
+            // Prepare the statement
+            $stmt = $db->prepare($sql);
+
+            // Bind the parameters
+            $stmt->bindParam(':start_date', $weekDates['monday']);
+            $stmt->bindParam(':end_date', $weekDates['sunday']);
+
+            // Execute the statement
+            $stmt->execute();
+
+            // Fetch the results
+            $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            // Return the results as JSON
+            return json_encode($results);
+        } catch (PDOException $e) {
+            // Handle database connection error
+            http_response_code(500); // Internal Server Error
+            return json_encode(['error' => $e->getMessage()]);
+        }
     }
 }

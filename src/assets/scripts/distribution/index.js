@@ -58,42 +58,69 @@ function formatDate(date) {
   return new Intl.DateTimeFormat("en-PH", options).format(date);
 }
 
+// Function to fetch user data from the API
+async function fetchUserData(userId) {
+  const response = await fetch(
+    `http://localhost/tms/api/fetchallusers?searchaccount=${userId}`
+  );
+  if (!response.ok) {
+    throw new Error(`Failed to fetch user data: ${response.statusText}`);
+  }
+  const userData = await response.json();
+  return userData[0].username; // Assuming username is needed
+}
+
 async function updateTable(tasks) {
   // Clear existing table content
   taskTable.innerHTML = "";
 
   if (tasks.length === 0) {
+    // If no tasks found, display a message
     const row = document.createElement("tr");
     row.innerHTML = `<td colspan="4" class="text-center py-3">No tasks found.</td>`;
     taskTable.appendChild(row);
   } else {
+    // Iterate over tasks and populate the table rows
     for (const task of tasks) {
-      const formattedDate = formatDate(new Date(task.createdAt));
+      const dateCreated = formatDate(new Date(task.createdAt));
+      let userData = "N/A"; // Default value if user_id is null or undefined
+      let dueDate = "N/A";
+      let startedAt = "N/A";
+      let endedAt = "N/A";
+      if (task?.dueAt) {
+        dueDate = formatDate(new Date(task?.dueAt));
+      }
+      if (task?.startedAt) {
+        startedAt = formatDate(new Date(task?.startedAt));
+      }
+      if (task?.endedAt) {
+        endedAt = formatDate(new Date(task?.endedAt));
+      }
+      if (task.user_id) {
+        userData = await fetchUserData(task.user_id);
+      }
       const row = document.createElement("tr");
-      row.id = `userRow_${task.id}`;
       row.innerHTML = `
-                <td class="whitespace-nowrap py-4 pl-4 pr-3 font-medium text-gray-900 sm:pl-6">
-                    ${task.title}
-                </td>
-                <td class="whitespace-nowrap px-3 py-4 text-gray-500">${formattedDate}</td>
+                <td class="whitespace-nowrap py-4 pl-4 pr-3 font-medium text-gray-900 sm:pl-6">${
+                  task.title
+                }</td>
+                <td class="whitespace-nowrap px-3 py-4 text-gray-500">${userData}</td>
+                <td class="whitespace-nowrap px-3 py-4 text-gray-500">${
+                  task?.task_type ? task?.task_type : "N/A"
+                }</td>
+                <td class="whitespace-nowrap px-3 py-4 text-gray-500">${dateCreated}</td>
+                <td class="whitespace-nowrap px-3 py-4 text-gray-500">${dueDate}</td>
+                <td class="whitespace-nowrap px-3 py-4 text-gray-500">${startedAt}</td>
+                <td class="whitespace-nowrap px-3 py-4 text-gray-500">${endedAt}</td>
                 <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right sm:pr-6">
-                    <span class="bg-red-500 hover:bg-red-600 text-white hover:text-gray-100 px-2 py-1 rounded delete-btn" style="cursor: pointer"><i class="fa-solid fa-trash-can"></i></span>
-                    <span class="bg-blue-500 hover:bg-blue-600 text-white hover:text-gray-100 px-2 py-1 rounded view-btn" style="cursor: pointer"><i class="fa-solid fa-eye"></i></span>
-                    <span class="bg-yellow-500 hover:bg-yellow-600 text-white hover:text-gray-100 px-2 py-1 rounded edit-btn" style="cursor: pointer"><i class="fa-solid fa-pen-to-square"></i></span>
+                    <span class="bg-blue-500 hover:bg-blue-600 text-white hover:text-gray-100 px-2 py-1 rounded assign-btn" style="cursor: pointer"><i class="fas fa-people-arrows"></i></span>
                 </td>
             `;
       taskTable.appendChild(row);
 
-      // Add event listeners to VIEW and EDIT buttons
       row
-        .querySelector(".delete-btn")
-        .addEventListener("click", () => handleDeleteTask(task.id));
-      row
-        .querySelector(".view-btn")
-        .addEventListener("click", () => handleViewTask(task.id));
-      row
-        .querySelector(".edit-btn")
-        .addEventListener("click", () => handleEditTask(task.id));
+        .querySelector(".assign-btn")
+        .addEventListener("click", () => openDistribute(task.id));
     }
   }
 }
@@ -140,7 +167,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   try {
     // Fetch tasks without filtering initially
     tasks = await fetchTasks();
-    taskCount.innerText = Math.ceil(tasks.length / itemsPerPage);
+    taskCount.innerText = tasks.length / itemsPerPage;
     await updateTableForCurrentPage();
   } catch (error) {
     console.error("Error fetching tasks:", error.message);

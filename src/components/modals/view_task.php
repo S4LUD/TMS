@@ -4,7 +4,7 @@
             <div class="w-80">
                 <p id="taskTitle" class="text-xl font-medium font-semibold"></p>
             </div>
-            <i onclick="closeViewTaskModal()" class="fa-solid fa-xmark text-white bg-gray-300 hover:bg-gray-400 py-1 px-1.5 rounded-full cursor-pointer"></i>
+            <i onclick="closeViewTaskModal()" class="fa-solid h-fit fa-xmark text-white bg-gray-300 hover:bg-gray-400 py-1 px-1.5 rounded-full cursor-pointer"></i>
         </div>
         <div class="status-container space-y-2">
             <!-- Status Item -->

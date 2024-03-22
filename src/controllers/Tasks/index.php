@@ -9,29 +9,56 @@ class Tasks
         return $db;
     }
 
+    // public static function countTaskPages($limit)
+    // {
+    //     global $db;
+    //     try {
+    //         $stmt = $db->prepare("SELECT CEIL(COUNT(*) / :limit) AS total_pages FROM tasks");
+    //         $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
+    //         $stmt->execute();
+    //         $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    //         return $result;
+    //     } catch (PDOException $e) {
+    //         return ['error' => 'Database error: ' . $e->getMessage()];
+    //     }
+    // }
+
     public static function fetchAllTasks($startDate, $endDate)
     {
         global $db;
 
-        // Initial query without WHERE clause
-        $query = "SELECT id, title, createdAt FROM tasks";
+        try {
+            $query = "SELECT id, title, createdAt, task_type, dueAt, user_id, startedAt, endedAt FROM tasks";
 
-        if (!empty($startDate) && !empty($endDate)) {
-            // Append WHERE clause for specific date range
-            $query .= " WHERE createdAt BETWEEN :startDate AND :endDate";
+            // Check if date range is provided
+            if (!empty($startDate) && !empty($endDate)) {
+                $query .= " WHERE createdAt BETWEEN :startDate AND :endDate";
+            }
+
+            // Prepare the statement
             $stmt = $db->prepare($query);
-            $startDate .= " 00:00:00";
-            $endDate .= " 23:59:59";
-            $stmt->bindParam(':startDate', $startDate, PDO::PARAM_STR);
-            $stmt->bindParam(':endDate', $endDate, PDO::PARAM_STR);
-        } else {
-            $stmt = $db->query($query);
+
+            // Bind parameters if date range is provided
+            if (!empty($startDate) && !empty($endDate)) {
+                $startDate .= " 00:00:00";
+                $endDate .= " 23:59:59";
+                $stmt->bindParam(':startDate', $startDate, PDO::PARAM_STR);
+                $stmt->bindParam(':endDate', $endDate, PDO::PARAM_STR);
+            }
+
+            // Execute the statement
+            $stmt->execute();
+
+            // Fetch the results
+            $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            // Return JSON-encoded results
+            return json_encode($results);
+        } catch (PDOException $e) {
+            // Handle database error
+            http_response_code(500); // Internal Server Error
+            return json_encode(['error' => $e->getMessage()]);
         }
-
-        $stmt->execute();
-        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-        return json_encode($results);
     }
 
     public static function newFile($filename, $file_size, $destination,  $task_id)
@@ -187,5 +214,57 @@ class Tasks
         $rowCount = $stmt->rowCount();
 
         return $rowCount > 0; // Returns true if the task was deleted successfully
+    }
+
+    public static function fetchPerformance()
+    {
+        global $db;
+
+        // Initialize status counts
+        $statuses = [
+            "DONE" => 0,
+            "FAILED" => 0,
+            "REJECTED" => 0,
+            "PENDING" => 0,
+            "LATE" => 0,
+            "IN_REVIEW" => 0,
+            "IN_PROGRESS" => 0
+        ];
+
+        try {
+            $weekDates = getCurrentWeekDates();
+
+            $stmt = $db->prepare("SELECT
+            task_status.status,
+            COUNT(*) AS status_count
+        FROM
+            tasks
+        LEFT JOIN
+            task_status ON tasks.status_id = task_status.id
+        WHERE
+            DATE(tasks.createdAt) BETWEEN :start_date AND :end_date
+        GROUP BY
+            task_status.status
+        ORDER BY
+            task_status.status");
+
+            $stmt->bindParam(':start_date', $weekDates['monday']);
+            $stmt->bindParam(':end_date', $weekDates['sunday']);
+            $stmt->execute();
+            $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            // Update status counts
+            foreach ($results as $row) {
+                $status = strtoupper($row['status']);
+                $statuses[$status] = $row['status_count'];
+            }
+
+            // Return the statuses
+            return json_encode($statuses);
+        } catch (PDOException $e) {
+            // Handle database connection error
+            http_response_code(500); // Internal Server Error
+            return json_encode(['error' => $e->getMessage()]);
+        }
     }
 }

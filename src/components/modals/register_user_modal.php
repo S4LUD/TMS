@@ -23,7 +23,7 @@ $departments = json_decode($departmentsJson, true);
 
             <div class="mb-4">
                 <label for="createDepartment" class="block text-gray-700">Department:</label>
-                <select id="createDepartment" name="createDepartment" class="w-full border rounded-md py-2 px-3 focus:outline-none focus:border-blue-500 transition duration-75" required>
+                <select id="createDepartment" name="createDepartment" class="bg-white w-full border rounded-md py-2 px-3 focus:outline-none focus:border-blue-500 transition duration-75" required>
                     <option value="">---SELECT---</option>
                     <?php
                     foreach ($departments as $department) {
@@ -37,7 +37,7 @@ $departments = json_decode($departmentsJson, true);
 
             <div class="mb-4">
                 <label for="createRole" class="block text-gray-700">Role:</label>
-                <select id="createRole" name="createRole" class="w-full border rounded-md py-2 px-3 focus:outline-none focus:border-blue-500 transition duration-75" required>
+                <select id="createRole" name="createRole" class="bg-white w-full border rounded-md py-2 px-3 focus:outline-none focus:border-blue-500 transition duration-75" required>
                     <option value="">---SELECT---</option>
                     <?php
                     foreach ($roles as $role) {

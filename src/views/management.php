@@ -1,4 +1,3 @@
-<h1 class="text-xl font-bold mb-4">Account Management</h1>
 <button id="openCreateUserModal" class="font-semibold bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 hover:text-gray-100 transition duration-75">Create a user</button>
 
 <div class="bg-white p-4 mt-4 border rounded">

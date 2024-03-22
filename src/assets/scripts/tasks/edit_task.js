@@ -48,6 +48,7 @@ function clearEditInputs() {
   document.getElementById("edit_task_details").value = "";
   document.getElementById("fileEditPreviewContainer").classList.add("hidden");
   document.getElementById("fileDBEditPreviewContainer").classList.add("hidden");
+  localStorage.removeItem("taskId");
 }
 
 function removeEditFile(file) {
