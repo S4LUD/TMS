@@ -2,9 +2,11 @@ const fileInput = document.getElementById("fileInput");
 const filePreviewContainer = document.getElementById("filePreview");
 const selectedFiles = [];
 
-document
-  .getElementById("openCreateTaskModal")
-  .addEventListener("click", openCreateTaskModal);
+// Check if the element with ID "openCreateTaskModal" exists before adding the event listener
+let openCreateTaskModalButton = document.getElementById("openCreateTaskModal");
+if (openCreateTaskModalButton) {
+  openCreateTaskModalButton.addEventListener("click", openCreateTaskModal);
+}
 
 fileInput.addEventListener("change", () =>
   handleFileSelection(fileInput.files)

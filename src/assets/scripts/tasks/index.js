@@ -68,32 +68,54 @@ async function updateTable(tasks) {
     taskTable.appendChild(row);
   } else {
     for (const task of tasks) {
+      const { tasks: taskPermissions } = JSON.parse(
+        localStorage.getItem("permissions")
+      );
+      const { source } = taskPermissions;
       const formattedDate = formatDate(new Date(task.createdAt));
       const row = document.createElement("tr");
-      row.id = `userRow_${task.id}`;
       row.innerHTML = `
                 <td class="whitespace-nowrap py-4 pl-4 pr-3 font-medium text-gray-900 sm:pl-6">
                     ${task.title}
                 </td>
                 <td class="whitespace-nowrap px-3 py-4 text-gray-500">${formattedDate}</td>
                 <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right sm:pr-6">
-                    <span class="bg-red-500 hover:bg-red-600 text-white hover:text-gray-100 px-2 py-1 rounded delete-btn" style="cursor: pointer"><i class="fa-solid fa-trash-can"></i></span>
-                    <span class="bg-blue-500 hover:bg-blue-600 text-white hover:text-gray-100 px-2 py-1 rounded view-btn" style="cursor: pointer"><i class="fa-solid fa-eye"></i></span>
-                    <span class="bg-yellow-500 hover:bg-yellow-600 text-white hover:text-gray-100 px-2 py-1 rounded edit-btn" style="cursor: pointer"><i class="fa-solid fa-pen-to-square"></i></span>
+                    ${
+                      source.delete
+                        ? '<span class="bg-red-500 hover:bg-red-600 text-white hover:text-gray-100 px-2 py-1 rounded delete-btn" style="cursor: pointer"><i class="fa-solid fa-trash-can"></i></span>'
+                        : ""
+                    }
+                    ${
+                      source.view
+                        ? '<span class="bg-blue-500 hover:bg-blue-600 text-white hover:text-gray-100 px-2 py-1 rounded view-btn" style="cursor: pointer"><i class="fa-solid fa-eye"></i></span>'
+                        : ""
+                    }
+                    ${
+                      source.edit
+                        ? '<span class="bg-yellow-500 hover:bg-yellow-600 text-white hover:text-gray-100 px-2 py-1 rounded edit-btn" style="cursor: pointer"><i class="fa-solid fa-pen-to-square"></i></span>'
+                        : ""
+                    }
                 </td>
             `;
       taskTable.appendChild(row);
 
-      // Add event listeners to VIEW and EDIT buttons
-      row
-        .querySelector(".delete-btn")
-        .addEventListener("click", () => handleDeleteTask(task.id));
-      row
-        .querySelector(".view-btn")
-        .addEventListener("click", () => handleViewTask(task.id));
-      row
-        .querySelector(".edit-btn")
-        .addEventListener("click", () => handleEditTask(task.id));
+      // Get the buttons in the row
+      let deleteBtn = row.querySelector(".delete-btn");
+      let viewBtn = row.querySelector(".view-btn");
+      let editBtn = row.querySelector(".edit-btn");
+
+      // Add event listeners only if the buttons exist
+      if (deleteBtn) {
+        deleteBtn.addEventListener("click", () => handleDeleteTask(task.id));
+      }
+
+      if (viewBtn) {
+        viewBtn.addEventListener("click", () => handleViewTask(task.id));
+      }
+
+      if (editBtn) {
+        editBtn.addEventListener("click", () => handleEditTask(task.id));
+      }
     }
   }
 }

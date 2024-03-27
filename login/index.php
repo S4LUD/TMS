@@ -11,7 +11,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $loginResult = Auth::login($_POST['username'], $_POST['password']);
     if ($loginResult !== null) {
         $_SESSION['user'] = $loginResult;
-        header('Location: /tms/dashboard/');
+        $userData = json_decode($loginResult, true);
+        echo '<script>localStorage.setItem("permissions",' . json_encode($userData['permissions'], true) . ');</script>';
+        header("refresh:0;url=/tms/dashboard/");
         exit();
     } else {
         echo '<script>alert("Invalid credentials.");</script>';

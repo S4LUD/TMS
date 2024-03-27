@@ -99,6 +99,11 @@ async function updateTable(tasks) {
       if (task.user_id) {
         userData = await fetchUserData(task.user_id);
       }
+      const { distribute: distributePermissions } = JSON.parse(
+        localStorage.getItem("permissions")
+      );
+      const { source } = distributePermissions;
+
       const row = document.createElement("tr");
       row.innerHTML = `
                 <td class="whitespace-nowrap py-4 pl-4 pr-3 font-medium text-gray-900 sm:pl-6">${
@@ -113,14 +118,21 @@ async function updateTable(tasks) {
                 <td class="whitespace-nowrap px-3 py-4 text-gray-500">${startedAt}</td>
                 <td class="whitespace-nowrap px-3 py-4 text-gray-500">${endedAt}</td>
                 <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right sm:pr-6">
-                    <span class="bg-blue-500 hover:bg-blue-600 text-white hover:text-gray-100 px-2 py-1 rounded assign-btn" style="cursor: pointer"><i class="fas fa-people-arrows"></i></span>
+                    ${
+                      source.assign
+                        ? '<span class="bg-blue-500 hover:bg-blue-600 text-white hover:text-gray-100 px-2 py-1 rounded assign-btn" style="cursor: pointer"><i class="fas fa-people-arrows"></i></span>'
+                        : ""
+                    }
                 </td>
             `;
       taskTable.appendChild(row);
 
-      row
-        .querySelector(".assign-btn")
-        .addEventListener("click", () => openDistribute(task.id));
+      let assignBtn = row.querySelector(".assign-btn");
+
+      // Add event listeners only if the buttons exist
+      if (assignBtn) {
+        assignBtn.addEventListener("click", () => openDistribute(task.id));
+      }
     }
   }
 }

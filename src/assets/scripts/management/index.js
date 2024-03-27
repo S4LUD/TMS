@@ -22,16 +22,10 @@ async function updateTable(users) {
     for (const user of users) {
       const row = document.createElement("tr");
 
-      const { permissions } = await fetch(
-        `http://localhost/tms/api/fetchuser?searchTerm=${user.username}`,
-        {
-          method: "GET",
-          redirect: "follow",
-        }
-      )
-        .then((response) => response.json())
-        .then((result) => result)
-        .catch((error) => console.error(error));
+      const { account_management: accountManagementPermissions } = JSON.parse(
+        localStorage.getItem("permissions")
+      );
+      const { source } = accountManagementPermissions;
 
       row.innerHTML = `
             <td class="whitespace-nowrap py-4 pl-4 pr-3 font-medium text-gray-900 sm:pl-6">
@@ -52,22 +46,22 @@ async function updateTable(users) {
             </td>
             <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right sm:pr-6">
                 ${
-                  permissions.account_management.source.delete
+                  source.delete
                     ? '<span class="bg-red-500 hover:bg-red-600 text-white hover:text-gray-100 px-2 py-1 rounded delete-btn" style="cursor: pointer"><i class="fa-solid fa-trash-can"></i></span>'
                     : ""
                 }
                 ${
-                  permissions.account_management.source.view
+                  source.view
                     ? '<span class="bg-blue-500 hover:bg-blue-600 text-white hover:text-gray-100 px-2 py-1 rounded view-btn" style="cursor: pointer"><i class="fa-solid fa-eye"></i></span>'
                     : ""
                 }
                 ${
-                  permissions.account_management.source.edit
+                  source.edit
                     ? '<span class="bg-yellow-500 hover:bg-yellow-600 text-white hover:text-gray-100 px-2 py-1 rounded edit-btn" style="cursor: pointer"><i class="fa-solid fa-pen-to-square"></i></span>'
                     : ""
                 }
                 ${
-                  permissions.account_management.source.permissions
+                  source.permissions
                     ? '<span class="bg-gray-500 hover:bg-gray-600 text-white hover:text-gray-100 px-2 py-1 rounded permission-btn" style="cursor: pointer"><i class="fa-solid fa-sliders"></i></span>'
                     : ""
                 }
@@ -75,16 +69,28 @@ async function updateTable(users) {
         `;
       userTable.appendChild(row);
 
-      // Add event listeners to VIEW and EDIT buttons
-      row
-        .querySelector(".delete-btn")
-        .addEventListener("click", () => console.log(user.id));
-      row
-        .querySelector(".view-btn")
-        .addEventListener("click", () => console.log(user.id));
-      row
-        .querySelector(".edit-btn")
-        .addEventListener("click", () => console.log(user.id));
+      // Get the buttons in the row
+      let deleteBtn = row.querySelector(".delete-btn");
+      let viewBtn = row.querySelector(".view-btn");
+      let editBtn = row.querySelector(".edit-btn");
+      let permissionBtn = row.querySelector(".permission-btn");
+
+      // Add event listeners only if the buttons exist
+      if (deleteBtn) {
+        deleteBtn.addEventListener("click", () => console.log(user.id));
+      }
+
+      if (viewBtn) {
+        viewBtn.addEventListener("click", () => console.log(user.id));
+      }
+
+      if (editBtn) {
+        editBtn.addEventListener("click", () => console.log(user.id));
+      }
+
+      if (permissionBtn) {
+        permissionBtn.addEventListener("click", () => console.log(user.id));
+      }
     }
   }
 }
@@ -97,9 +103,10 @@ function clearCreateInputs() {
 }
 
 // Open the modal when the button is clicked
-document
-  .getElementById("openCreateUserModal")
-  .addEventListener("click", openCreateUserModal);
+let openCreateUserModalButton = document.getElementById("openCreateUserModal");
+if (openCreateUserModalButton) {
+  openCreateUserModalButton.addEventListener("click", openCreateUserModal);
+}
 
 // Function to open the modal
 function openCreateUserModal() {

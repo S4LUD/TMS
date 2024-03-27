@@ -12,9 +12,14 @@ $lastDayOfMonth = new DateTime('last day of this month');
 // Format the dates as required (Y-m-d)
 $firstDayOfMonthFormatted = $firstDayOfMonth->format('Y-m-d');
 $lastDayOfMonthFormatted = $lastDayOfMonth->format('Y-m-d');
+
+$userData = json_decode($_SESSION['user'], true);
+$permissions = json_decode($userData['permissions'], true);
 ?>
 
-<button id="openCreateTaskModal" class="font-semibold bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 hover:text-gray-100 transition duration-75">Create task</button>
+<?php if ($permissions['tasks']['source']['create_task']) { ?>
+    <button id="openCreateTaskModal" class="font-semibold bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 hover:text-gray-100 transition duration-75">Create task</button>
+<?php } ?>
 <div class="bg-white p-4 mt-4 border rounded">
     <form id="searchForm" onsubmit="return false;" class="flex flex-col md:flex-row gap-1 select-none">
         <div class="flex flex-col">

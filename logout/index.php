@@ -1,5 +1,5 @@
 <?php
-
 session_start();
 session_destroy();
-header('Location: /tms/login/');
+echo '<script>localStorage.clear();</script>';
+header("refresh:0;url=/tms/login/");
