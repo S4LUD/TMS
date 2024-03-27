@@ -1,5 +1,5 @@
 <?php
-require_once($_SERVER['DOCUMENT_ROOT'] . '/src/controllers/Users/index.php');
+require_once($_SERVER['DOCUMENT_ROOT'] . '/tms/src/controllers/Users/index.php');
 
 $rolesJson = Users::fetchAllRoles();
 $departmentsJson = Users::fetchAllDepartments();

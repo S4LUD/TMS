@@ -10,7 +10,7 @@ searchButton.addEventListener("click", function () {
   }
 
   clearButton.classList.remove("hidden");
-  fetch(`https://tms-project.000webhostapp.com/api/fetchallusers?searchaccount=${searchAccount}`)
+  fetch(`http://localhost/tms/api/fetchallusers?searchaccount=${searchAccount}`)
     .then((response) => response.json())
     .then((users) => updateTable(users));
 });
@@ -19,7 +19,7 @@ clearButton.addEventListener("click", function () {
   isSearchPerformed = false;
   document.getElementById("searchAccount").value = "";
   clearButton.classList.add("hidden");
-  fetch(`https://tms-project.000webhostapp.com/api/fetchallusers`)
+  fetch(`http://localhost/tms/api/fetchallusers`)
     .then((response) => response.json())
     .then((users) => updateTable(users));
 });

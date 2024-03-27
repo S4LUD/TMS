@@ -8,7 +8,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $title = $_POST['title'];
     $details = $_POST['details'];
 
-    $uploadDirectory = $_SERVER['DOCUMENT_ROOT'] . '/src/assets/uploads/';
+    $uploadDirectory = $_SERVER['DOCUMENT_ROOT'] . '/tms/src/assets/uploads/';
 
     // Start a database transaction
     $pdo = Tasks::getPDO(); // Replace with your actual method for getting a PDO instance

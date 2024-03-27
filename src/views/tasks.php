@@ -64,11 +64,11 @@ $lastDayOfMonthFormatted = $lastDayOfMonth->format('Y-m-d');
         </div>
     </div>
 </div>
-<?php include($_SERVER['DOCUMENT_ROOT'] . '/src/components/modals/create_task_modal.php'); ?>
-<?php include($_SERVER['DOCUMENT_ROOT'] . '/src/components/modals/view_task.php'); ?>
-<?php include($_SERVER['DOCUMENT_ROOT'] . '/src/components/modals/edit_task.php'); ?>
-<script src="/src/assets/scripts/tasks/index.js"></script>
-<script src="/src/assets/scripts/tasks/create_task.js"></script>
-<script src="/src/assets/scripts/tasks/view_task.js"></script>
-<script src="/src/assets/scripts/tasks/edit_task.js"></script>
-<script src="/src/assets/scripts/tasks/delete_task.js"></script>
+<?php include($_SERVER['DOCUMENT_ROOT'] . '/tms/src/components/modals/create_task_modal.php'); ?>
+<?php include($_SERVER['DOCUMENT_ROOT'] . '/tms/src/components/modals/view_task.php'); ?>
+<?php include($_SERVER['DOCUMENT_ROOT'] . '/tms/src/components/modals/edit_task.php'); ?>
+<script src="/tms/src/assets/scripts/tasks/index.js"></script>
+<script src="/tms/src/assets/scripts/tasks/create_task.js"></script>
+<script src="/tms/src/assets/scripts/tasks/view_task.js"></script>
+<script src="/tms/src/assets/scripts/tasks/edit_task.js"></script>
+<script src="/tms/src/assets/scripts/tasks/delete_task.js"></script>

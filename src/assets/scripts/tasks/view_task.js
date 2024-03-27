@@ -19,7 +19,7 @@ function formatReadableDate(dateString) {
 async function handleViewTask(taskId) {
   try {
     const response = await fetch(
-      `https://tms-project.000webhostapp.com/api/viewtask?task_id=${taskId}`
+      `http://localhost/tms/api/viewtask?task_id=${taskId}`
     );
     const tasks = await response.json();
 
@@ -118,7 +118,7 @@ function createviewFilePreview(file) {
   fileDetailsContainer.className = "flex items-center justify-between";
   fileDetailsContainer.innerHTML = `<div class="text-gray-500">${formatFileSize(
     file.file_size
-  )}</div><a class="text-blue-600" href="/download.php?file=${
+  )}</div><a class="text-blue-600" href="/tms/download?file=${
     file.file_destination
   }">Download</a>`;
 

@@ -4,7 +4,9 @@ let names = []; // Array to hold user names
 
 async function fetchUsers() {
   try {
-    const response = await fetch("https://tms-project.000webhostapp.com/api/fetchallusers");
+    const response = await fetch(
+      "http://localhost/tms/api/fetchallusers"
+    );
     const result = await response.json();
     names = result; // Update the names array with the fetched user data
     updateDisplay(""); // Call updateDisplay with an empty query to display all users
@@ -101,7 +103,7 @@ async function assigntask(event) {
   console.log({ dueDate, taskType, taskId, user_id });
 
   await fetch(
-    `https://tms-project.000webhostapp.com/api/distributetask?task_type=${taskType}&user_id=${user_id}&dueAt=${dueDate}&task_id=${taskId}`,
+    `http://localhost/tms/api/distributetask?task_type=${taskType}&user_id=${user_id}&dueAt=${dueDate}&task_id=${taskId}`,
     {
       method: "GET",
     }

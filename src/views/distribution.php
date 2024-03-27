@@ -37,6 +37,8 @@ $lastDayOfMonthFormatted = $lastDayOfMonth->format('Y-m-d');
                         <th scope="col" class="px-3 py-3.5 text-left font-semibold text-gray-900">TASK TYPE</th>
                         <th scope="col" class="px-3 py-3.5 text-left font-semibold text-gray-900">DATE CREATED</th>
                         <th scope="col" class="px-3 py-3.5 text-left font-semibold text-gray-900">DUE DATE</th>
+                        <th scope="col" class="px-3 py-3.5 text-left font-semibold text-gray-900">DATE STARTED</th>
+                        <th scope="col" class="px-3 py-3.5 text-left font-semibold text-gray-900">DATE FINISHED</th>
                         <th scope="col" class="px-3 py-3.5 text-left font-semibold text-gray-900"></th>
                     </tr>
                 </thead>
@@ -65,6 +67,6 @@ $lastDayOfMonthFormatted = $lastDayOfMonth->format('Y-m-d');
         </div>
     </div>
 </div>
-<?php include($_SERVER['DOCUMENT_ROOT'] . '/src/components/modals/distribute_task_modal.php'); ?>
-<script src="/src/assets/scripts/distribution/index.js"></script>
-<script src="/src/assets/scripts/distribution/assign_task.js"></script>
+<?php include($_SERVER['DOCUMENT_ROOT'] . '/tms/src/components/modals/distribute_task_modal.php'); ?>
+<script src="/tms/src/assets/scripts/distribution/index.js"></script>
+<script src="/tms/src/assets/scripts/distribution/assign_task.js"></script>

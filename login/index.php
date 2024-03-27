@@ -1,9 +1,9 @@
 <?php
 session_start();
-require_once $_SERVER['DOCUMENT_ROOT'] . '/src/controllers/Auth/index.php';
+require_once '../src/controllers/Auth/index.php';
 
 if (isset($_SESSION['user'])) {
-    header('Location: /dashboard.php');
+    header('Location: /tms/dashboard/');
     exit();
 }
 
@@ -11,7 +11,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $loginResult = Auth::login($_POST['username'], $_POST['password']);
     if ($loginResult !== null) {
         $_SESSION['user'] = $loginResult;
-        header('Location: /dashboard.php');
+        header('Location: /tms/dashboard/');
         exit();
     } else {
         echo '<script>alert("Invalid credentials.");</script>';
@@ -29,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <script src="https://cdn.tailwindcss.com/3.4.1"></script>
     <script src="https://kit.fontawesome.com/ece8d271f7.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-    <link rel="icon" href="/src/image/logo.png" type="image/png">
+    <link rel="icon" href="/tms/src/image/logo.png" type="image/png">
 </head>
 
 <body>
@@ -51,7 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </form>
             </div>
         </div>
-        <?php include($_SERVER['DOCUMENT_ROOT'] . '/src/components/footer.php'); ?>
+        <?php include($_SERVER['DOCUMENT_ROOT'] . '/tms/src/components/footer.php'); ?>
     </div>
 </body>
 

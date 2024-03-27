@@ -1,4 +1,19 @@
-<button id="openCreateUserModal" class="font-semibold bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 hover:text-gray-100 transition duration-75">Create a user</button>
+<?php
+$userData = json_decode($_SESSION['user'], true);
+$permissions = json_decode($userData['permissions'], true);
+?>
+
+<div>
+    <?php if ($permissions['account_management']['source']['create_user']) { ?>
+        <button id="openCreateUserModal" class="font-semibold bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 hover:text-gray-100 transition duration-75">Create a user</button>
+    <?php } ?>
+    <?php if ($permissions['account_management']['source']['roles']) { ?>
+        <button id="openRoleModal" class="font-semibold bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 hover:text-gray-100 transition duration-75">Roles</button>
+    <?php } ?>
+    <?php if ($permissions['account_management']['source']['departments']) { ?>
+        <button id="openDepartmentModal" class="font-semibold bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 hover:text-gray-100 transition duration-75">Departments</button>
+    <?php } ?>
+</div>
 
 <div class="bg-white p-4 mt-4 border rounded">
     <form onsubmit="return false;" class="select-none">
@@ -28,7 +43,7 @@
     </div>
 </div>
 
-<?php include($_SERVER['DOCUMENT_ROOT'] . '/src/components/modals/register_user_modal.php'); ?>
-<script src="/src/assets/scripts/management/index.js"></script>
-<script src="/src/assets/scripts/management/search.js"></script>
-<script src="/src/assets/scripts/management/create_user.js"></script>
+<?php include($_SERVER['DOCUMENT_ROOT'] . '/tms/src/components/modals/register_user_modal.php'); ?>
+<script src="/tms/src/assets/scripts/management/index.js"></script>
+<script src="/tms/src/assets/scripts/management/search.js"></script>
+<script src="/tms/src/assets/scripts/management/create_user.js"></script>

@@ -10,7 +10,7 @@ const itemsPerPage = 10; // Number of tasks per page
 
 // Function to fetch tasks from the API
 async function fetchTasks(startDate = "", endDate = "") {
-  let url = "https://tms-project.000webhostapp.com/api/fetchalltasks";
+  let url = "http://localhost/tms/api/fetchalltasks";
 
   // Construct query parameters
   const params = new URLSearchParams();
@@ -54,8 +54,6 @@ function formatDate(date) {
     weekday: "long",
     day: "numeric",
     month: "long",
-    hour: "numeric",
-    minute: "numeric",
   };
   return new Intl.DateTimeFormat("en-PH", options).format(date);
 }
@@ -63,7 +61,7 @@ function formatDate(date) {
 // Function to fetch user data from the API
 async function fetchUserData(userId) {
   const response = await fetch(
-    `https://tms-project.000webhostapp.com/api/fetchallusers?searchaccount=${userId}`
+    `http://localhost/tms/api/fetchallusers?searchaccount=${userId}`
   );
   if (!response.ok) {
     throw new Error(`Failed to fetch user data: ${response.statusText}`);
@@ -87,8 +85,16 @@ async function updateTable(tasks) {
       const dateCreated = formatDate(new Date(task.createdAt));
       let userData = "N/A"; // Default value if user_id is null or undefined
       let dueDate = "N/A";
+      let startedAt = "N/A";
+      let endedAt = "N/A";
       if (task?.dueAt) {
         dueDate = formatDate(new Date(task?.dueAt));
+      }
+      if (task?.startedAt) {
+        startedAt = formatDate(new Date(task?.startedAt));
+      }
+      if (task?.endedAt) {
+        endedAt = formatDate(new Date(task?.endedAt));
       }
       if (task.user_id) {
         userData = await fetchUserData(task.user_id);
@@ -104,6 +110,8 @@ async function updateTable(tasks) {
                 }</td>
                 <td class="whitespace-nowrap px-3 py-4 text-gray-500">${dateCreated}</td>
                 <td class="whitespace-nowrap px-3 py-4 text-gray-500">${dueDate}</td>
+                <td class="whitespace-nowrap px-3 py-4 text-gray-500">${startedAt}</td>
+                <td class="whitespace-nowrap px-3 py-4 text-gray-500">${endedAt}</td>
                 <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right sm:pr-6">
                     <span class="bg-blue-500 hover:bg-blue-600 text-white hover:text-gray-100 px-2 py-1 rounded assign-btn" style="cursor: pointer"><i class="fas fa-people-arrows"></i></span>
                 </td>
@@ -112,7 +120,7 @@ async function updateTable(tasks) {
 
       row
         .querySelector(".assign-btn")
-        .addEventListener("click", () => openDistribute(task?.id));
+        .addEventListener("click", () => openDistribute(task.id));
     }
   }
 }
@@ -159,7 +167,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   try {
     // Fetch tasks without filtering initially
     tasks = await fetchTasks();
-    taskCount.innerText = Math.ceil(tasks.length / itemsPerPage);
+    taskCount.innerText = tasks.length / itemsPerPage;
     await updateTableForCurrentPage();
   } catch (error) {
     console.error("Error fetching tasks:", error.message);

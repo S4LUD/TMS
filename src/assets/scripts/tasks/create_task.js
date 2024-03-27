@@ -71,7 +71,7 @@ async function submitNewTask(event) {
   }
 
   // Perform API request using fetch
-  await fetch("https://tms-project.000webhostapp.com/api/createtask/", {
+  await fetch("http://localhost/tms/api/createtask/", {
     method: "POST",
     body: formData,
   })

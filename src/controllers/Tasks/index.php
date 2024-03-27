@@ -204,23 +204,16 @@ class Tasks
     public static function deleteTask($task_id)
     {
         global $db;
-        try {
-            // Delete task from the database
-            $stmt = $db->prepare("DELETE FROM tasks WHERE id = :task_id");
-            $stmt->bindParam(':task_id', $task_id, PDO::PARAM_INT);
-            $stmt->execute();
 
-            // Check if any rows were affected by the update
-            if ($stmt->rowCount() > 0) {
-                return true; // Task successfully distributed
-            } else {
-                return false; // Task not found or no changes made
-            }
-        } catch (PDOException $e) {
-            // Handle database errors
-            error_log("Error deleting task: " . $e->getMessage());
-            return false;
-        }
+        // Delete task from the database
+        $stmt = $db->prepare("DELETE FROM tasks WHERE id = :task_id");
+        $stmt->bindParam(':task_id', $task_id, PDO::PARAM_INT);
+        $stmt->execute();
+
+        // Check if any rows were affected
+        $rowCount = $stmt->rowCount();
+
+        return $rowCount > 0; // Returns true if the task was deleted successfully
     }
 
     public static function fetchPerformance()

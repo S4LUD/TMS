@@ -10,7 +10,7 @@ const itemsPerPage = 10; // Number of tasks per page
 
 // Function to fetch tasks from the API
 async function fetchTasks(startDate = "", endDate = "") {
-  let url = "https://tms-project.000webhostapp.com/api/fetchalltasks";
+  let url = "http://localhost/tms/api/fetchalltasks";
 
   // Construct query parameters
   const params = new URLSearchParams();

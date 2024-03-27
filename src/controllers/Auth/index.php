@@ -28,9 +28,10 @@ class Auth
     {
         global $db;
 
-        $stmt = $db->prepare("SELECT users.id, users.username, users.password, role.role, department.department, department.abbreviation FROM users
+        $stmt = $db->prepare("SELECT users.id, users.username, users.password, role.role, department.department, department.abbreviation, permissions.permissions FROM users
                         JOIN role on users.role_id = role.id
                         JOIN department on users.department_id = department.id
+                        JOIN permissions on users.id = permissions.user_id
                         WHERE BINARY users.username = ?");
 
         $stmt->execute([$username]);
@@ -44,11 +45,43 @@ class Auth
                 'role' => $user['role'],
                 'department' => $user['department'],
                 'abbreviation' => $user['abbreviation'],
+                'permissions' => $user['permissions'],
             ]);
         } else {
             return null;
         }
     }
+
+    public static function userDetails($searchTerm)
+    {
+        global $db;
+
+        // Prepare the SQL query using placeholders to prevent SQL injection
+        $stmt = $db->prepare("SELECT permissions.permissions 
+                        FROM users
+                        JOIN permissions ON users.id = permissions.user_id
+                        WHERE BINARY users.username = :searchTerm OR users.id = :searchTerm");
+
+        // Execute the prepared statement with parameters
+        $stmt->execute([':searchTerm' => $searchTerm]);
+
+        // Fetch the user details
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$user) {
+            // User not found, return null or handle accordingly
+            return null;
+        }
+
+        // Prepare the user details as an associative array
+        $userData = [
+            'permissions' => json_decode($user['permissions'], true) // Decode permissions JSON string to an array
+        ];
+
+        // Encode the user details as JSON and return
+        return json_encode($userData);
+    }
+
 
     public static function createUser($username, $password, $departmentId, $roleId)
     {
