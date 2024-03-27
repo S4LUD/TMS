@@ -4,7 +4,9 @@ let names = []; // Array to hold user names
 
 async function fetchUsers() {
   try {
-    const response = await fetch("http://localhost/tms/api/fetchallusers");
+    const response = await fetch(
+      "http://localhost/tms/api/fetchallusers"
+    );
     const result = await response.json();
     names = result; // Update the names array with the fetched user data
     updateDisplay(""); // Call updateDisplay with an empty query to display all users
@@ -72,28 +74,74 @@ function closeUserDropdown() {
   document.getElementById("searchUser").value = "";
   document.getElementById("userdropdown").classList.add("hidden");
   document.getElementById("userdropdownbackdrop").classList.add("hidden");
-  localStorage.removeItem("taskId");
 }
 
 function selectUser(user_id, username) {
-  localStorage.setItem("user_id", user_id);
+  localStorage.setItem("userId", user_id);
   const assignTo = document.getElementById("assignTo");
   assignTo.value = username;
   closeUserDropdown();
 }
 
 function closeDistribute() {
-  localStorage.removeItem("user_id");
   document.getElementById("dueDate").value = "";
   document.getElementById("taskType").value = "";
   document.getElementById("assignTo").value = "";
   document.getElementById("distributeTask").classList.add("hidden");
   document.getElementById("userdropdown").classList.add("hidden");
   document.getElementById("userdropdownbackdrop").classList.add("hidden");
-  localStorage.removeItem("user_id");
+  localStorage.removeItem("userId");
+  localStorage.removeItem("taskId");
 }
 
-function assigntask() {
+async function assigntask(event) {
+  event.preventDefault();
+  const dueDate = document.getElementById("dueDate").value;
+  const taskType = document.getElementById("taskType").value;
   const taskId = localStorage.getItem("taskId");
-  console.log(taskId);
+  const user_id = localStorage.getItem("userId");
+  console.log({ dueDate, taskType, taskId, user_id });
+
+  await fetch(
+    `http://localhost/tms/api/distributetask?task_type=${taskType}&user_id=${user_id}&dueAt=${dueDate}&task_id=${taskId}`,
+    {
+      method: "GET",
+    }
+  )
+    .then((response) => response.json())
+    .then((result) => {
+      if (result.message) {
+        Toastify({
+          text: result.message,
+          duration: 5000,
+          gravity: "top", // `top` or `bottom`
+          position: "right", // `left`, `center` or `right`
+          stopOnFocus: true, // Prevents dismissing of toast on hover
+          style: {
+            background: "#3CA2FA",
+          },
+        }).showToast();
+      } else if (result.error) {
+        Toastify({
+          text: result.error,
+          duration: 5000,
+          gravity: "top", // `top` or `bottom`
+          position: "right", // `left`, `center` or `right`
+          stopOnFocus: true, // Prevents dismissing of toast on hover
+          style: {
+            background: "#FA3636",
+          },
+        }).showToast();
+      }
+    })
+    .catch((error) => {
+      // Handle errors
+      console.error("Error:", error);
+    })
+    .finally(async () => {
+      tasks = await fetchTasks();
+      taskCount.innerText = Math.ceil(tasks.length / itemsPerPage);
+      await updateTableForCurrentPage();
+      closeDistribute();
+    });
 }

@@ -267,4 +267,29 @@ class Tasks
             return json_encode(['error' => $e->getMessage()]);
         }
     }
+
+    public static function distributeTask($task_id, $task_type, $user_id, $dueAt)
+    {
+        global $db;
+        try {
+            $stmt = $db->prepare("UPDATE `tasks` SET `user_id`=:user_id, `task_type`=:task_type, `dueAt`=:dueAt WHERE `id`=:taskId");
+            $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+            $stmt->bindParam(':task_type', $task_type);
+            $stmt->bindParam(':dueAt', $dueAt);
+            $stmt->bindParam(':taskId', $task_id, PDO::PARAM_INT);
+
+            $stmt->execute();
+
+            // Check if any rows were affected by the update
+            if ($stmt->rowCount() > 0) {
+                return true; // Task successfully distributed
+            } else {
+                return false; // Task not found or no changes made
+            }
+        } catch (PDOException $e) {
+            // Handle database errors
+            error_log("Error distributing task: " . $e->getMessage());
+            return false;
+        }
+    }
 }
