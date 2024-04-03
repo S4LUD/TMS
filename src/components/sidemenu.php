@@ -15,14 +15,12 @@ $permissions = json_decode($userData['permissions'], true);
         <span class="font-semibold text-gray-200"><?php echo $userData['username'] . " | " . $userData['abbreviation'] . " | " . $userData['role'] ?></span>
     </div>
     <ul class="p-2">
-        <?php if ($permissions['dashboard']) { ?>
-            <li class="hover:bg-gray-600 cursor-pointer rounded-md transition duration-75 <?php echo isCurrentPage('dashboard'); ?>">
-                <a href="/tms/dashboard" class="flex py-2 pl-2.5 whitespace-nowrap">
-                    <div class="min-w-7 flex justify-center items-center mr-1.5"><i class="fas fa-home text-lg text-gray-200"></i></div>
-                    <span class="text-gray-200">Dashboard</span>
-                </a>
-            </li>
-        <?php } ?>
+        <li class="hover:bg-gray-600 cursor-pointer rounded-md transition duration-75 <?php echo isCurrentPage('dashboard'); ?>">
+            <a href="/tms/dashboard" class="flex py-2 pl-2.5 whitespace-nowrap">
+                <div class="min-w-7 flex justify-center items-center mr-1.5"><i class="fas fa-home text-lg text-gray-200"></i></div>
+                <span class="text-gray-200">Dashboard</span>
+            </a>
+        </li>
         <?php if ($permissions['account_management']['enabled']) { ?>
             <li class="hover:bg-gray-600 cursor-pointer rounded-md transition duration-75 <?php echo isCurrentPage('management'); ?>">
                 <a href="/tms/management" class="flex py-2 pl-2.5 whitespace-nowrap">

@@ -1,3 +1,5 @@
+<?php include($_SERVER['DOCUMENT_ROOT'] . '/tms/src\config\api.config.php'); ?>
+
 <div class="grid grid-cols-4 gap-4 py-5">
     <div class="flex items-center justify-between py-2 px-6 bg-gray-600 rounded">
         <div class="flex items-center">
@@ -7,7 +9,7 @@
             <div>
                 <p class="text-base font-semibold text-white">Total Users</p>
                 <?php
-                $apiEndpoint = 'http://localhost/tms/api/userscount';
+                $apiEndpoint = $apiLink . '/userscount';
                 $apiResponse = file_get_contents($apiEndpoint);
                 $result = json_decode($apiResponse, true);
                 if (isset($result['total_users'])) {
@@ -27,7 +29,7 @@
             <div>
                 <p class="text-base font-semibold text-white">Total Tasks</p>
                 <?php
-                $apiEndpoint = 'http://localhost/tms/api/taskscount';
+                $apiEndpoint = $apiLink . '/taskscount';
                 $apiResponse = file_get_contents($apiEndpoint);
                 $result = json_decode($apiResponse, true);
                 if (isset($result['total_tasks'])) {
@@ -63,7 +65,7 @@
         <div class="bg-white p-2.5 rounded border">
             <?php
             // Fetch data from your API
-            $apiEndpoint = 'http://localhost/tms/api/countuserbyrole';
+            $apiEndpoint = $apiLink . '/countuserbyrole';
             $apiResponse = file_get_contents($apiEndpoint);
             $result = json_decode($apiResponse, true);
 
@@ -97,7 +99,7 @@
         <div class="bg-white p-2.5 rounded border">
             <?php
             // Fetch data from your API
-            $apiEndpoint = 'http://localhost/tms/api/countuserbydepartment';
+            $apiEndpoint = $apiLink . '/countuserbydepartment';
             $apiResponse = file_get_contents($apiEndpoint);
             $result = json_decode($apiResponse, true);
 
@@ -131,7 +133,7 @@
         <div class="bg-white p-2.5 rounded border">
             <?php
             // Fetch data from your API
-            $apiEndpoint = 'http://localhost/tms/api/fetchallusersperformance';
+            $apiEndpoint = $apiLink . '/fetchallusersperformance';
             $apiResponse = file_get_contents($apiEndpoint);
             $result = json_decode($apiResponse, true);
 
@@ -165,7 +167,7 @@
         <div class="bg-white p-2.5 rounded border">
             <?php
             // Fetch data from your API
-            $apiEndpoint = 'http://localhost/tms/api/fetchtaskcount';
+            $apiEndpoint = $apiLink . '/fetchtaskcount';
             $apiResponse = file_get_contents($apiEndpoint);
             $result = json_decode($apiResponse, true);
 

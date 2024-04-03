@@ -12,9 +12,7 @@ fileEditPreview.addEventListener("drop", (e) => handleEditDrop(e));
 async function handleEditTask(taskId) {
   localStorage.setItem("taskId", taskId);
   try {
-    const response = await fetch(
-      `http://localhost/tms/api/viewtask?task_id=${taskId}`
-    );
+    const response = await fetch(`${apiLink}/viewtask?task_id=${taskId}`);
     const tasks = await response.json();
 
     if (tasks) {
@@ -113,9 +111,7 @@ function updateDBFilePreview(viewFiles) {
 async function onRefresh() {
   const taskId = localStorage.getItem("taskId");
   try {
-    const response = await fetch(
-      `http://localhost/tms/api/viewtask?task_id=${taskId}`
-    );
+    const response = await fetch(`${apiLink}/viewtask?task_id=${taskId}`);
     const tasks = await response.json();
 
     if (tasks) {
@@ -149,7 +145,7 @@ async function removeOnDB(file) {
 
   // Check user's confirmation
   if (isConfirmed) {
-    await fetch(`http://localhost/tms/api/removefile?file_id=${file.file_id}`, {
+    await fetch(`${apiLink}/removefile?file_id=${file.file_id}`, {
       method: "GET",
       redirect: "follow",
     })
@@ -343,7 +339,7 @@ async function submitEditTask(event) {
   }
 
   // Perform API request using fetch
-  await fetch("http://localhost/tms/api/updatetask/", {
+  await fetch(`${apiLink}/updatetask/`, {
     method: "POST",
     body: formData,
   })
@@ -361,7 +357,6 @@ async function submitEditTask(event) {
           },
         }).showToast();
         closeEditTaskModal();
-        fetchTasks();
       } else if (result.error) {
         Toastify({
           text: result.error,
@@ -378,5 +373,10 @@ async function submitEditTask(event) {
     .catch((error) => {
       // Handle errors
       console.error("Error:", error);
+    })
+    .finally(async () => {
+      tasks = await fetchTasks();
+      taskCount.innerText = Math.ceil(tasks.length / itemsPerPage);
+      await updateTableForCurrentPage();
     });
 }

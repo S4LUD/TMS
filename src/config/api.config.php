@@ -1,2 +1,2 @@
 <?php
-$api_default = "http://localhost/tms/api/";
+$apiLink = "http://localhost/tms/api";

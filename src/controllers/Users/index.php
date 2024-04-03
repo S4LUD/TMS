@@ -5,16 +5,18 @@ class Users
 {
     public $id;
     public $username;
+    public $auth;
     public $department;
     public $role;
     public $status;
 
 
 
-    public function __construct($id, $username, $department, $role, $status)
+    public function __construct($id, $username, $auth, $department, $role, $status)
     {
         $this->id = $id;
         $this->username = $username;
+        $this->auth = $auth;
         $this->department = $department;
         $this->role = $role;
         $this->status = $status;
@@ -25,7 +27,7 @@ class Users
         global $db;
 
         // Initial query without WHERE clause
-        $query = "SELECT users.id, users.username, role.role, department.department, user_status.status
+        $query = "SELECT users.id, users.username, users.auth, role.role, department.department, user_status.status
                     FROM users
                     INNER JOIN role ON users.role_id = role.id
                     INNER JOIN department ON users.department_id = department.id
@@ -51,6 +53,7 @@ class Users
             $users[] = new Users(
                 $result['id'],
                 $result['username'],
+                $result['auth'],
                 $result['department'],
                 $result['role'],
                 $result['status']

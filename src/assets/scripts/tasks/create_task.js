@@ -1,3 +1,5 @@
+
+
 const fileInput = document.getElementById("fileInput");
 const filePreviewContainer = document.getElementById("filePreview");
 const selectedFiles = [];
@@ -73,7 +75,7 @@ async function submitNewTask(event) {
   }
 
   // Perform API request using fetch
-  await fetch("http://localhost/tms/api/createtask/", {
+  await fetch(`${apiLink}/createtask/`, {
     method: "POST",
     body: formData,
   })

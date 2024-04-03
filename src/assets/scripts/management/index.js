@@ -1,7 +1,7 @@
 const userTable = document.getElementById("userTable");
 
-function fetchUsers() {
-  fetch(`http://localhost/tms/api/fetchallusers`)
+async function fetchUsers() {
+  await fetch(`${apiLink}/fetchallusers`)
     .then((response) => response.json())
     .then((users) => updateTable(users));
 }
@@ -21,7 +21,6 @@ async function updateTable(users) {
   } else {
     for (const user of users) {
       const row = document.createElement("tr");
-
       const { account_management: accountManagementPermissions } = JSON.parse(
         localStorage.getItem("permissions")
       );
@@ -89,7 +88,9 @@ async function updateTable(users) {
       }
 
       if (permissionBtn) {
-        permissionBtn.addEventListener("click", () => console.log(user.id));
+        permissionBtn.addEventListener("click", () =>
+          openPermissionsModal(user.id)
+        );
       }
     }
   }

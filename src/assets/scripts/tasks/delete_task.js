@@ -1,3 +1,5 @@
+
+
 async function handleDeleteTask(taskId) {
   // Ask for confirmation using window.confirm
   const isConfirmed = window.confirm(
@@ -5,7 +7,7 @@ async function handleDeleteTask(taskId) {
   );
 
   if (isConfirmed) {
-    await fetch(`http://localhost/tms/api/deletetask?task_id=${taskId}`, {
+    await fetch(`${apiLink}/deletetask?task_id=${taskId}`, {
       method: "POST",
       redirect: "follow",
     })

@@ -44,6 +44,8 @@ $permissions = json_decode($userData['permissions'], true);
 </div>
 
 <?php include($_SERVER['DOCUMENT_ROOT'] . '/tms/src/components/modals/register_user_modal.php'); ?>
+<?php include($_SERVER['DOCUMENT_ROOT'] . '/tms/src/components/modals/permissions_modal.php'); ?>
 <script src="/tms/src/assets/scripts/management/index.js"></script>
 <script src="/tms/src/assets/scripts/management/search.js"></script>
 <script src="/tms/src/assets/scripts/management/create_user.js"></script>
+<script src="/tms/src/assets/scripts/management/permissions.js"></script>

@@ -1,3 +1,5 @@
+
+
 const viewPreviewContainer = document.getElementById("viewFilePreview");
 const viewTask = document.getElementById("viewTask");
 
@@ -18,9 +20,7 @@ function formatReadableDate(dateString) {
 
 async function handleViewTask(taskId) {
   try {
-    const response = await fetch(
-      `http://localhost/tms/api/viewtask?task_id=${taskId}`
-    );
+    const response = await fetch(`${apiLink}/viewtask?task_id=${taskId}`);
     const tasks = await response.json();
 
     if (tasks) {

@@ -1,12 +1,12 @@
+
+
 const userContainer = document.getElementById("user_list_container");
 const maxDisplay = 4;
 let names = []; // Array to hold user names
 
 async function fetchUsers() {
   try {
-    const response = await fetch(
-      "http://localhost/tms/api/fetchallusers"
-    );
+    const response = await fetch(`${apiLink}/fetchallusers`);
     const result = await response.json();
     names = result; // Update the names array with the fetched user data
     updateDisplay(""); // Call updateDisplay with an empty query to display all users
@@ -103,7 +103,7 @@ async function assigntask(event) {
   console.log({ dueDate, taskType, taskId, user_id });
 
   await fetch(
-    `http://localhost/tms/api/distributetask?task_type=${taskType}&user_id=${user_id}&dueAt=${dueDate}&task_id=${taskId}`,
+    `${apiLink}/distributetask?task_type=${taskType}&user_id=${user_id}&dueAt=${dueDate}&task_id=${taskId}`,
     {
       method: "GET",
     }
