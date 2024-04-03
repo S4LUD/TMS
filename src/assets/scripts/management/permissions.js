@@ -86,7 +86,7 @@ async function openPermissionsModal(userId) {
 
   try {
     const response = await fetch(
-      `http://localhost/tms/api/fetchuser?searchTerm=${userId}`,
+      `${apiLink}/fetchuser?searchTerm=${userId}`,
       {
         method: "GET",
         redirect: "follow",

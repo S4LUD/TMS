@@ -1,4 +1,4 @@
-<?php include($_SERVER['DOCUMENT_ROOT'] . '/tms/src\config\api.config.php'); ?>
+<?php include($_SERVER['DOCUMENT_ROOT'] . '/tms/src/config/config.php'); ?>
 
 <div class="grid grid-cols-4 gap-4 py-5">
     <div class="flex items-center justify-between py-2 px-6 bg-gray-600 rounded">

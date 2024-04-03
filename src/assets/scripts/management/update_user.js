@@ -68,7 +68,7 @@ async function fetchUserData(userId) {
 
 async function saveUserDetails() {
   await fetch(
-    `http://localhost/tms/api/updateuserdetails?userId=${userIdInput.value}&fullname=${fullnameInput.value}&address=${addressInput.value}&age=${ageInput.value}&contact=${contackInput.value}&gender=${genderInput.value}`,
+    `${apiLink}/updateuserdetails?userId=${userIdInput.value}&fullname=${fullnameInput.value}&address=${addressInput.value}&age=${ageInput.value}&contact=${contackInput.value}&gender=${genderInput.value}`,
     {
       method: "GET",
       headers: { "Content-Type": "application/json" },
