@@ -3,27 +3,6 @@ require_once __DIR__ . '/../../config/db.php';
 
 class Auth
 {
-    // public static function fetchAll()
-    // {
-    //     global $db;
-
-    //     $stmt = $db->query("SELECT users.id, users.username, users.createdAt, users.updatedAt, role.role FROM users INNER JOIN role ON users.role_id = role.id");
-    //     $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-    //     $users = [];
-    //     foreach ($results as $result) {
-    //         $users[] = new Users(
-    //             $result['id'],
-    //             $result['username'],
-    //             $result['createdAt'],
-    //             $result['updatedAt'],
-    //             $result['role']
-    //         );
-    //     }
-
-    //     return json_encode($users);
-    // }
-
     public static function login($username, $password)
     {
         global $db;
@@ -82,7 +61,6 @@ class Auth
         // Encode the user details as JSON and return
         return json_encode($userData);
     }
-
 
     public static function createUser($username, $password, $departmentId, $roleId)
     {
