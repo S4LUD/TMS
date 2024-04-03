@@ -10,14 +10,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $pdo->beginTransaction();
 
     try {
-        if (isset($_GET['userId']) && isset($_GET['permissions'])) {
+        if (isset($_GET['userId']) && isset($_GET['fullname']) && isset($_GET['address']) && isset($_GET['age']) && isset($_GET['contact']) && isset($_GET['gender'])) {
             $userId = $_GET['userId'];
-            $permissions = $_GET['permissions'];
-            $result = Users::updateUserPermissions($userId, $permissions);
+            $fullname = $_GET['fullname'];
+            $address = $_GET['address'];
+            $age = $_GET['age'];
+            $contact = $_GET['contact'];
+            $gender = $_GET['gender'];
+
+            $result = Users::insertupdateUserDetails($userId, $fullname, $address, $age, $contact, $gender);
 
             if ($result) {
                 $pdo->commit();
-                echo json_encode(['message' => 'Successfully updated permissions']);
+                echo json_encode(['message' => 'Successfully updated user details']);
             } else {
                 echo json_encode([
                     'error' => 'Updating permissions failed',

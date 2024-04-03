@@ -20,10 +20,15 @@ async function updateTable(users) {
     userTable.appendChild(row);
   } else {
     for (const user of users) {
+      if (user?.auth === 1) {
+        continue;
+      }
+
       const row = document.createElement("tr");
       const { account_management: accountManagementPermissions } = JSON.parse(
         localStorage.getItem("permissions")
       );
+
       const { source } = accountManagementPermissions;
 
       row.innerHTML = `
@@ -84,7 +89,7 @@ async function updateTable(users) {
       }
 
       if (editBtn) {
-        editBtn.addEventListener("click", () => console.log(user.id));
+        editBtn.addEventListener("click", () => openUserDetailsModal(user.id));
       }
 
       if (permissionBtn) {

@@ -9,6 +9,11 @@ class Users
     public $department;
     public $role;
     public $status;
+    public $full_name;
+    public $address;
+    public $age;
+    public $contact;
+    public $gender;
 
     public static function getPDO()
     {
@@ -16,7 +21,7 @@ class Users
         return $db;
     }
 
-    public function __construct($id, $username, $auth, $department, $role, $status)
+    public function __construct($id, $username, $auth, $department, $role, $status, $full_name, $address, $age, $contact, $gender)
     {
         $this->id = $id;
         $this->username = $username;
@@ -24,6 +29,11 @@ class Users
         $this->department = $department;
         $this->role = $role;
         $this->status = $status;
+        $this->full_name = $full_name;
+        $this->address = $address;
+        $this->age = $age;
+        $this->contact = $contact;
+        $this->gender = $gender;
     }
 
     public static function fetchAllUsers($searchTerm  = null)
@@ -31,12 +41,12 @@ class Users
         global $db;
 
         // Initial query without WHERE clause
-        $query = "SELECT users.id, users.username, users.auth, role.role, department.department, user_status.status
-                    FROM users
-                    INNER JOIN role ON users.role_id = role.id
-                    INNER JOIN department ON users.department_id = department.id
-                    LEFT JOIN user_status ON users.status = user_status.id
-                    ";
+        $query = "SELECT users.id, users.username, users.auth, role.role, department.department, user_status.status, user_details.full_name, user_details.address, user_details.age, user_details.contact, user_details.gender
+                FROM users
+                INNER JOIN role ON users.role_id = role.id
+                INNER JOIN department ON users.department_id = department.id
+                LEFT JOIN user_status ON users.status = user_status.id
+                LEFT JOIN user_details ON users.id = user_details.user_id";
 
         // Check if $username is provided
         if (!empty($searchTerm)) {
@@ -60,7 +70,12 @@ class Users
                 $result['auth'],
                 $result['department'],
                 $result['role'],
-                $result['status']
+                $result['status'],
+                $result['full_name'],
+                $result['address'],
+                $result['age'],
+                $result['contact'],
+                $result['gender']
             );
         }
 
@@ -277,6 +292,45 @@ class Users
             // Handle the error
             // For example, you can throw an exception or return false
             return false;
+        }
+    }
+
+    public static function insertupdateUserDetails($userId, $fullname, $address, $age, $contact, $gender)
+    {
+        global $db;
+
+        try {
+            // Prepare and execute the SQL query to insert or update user details
+            $stmt = $db->prepare("
+            INSERT INTO user_details (user_id, full_name, address, age, contact, gender)
+            VALUES (:userId, :full_name, :address, :age, :contact, :gender)
+            ON DUPLICATE KEY UPDATE
+            full_name = VALUES(full_name),
+            address = VALUES(address),
+            age = VALUES(age),
+            contact = VALUES(contact),
+            gender = VALUES(gender)
+        ");
+            $stmt->bindParam(':userId', $userId);
+            $stmt->bindParam(':full_name', $fullname);
+            $stmt->bindParam(':address', $address);
+            $stmt->bindParam(':age', $age);
+            $stmt->bindParam(':contact', $contact);
+            $stmt->bindParam(':gender', $gender);
+            $stmt->execute();
+
+            // Check if any rows were affected
+            $rowCount = $stmt->rowCount();
+
+            // Return a success message or the number of affected rows
+            if ($rowCount > 0) {
+                return "User details updated successfully for user with ID: $userId";
+            } else {
+                return "No user details updated for user with ID: $userId";
+            }
+        } catch (PDOException $e) {
+            // Handle database errors
+            return "Error updating user details for user with ID: $userId - " . $e->getMessage();
         }
     }
 }
