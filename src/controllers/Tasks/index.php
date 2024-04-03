@@ -9,20 +9,6 @@ class Tasks
         return $db;
     }
 
-    // public static function countTaskPages($limit)
-    // {
-    //     global $db;
-    //     try {
-    //         $stmt = $db->prepare("SELECT CEIL(COUNT(*) / :limit) AS total_pages FROM tasks");
-    //         $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
-    //         $stmt->execute();
-    //         $result = $stmt->fetch(PDO::FETCH_ASSOC);
-    //         return $result;
-    //     } catch (PDOException $e) {
-    //         return ['error' => 'Database error: ' . $e->getMessage()];
-    //     }
-    // }
-
     public static function fetchAllTasks($startDate, $endDate)
     {
         global $db;

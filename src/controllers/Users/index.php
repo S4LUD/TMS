@@ -10,7 +10,11 @@ class Users
     public $role;
     public $status;
 
-
+    public static function getPDO()
+    {
+        global $db;
+        return $db;
+    }
 
     public function __construct($id, $username, $auth, $department, $role, $status)
     {
@@ -210,6 +214,69 @@ class Users
             // Handle database connection error
             http_response_code(500); // Internal Server Error
             return json_encode(['error' => $e->getMessage()]);
+        }
+    }
+
+    public static function updateUserPermissions($userId, $permissions)
+    {
+        global $db;
+
+        try {
+            // Prepare and execute the SQL query to update permissions
+            $stmt = $db->prepare("UPDATE permissions SET permissions = :permissions WHERE user_id = :userId");
+            $stmt->bindParam(':permissions', $permissions);
+            $stmt->bindParam(':userId', $userId);
+            $stmt->execute();
+
+            // Check if any rows were affected
+            $rowCount = $stmt->rowCount();
+
+            // Return a success message or the number of affected rows
+            if ($rowCount > 0) {
+                return "Permissions updated successfully for user with ID: $userId";
+            } else {
+                return "No permissions updated for user with ID: $userId";
+            }
+        } catch (PDOException $e) {
+            // Handle database errors
+            return "Error updating permissions for user with ID: $userId - " . $e->getMessage();
+        }
+    }
+
+    public static function deleteUser($userId)
+    {
+        global $db;
+
+        // Start a transaction
+        $db->beginTransaction();
+
+        try {
+            // Delete user from the database
+            $stmt1 = $db->prepare("DELETE FROM users WHERE id = :userId");
+            $stmt1->bindParam(':userId', $userId, PDO::PARAM_INT);
+            $stmt1->execute();
+
+            // Update other tasks
+            $stmt2 = $db->prepare("UPDATE tasks SET task_type = NULL, dueAt = NULL, user_id = NULL WHERE user_id = :userId");
+            $stmt2->bindParam(':userId', $userId, PDO::PARAM_INT);
+            $stmt2->execute();
+
+            // Commit the transaction
+            $db->commit();
+
+            // Check if any rows were affected
+            $rowCount1 = $stmt1->rowCount();
+            $rowCount2 = $stmt2->rowCount();
+
+            // Return true if any rows were affected by any of the SQL statements
+            return ($rowCount1 > 0 || $rowCount2 > 0);
+        } catch (PDOException $e) {
+            // An error occurred, rollback the transaction
+            $db->rollBack();
+
+            // Handle the error
+            // For example, you can throw an exception or return false
+            return false;
         }
     }
 }

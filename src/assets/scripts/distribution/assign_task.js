@@ -1,5 +1,3 @@
-
-
 const userContainer = document.getElementById("user_list_container");
 const maxDisplay = 4;
 let names = []; // Array to hold user names
@@ -74,12 +72,14 @@ function closeUserDropdown() {
   document.getElementById("searchUser").value = "";
   document.getElementById("userdropdown").classList.add("hidden");
   document.getElementById("userdropdownbackdrop").classList.add("hidden");
+  updateDisplay("");
 }
 
 function selectUser(user_id, username) {
   localStorage.setItem("userId", user_id);
   const assignTo = document.getElementById("assignTo");
   assignTo.value = username;
+  updateDisplay("");
   closeUserDropdown();
 }
 
@@ -142,6 +142,7 @@ async function assigntask(event) {
       tasks = await fetchTasks();
       taskCount.innerText = Math.ceil(tasks.length / itemsPerPage);
       await updateTableForCurrentPage();
+      fetchUsers();
       closeDistribute();
     });
 }

@@ -3,26 +3,26 @@ require_once __DIR__ . '/../../config/db.php';
 
 class Auth
 {
-    public static function fetchAll()
-    {
-        global $db;
+    // public static function fetchAll()
+    // {
+    //     global $db;
 
-        $stmt = $db->query("SELECT users.id, users.username, users.createdAt, users.updatedAt, role.role FROM users INNER JOIN role ON users.role_id = role.id");
-        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    //     $stmt = $db->query("SELECT users.id, users.username, users.createdAt, users.updatedAt, role.role FROM users INNER JOIN role ON users.role_id = role.id");
+    //     $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        $users = [];
-        foreach ($results as $result) {
-            $users[] = new Users(
-                $result['id'],
-                $result['username'],
-                $result['createdAt'],
-                $result['updatedAt'],
-                $result['role']
-            );
-        }
+    //     $users = [];
+    //     foreach ($results as $result) {
+    //         $users[] = new Users(
+    //             $result['id'],
+    //             $result['username'],
+    //             $result['createdAt'],
+    //             $result['updatedAt'],
+    //             $result['role']
+    //         );
+    //     }
 
-        return json_encode($users);
-    }
+    //     return json_encode($users);
+    // }
 
     public static function login($username, $password)
     {
@@ -120,7 +120,7 @@ class Auth
             $userId = $db->lastInsertId(); // Get the ID of the newly inserted user
 
             // Insert default permissions for the user
-            $defaultPermissions = '{"dashboard":true,"account_management":{"enabled":true,"source":{"create_user":true,"roles":true,"departments":true,"delete":true,"view":true,"edit":true,"permissions":true}},"tasks":{"enabled":true,"source":{"create_task":true,"delete":true,"view":true,"edit":true}},"distribute":{"enabled":true,"source":{"assign":true}},"performance":true, "report":false}'; // Define default permissions
+            $defaultPermissions = '{"account_management":{"enabled":false,"source":{"create_user":false,"roles":false,"departments":false,"delete":false,"view":false,"edit":false,"permissions":false}},"tasks":{"enabled":false,"source":{"create_task":false,"delete":false,"view":false,"edit":false}},"distribute":{"enabled":false,"source":{"assign":false}},"performance":false, "report":false}'; // Define default permissions
             $insertPermissionStmt = $db->prepare("INSERT INTO `permissions`(`user_id`, `permissions`) VALUES (?, ?)");
             $insertPermissionSuccess = $insertPermissionStmt->execute([$userId, $defaultPermissions]);
 
