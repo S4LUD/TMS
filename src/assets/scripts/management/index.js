@@ -81,7 +81,7 @@ async function updateTable(users) {
 
       // Add event listeners only if the buttons exist
       if (deleteBtn) {
-        deleteBtn.addEventListener("click", () => console.log(user.id));
+        deleteBtn.addEventListener("click", () => deleteAccount(user.id));
       }
 
       if (viewBtn) {

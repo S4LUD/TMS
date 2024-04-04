@@ -24,9 +24,6 @@ createUserForm.addEventListener("submit", function (event) {
             background: "#3CA2FA",
           },
         }).showToast();
-        closeCreateUserModal();
-        clearCreateInputs();
-        fetchUsers();
       } else if (result.error) {
         Toastify({
           text: result.error,
@@ -42,5 +39,10 @@ createUserForm.addEventListener("submit", function (event) {
     })
     .catch((error) => {
       console.error("Error:", error);
+    })
+    .finally(() => {
+      closeCreateUserModal();
+      clearCreateInputs();
+      fetchUsers();
     });
 });

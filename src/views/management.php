@@ -51,3 +51,4 @@ $permissions = json_decode($userData['permissions'], true);
 <script src="/tms/src/assets/scripts/management/create_user.js"></script>
 <script src="/tms/src/assets/scripts/management/permissions.js"></script>
 <script src="/tms/src/assets/scripts/management/update_user.js"></script>
+<script src="/tms/src/assets/scripts/management/delete_user.js"></script>
