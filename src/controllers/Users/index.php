@@ -128,6 +128,71 @@ class Users
         return json_encode($usersByDepartment);
     }
 
+    public static function fetchDepartments()
+    {
+        global $db;
+
+        $stmt = $db->query("SELECT id, abbreviation, department FROM department");
+        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        return json_encode($results);
+    }
+
+    public static function insertDepartment($abbreviation, $department)
+    {
+        global $db;
+        try {
+            // Prepare the SQL statement for insertion
+            $stmt = $db->prepare("INSERT INTO department (abbreviation, department) VALUES (:abbreviation, :department)");
+
+            // Bind parameters and execute the statement
+            $stmt->bindParam(':abbreviation', $abbreviation);
+            $stmt->bindParam(':department', $department);
+            $stmt->execute();
+
+            // Check if any rows were affected
+            $rowCount = $stmt->rowCount();
+
+            // Return a success message or the number of affected rows
+            if ($rowCount > 0) {
+                return "Successfully added: $abbreviation";
+            } else {
+                return "No rows affected.";
+            }
+        } catch (PDOException $e) {
+            // Handle database errors
+            return "Error inserting department: " . $e->getMessage();
+        }
+    }
+
+    public static function updateDepartment($departmentId, $abbreviation, $department)
+    {
+        global $db;
+        try {
+            // Prepare the SQL statement for update
+            $stmt = $db->prepare("UPDATE department SET abbreviation = :abbreviation, department = :department WHERE id = :departmentId");
+
+            // Bind parameters and execute the statement
+            $stmt->bindParam(':departmentId', $departmentId);
+            $stmt->bindParam(':abbreviation', $abbreviation);
+            $stmt->bindParam(':department', $department);
+            $stmt->execute();
+
+            // Check if any rows were affected
+            $rowCount = $stmt->rowCount();
+
+            // Return a success message or the number of affected rows
+            if ($rowCount > 0) {
+                return "Successfully updated department";
+            } else {
+                return "No rows affected. Department with ID $departmentId not found.";
+            }
+        } catch (PDOException $e) {
+            // Handle database errors
+            return "Error updating department: " . $e->getMessage();
+        }
+    }
+
     public static function countUsers()
     {
         global $db;
@@ -285,6 +350,38 @@ class Users
 
             // Return true if any rows were affected by any of the SQL statements
             return ($rowCount1 > 0 || $rowCount2 > 0);
+        } catch (PDOException $e) {
+            // An error occurred, rollback the transaction
+            $db->rollBack();
+
+            // Handle the error
+            // For example, you can throw an exception or return false
+            return false;
+        }
+    }
+
+    public static function deleteDepartment($departmentId)
+    {
+        global $db;
+
+        // Start a transaction
+        $db->beginTransaction();
+
+        try {
+            // Delete user from the database
+            $stmt = $db->prepare("DELETE FROM department WHERE id = :departmentId");
+            $stmt->bindParam(':departmentId', $departmentId, PDO::PARAM_INT);
+            $stmt->execute();
+
+
+            // Commit the transaction
+            $db->commit();
+
+            // Check if any rows were affected
+            $rowCount = $stmt->rowCount();
+
+            // Return true if any rows were affected by any of the SQL statements
+            return ($rowCount > 0);
         } catch (PDOException $e) {
             // An error occurred, rollback the transaction
             $db->rollBack();

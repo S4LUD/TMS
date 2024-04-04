@@ -85,7 +85,7 @@ async function updateTable(users) {
       }
 
       if (viewBtn) {
-        viewBtn.addEventListener("click", () => console.log(user.id));
+        viewBtn.addEventListener("click", () => openViewUserDetailsModal(user.id));
       }
 
       if (editBtn) {
