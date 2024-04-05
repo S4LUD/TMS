@@ -1,5 +1,3 @@
-
-
 const taskTable = document.getElementById("taskTable");
 const filterButton = document.getElementById("filterButton");
 const prevPageBtn = document.getElementById("prevPageBtn");
@@ -46,6 +44,16 @@ async function fetchTasksWithPagination(page) {
 
 // Function to update the table with tasks for the current page
 async function updateTableForCurrentPage() {
+  // Calculate the total number of pages after the deletion
+  const totalPagesAfterDeletion = Math.ceil(tasks.length / itemsPerPage);
+
+  // Check if the current page is beyond the total pages after deletion
+  if (currentPage > totalPagesAfterDeletion) {
+    // If so, decrement the current page to go back to the previous page
+    currentPage--;
+    limitInput.value = currentPage;
+  }
+
   const tasksOnPage = await fetchTasksWithPagination(currentPage);
   updateTable(tasksOnPage);
 }

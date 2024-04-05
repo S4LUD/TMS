@@ -31,7 +31,10 @@ async function deleteAccount(userId) {
       .catch((error) => {
         console.error("Error:", error);
       })
-      .finally(() => {
+      .finally(async () => {
+        users = await fetchUsers();
+        userCount.innerText = Math.ceil(users.length / itemsPerPage);
+        await updateTableForCurrentPage();
         closeCreateUserModal();
         fetchUsers();
       });

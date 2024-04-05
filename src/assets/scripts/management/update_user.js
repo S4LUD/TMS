@@ -102,7 +102,10 @@ async function saveUserDetails() {
       }
     })
     .catch((error) => console.error(error))
-    .finally(() => {
+    .finally(async () => {
+      users = await fetchUsers();
+      userCount.innerText = Math.ceil(users.length / itemsPerPage);
+      await updateTableForCurrentPage();
       closeUserDetailsModal();
       clearInputs();
     });

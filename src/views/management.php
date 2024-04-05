@@ -41,6 +41,26 @@ $permissions = json_decode($userData['permissions'], true);
             </table>
         </div>
     </div>
+    <div class="flex justify-end items-center mt-4">
+        <div class="flex justify-start">
+            <button id="prevPageBtn" class="py-2 px-4"><i class="fa-solid fa-chevron-left"></i></button>
+        </div>
+        <div class="flex items-center gap-2">
+            <div class="font-medium">Page</div>
+            <div class="flex justify-center">
+                <input type="text" id="limitInput" class="border text-center rounded-md py-0.5 w-10" value="1" readonly>
+            </div>
+            <div class="flex gap-1">
+                <span class="font-medium">of</span>
+                <span id="userCount" class="font-medium"></span>
+            </div>
+        </div>
+        <div class="flex justify-end">
+            <button id="nextPageBtn" class="py-2 px-4">
+                <i class="fa-solid fa-chevron-right"></i>
+            </button>
+        </div>
+    </div>
 </div>
 
 <?php include($_SERVER['DOCUMENT_ROOT'] . '/tms/src/components/modals/register_user_modal.php'); ?>

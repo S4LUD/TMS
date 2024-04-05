@@ -40,7 +40,10 @@ createUserForm.addEventListener("submit", function (event) {
     .catch((error) => {
       console.error("Error:", error);
     })
-    .finally(() => {
+    .finally(async () => {
+      users = await fetchUsers();
+      userCount.innerText = Math.ceil(users.length / itemsPerPage);
+      await updateTableForCurrentPage();
       closeCreateUserModal();
       clearCreateInputs();
       fetchUsers();
