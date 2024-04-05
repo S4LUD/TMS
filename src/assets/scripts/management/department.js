@@ -14,7 +14,13 @@ async function fetchDepartments() {
     redirect: "follow",
   });
   const result = await response.json();
-  return result;
+
+  // Filter out roles with super value of 1
+  const filteredDepartments = result.filter(
+    (department) => department.super !== 1
+  );
+
+  return filteredDepartments;
 }
 
 async function fetchDepartmentsWithPagination(page) {

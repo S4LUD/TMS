@@ -14,7 +14,11 @@ async function fetchRoles() {
     redirect: "follow",
   });
   const result = await response.json();
-  return result;
+
+  // Filter out roles with super value of 1
+  const filteredRoles = result.filter((role) => role.super !== 1);
+
+  return filteredRoles;
 }
 
 async function fetchRolesWithPagination(page) {

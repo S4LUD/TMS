@@ -12,7 +12,11 @@ $permissions = json_decode($userData['permissions'], true);
 <aside id="sideMenu" class="fixed hidden bottom-0 top-0 sm:relative sm:block w-64 bg-[#343A40] text-white z-50">
     <div class="flex items-center py-4 pl-4 border-b border-gray-600 whitespace-nowrap">
         <div class="min-w-9 flex justify-center items-center pr-1.5"><i class=" fas fa-user text-lg text-gray-200"></i></div>
-        <span class="font-semibold text-gray-200"><?php echo $userData['username'] . " | " . $userData['abbreviation'] . " | " . $userData['role'] ?></span>
+        <?php if ($userData['auth']) { ?>
+            <span class="font-semibold text-gray-200"><?php echo $userData['username'] . " | " . $userData['role'] ?></span>
+        <?php } else { ?>
+            <span class="font-semibold text-gray-200"><?php echo $userData['username'] . " | " . $userData['abbreviation'] . " | " . $userData['role'] ?></span>
+        <?php } ?>
     </div>
     <ul class="p-2">
         <li class="hover:bg-gray-600 cursor-pointer rounded-md transition duration-75 <?php echo isCurrentPage('dashboard'); ?>">

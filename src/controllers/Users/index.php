@@ -132,7 +132,7 @@ class Users
     {
         global $db;
 
-        $stmt = $db->query("SELECT id, abbreviation, department FROM department");
+        $stmt = $db->query("SELECT id, abbreviation, department, super FROM department");
         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         return json_encode($results);
@@ -142,7 +142,7 @@ class Users
     {
         global $db;
 
-        $stmt = $db->query("SELECT id, role FROM role");
+        $stmt = $db->query("SELECT id, role, super FROM role");
         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         return json_encode($results);
