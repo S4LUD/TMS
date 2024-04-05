@@ -9,14 +9,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         if (isset($_GET['departmentId'])) {
             $departmentId = $_GET['departmentId'];
 
+            // Check if the department is being used before deletion
             $result = Users::deleteDepartment($departmentId);
 
-            if ($result) {
-                echo json_encode(['message' => 'Successfully delete department']);
+            if (is_string($result)) {
+                // If the result is a string, it contains a message indicating the department is being used
+                echo json_encode(['error' => $result]);
+            } else if ($result) {
+                // If the result is true, the department was successfully deleted
+                echo json_encode(['message' => 'Successfully deleted department']);
             } else {
-                echo json_encode([
-                    'error' => 'Failed to delete department',
-                ]);
+                // If the result is false, the department deletion failed
+                echo json_encode(['error' => 'Failed to delete department']);
             }
         } else {
             echo json_encode([

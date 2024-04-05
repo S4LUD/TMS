@@ -437,19 +437,30 @@ class Users
         $db->beginTransaction();
 
         try {
-            // Delete user from the database
-            $stmt = $db->prepare("DELETE FROM department WHERE id = :departmentId");
-            $stmt->bindParam(':departmentId', $departmentId, PDO::PARAM_INT);
-            $stmt->execute();
+            // Check if users are using the department
+            $stmtCountUsers = $db->prepare("SELECT COUNT(*) AS user_count FROM users WHERE department_id = :departmentId");
+            $stmtCountUsers->bindParam(':departmentId', $departmentId, PDO::PARAM_INT);
+            $stmtCountUsers->execute();
+            $userCountResult = $stmtCountUsers->fetch(PDO::FETCH_ASSOC);
+            $userCount = (int) $userCountResult['user_count'];
 
+            if ($userCount > 0) {
+                // If users are using the department, return a message indicating it's being used
+                return "The department is being used by $userCount user(s) and cannot be deleted.";
+            }
+
+            // Delete the department from the database
+            $stmtDeleteDepartment = $db->prepare("DELETE FROM department WHERE id = :departmentId");
+            $stmtDeleteDepartment->bindParam(':departmentId', $departmentId, PDO::PARAM_INT);
+            $stmtDeleteDepartment->execute();
 
             // Commit the transaction
             $db->commit();
 
             // Check if any rows were affected
-            $rowCount = $stmt->rowCount();
+            $rowCount = $stmtDeleteDepartment->rowCount();
 
-            // Return true if any rows were affected by any of the SQL statements
+            // Return true if any rows were affected by the SQL statement
             return ($rowCount > 0);
         } catch (PDOException $e) {
             // An error occurred, rollback the transaction
@@ -469,19 +480,30 @@ class Users
         $db->beginTransaction();
 
         try {
-            // Delete user from the database
-            $stmt = $db->prepare("DELETE FROM role WHERE id = :roleId");
-            $stmt->bindParam(':roleId', $roleId, PDO::PARAM_INT);
-            $stmt->execute();
+            // Check if the role is being used by any users
+            $stmtCountUsers = $db->prepare("SELECT COUNT(*) AS user_count FROM users WHERE role_id = :roleId");
+            $stmtCountUsers->bindParam(':roleId', $roleId, PDO::PARAM_INT);
+            $stmtCountUsers->execute();
+            $userCountResult = $stmtCountUsers->fetch(PDO::FETCH_ASSOC);
+            $userCount = $userCountResult['user_count'];
 
+            if ($userCount > 0) {
+                // If users are using the role, return a message indicating it's being used
+                return "The role is being used by $userCount user(s) and cannot be deleted.";
+            }
+
+            // Delete the role from the database
+            $stmtDeleteRole = $db->prepare("DELETE FROM role WHERE id = :roleId");
+            $stmtDeleteRole->bindParam(':roleId', $roleId, PDO::PARAM_INT);
+            $stmtDeleteRole->execute();
 
             // Commit the transaction
             $db->commit();
 
             // Check if any rows were affected
-            $rowCount = $stmt->rowCount();
+            $rowCount = $stmtDeleteRole->rowCount();
 
-            // Return true if any rows were affected by any of the SQL statements
+            // Return true if any rows were affected by the deletion
             return ($rowCount > 0);
         } catch (PDOException $e) {
             // An error occurred, rollback the transaction
