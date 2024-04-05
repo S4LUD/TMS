@@ -1,15 +1,12 @@
-async function handleDeleteTask(taskId) {
-  // Ask for confirmation using window.confirm
-  const isConfirmed = confirm(`Are you sure you want to delete this task?`);
-
+async function deleteDepartment(departmentId) {
+  const isConfirmed = confirm(
+    `Are you sure you want to delete this department?`
+  );
   if (isConfirmed) {
-    await fetch(`${apiLink}/deletetask?task_id=${taskId}`, {
-      method: "POST",
-      redirect: "follow",
-    })
+    await fetch(`${apiLink}/deletedepartment?departmentId=${departmentId}`)
       .then((response) => response.json())
       .then((result) => {
-        if (result.message === "Successfully deleted task") {
+        if (result.message) {
           Toastify({
             text: result.message,
             duration: 5000,
@@ -20,9 +17,9 @@ async function handleDeleteTask(taskId) {
               background: "#3CA2FA",
             },
           }).showToast();
-        } else {
+        } else if (result.error) {
           Toastify({
-            text: result.message,
+            text: result.error,
             duration: 5000,
             gravity: "top", // `top` or `bottom`
             position: "right", // `left`, `center` or `right`
@@ -33,14 +30,11 @@ async function handleDeleteTask(taskId) {
           }).showToast();
         }
       })
-      .catch((error) => console.error(error))
-      .finally(async () => {
-        tasks = await fetchTasks();
-        taskCount.innerText = Math.ceil(tasks.length / itemsPerPage);
-        await updateTableForCurrentPage();
+      .catch((error) => {
+        console.error("Error:", error);
+      })
+      .finally(() => {
+        updateDepartmentList();
       });
-  } else {
-    // User canceled, do nothing
-    console.log("Task Deletion Canceled");
   }
 }

@@ -15,14 +15,12 @@ $permissions = json_decode($userData['permissions'], true);
         <span class="font-semibold text-gray-200"><?php echo $userData['username'] . " | " . $userData['abbreviation'] . " | " . $userData['role'] ?></span>
     </div>
     <ul class="p-2">
-        <?php if ($permissions['dashboard']) { ?>
-            <li class="hover:bg-gray-600 cursor-pointer rounded-md transition duration-75 <?php echo isCurrentPage('dashboard'); ?>">
-                <a href="/tms/dashboard" class="flex py-2 pl-2.5 whitespace-nowrap">
-                    <div class="min-w-7 flex justify-center items-center mr-1.5"><i class="fas fa-home text-lg text-gray-200"></i></div>
-                    <span class="text-gray-200">Dashboard</span>
-                </a>
-            </li>
-        <?php } ?>
+        <li class="hover:bg-gray-600 cursor-pointer rounded-md transition duration-75 <?php echo isCurrentPage('dashboard'); ?>">
+            <a href="/tms/dashboard" class="flex py-2 pl-2.5 whitespace-nowrap">
+                <div class="min-w-7 flex justify-center items-center mr-1.5"><i class="fas fa-home text-lg text-gray-200"></i></div>
+                <span class="text-gray-200">Dashboard</span>
+            </a>
+        </li>
         <?php if ($permissions['account_management']['enabled']) { ?>
             <li class="hover:bg-gray-600 cursor-pointer rounded-md transition duration-75 <?php echo isCurrentPage('management'); ?>">
                 <a href="/tms/management" class="flex py-2 pl-2.5 whitespace-nowrap">
@@ -63,11 +61,11 @@ $permissions = json_decode($userData['permissions'], true);
                 </a>
             </li>
         <?php } ?>
-        <li class="hover:bg-gray-600 cursor-pointer rounded-md transition duration-75 <?php echo isCurrentPage('report'); ?>">
-            <a href="/tms/report" class="flex py-2 pl-2.5 whitespace-nowrap">
+        <li class="hover:bg-gray-600 cursor-pointer rounded-md transition duration-75">
+            <div class="flex py-2 pl-2.5 whitespace-nowrap" onclick="openSettingsModal(<?php echo $userData['id'] ?>)">
                 <div class="min-w-7 flex justify-center items-center mr-1.5"><i class="fa-solid fa-gear text-lg text-gray-200"></i></div>
                 <span class="text-gray-200">Settings</span>
-            </a>
+            </div>
         </li>
         <li class="flex py-2 pl-2.5 hover:bg-gray-600 whitespace-nowrap cursor-pointer rounded-md transition duration-75" onclick="openLogoutModal()">
             <div class="min-w-7 flex justify-center items-center mr-1.5"><i class="fas fa-sign-out-alt text-lg text-gray-200"></i></div>
@@ -76,4 +74,5 @@ $permissions = json_decode($userData['permissions'], true);
     </ul>
 </aside>
 
+<?php include($_SERVER['DOCUMENT_ROOT'] . '/tms/src/components/modals/settings_modal.php'); ?>
 <?php include($_SERVER['DOCUMENT_ROOT'] . '/tms/src/components/modals/logout_modal.php'); ?>

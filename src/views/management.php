@@ -8,10 +8,10 @@ $permissions = json_decode($userData['permissions'], true);
         <button id="openCreateUserModal" class="font-semibold bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 hover:text-gray-100 transition duration-75">Create a user</button>
     <?php } ?>
     <?php if ($permissions['account_management']['source']['roles']) { ?>
-        <button id="openRoleModal" class="font-semibold bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 hover:text-gray-100 transition duration-75">Roles</button>
+        <button onclick="openRoleModal()" id="openRoleModal" class="font-semibold bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 hover:text-gray-100 transition duration-75">Roles</button>
     <?php } ?>
     <?php if ($permissions['account_management']['source']['departments']) { ?>
-        <button id="openDepartmentModal" class="font-semibold bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 hover:text-gray-100 transition duration-75">Departments</button>
+        <button onclick="openDepartmentModal()" id="openDepartmentModal" class="font-semibold bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 hover:text-gray-100 transition duration-75">Departments</button>
     <?php } ?>
 </div>
 
@@ -44,6 +44,27 @@ $permissions = json_decode($userData['permissions'], true);
 </div>
 
 <?php include($_SERVER['DOCUMENT_ROOT'] . '/tms/src/components/modals/register_user_modal.php'); ?>
+<?php include($_SERVER['DOCUMENT_ROOT'] . '/tms/src/components/modals/permissions_modal.php'); ?>
+<?php include($_SERVER['DOCUMENT_ROOT'] . '/tms/src/components/modals/edit_user_modal.php'); ?>
+<?php include($_SERVER['DOCUMENT_ROOT'] . '/tms/src/components/modals/view_user_details_modal.php'); ?>
+<?php include($_SERVER['DOCUMENT_ROOT'] . '/tms/src/components/modals/role_modal.php'); ?>
+<?php include($_SERVER['DOCUMENT_ROOT'] . '/tms/src/components/modals/department_modal.php'); ?>
+<?php include($_SERVER['DOCUMENT_ROOT'] . '/tms/src/components/modals/insert_department_modal.php'); ?>
+<?php include($_SERVER['DOCUMENT_ROOT'] . '/tms/src/components/modals/update_department_modal.php'); ?>
+<?php include($_SERVER['DOCUMENT_ROOT'] . '/tms/src/components/modals/insert_role_modal.php'); ?>
+<?php include($_SERVER['DOCUMENT_ROOT'] . '/tms/src/components/modals/update_role_modal.php'); ?>
 <script src="/tms/src/assets/scripts/management/index.js"></script>
 <script src="/tms/src/assets/scripts/management/search.js"></script>
 <script src="/tms/src/assets/scripts/management/create_user.js"></script>
+<script src="/tms/src/assets/scripts/management/permissions.js"></script>
+<script src="/tms/src/assets/scripts/management/update_user.js"></script>
+<script src="/tms/src/assets/scripts/management/delete_user.js"></script>
+<script src="/tms/src/assets/scripts/management/view_user.js"></script>
+<script src="/tms/src/assets/scripts/management/roles.js"></script>
+<script src="/tms/src/assets/scripts/management/department.js"></script>
+<script src="/tms/src/assets/scripts/management/insert_department.js"></script>
+<script src="/tms/src/assets/scripts/management/update_department.js"></script>
+<script src="/tms/src/assets/scripts/management/delete_department.js"></script>
+<script src="/tms/src/assets/scripts/management/insert_role.js"></script>
+<script src="/tms/src/assets/scripts/management/update_role.js"></script>
+<script src="/tms/src/assets/scripts/management/delete_role.js"></script>

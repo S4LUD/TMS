@@ -9,7 +9,10 @@ $departments = json_decode($departmentsJson, true);
 
 <div id="createUserModalOverlay" class="select-none fixed inset-0 bg-gray-500 bg-opacity-50 flex items-center justify-center hidden z-50" onclick="closeCreateUserModal()">
     <div class="bg-white p-4 rounded shadow-md w-96" onclick="event.stopPropagation();">
-        <h2 class="text-2xl mb-4">Create User</h2>
+        <div class="mb-4 flex justify-between">
+            <h2 class="text-xl font-medium">Create User</h2>
+            <i onclick="closeCreateUserModal()" class="h-fit fa-solid fa-xmark text-white bg-gray-300 hover:bg-gray-400 py-1 px-1.5 rounded-full cursor-pointer"></i>
+        </div>
         <form id="createUserForm">
             <div class="mb-4">
                 <label for="createUsername" class="block text-gray-700">Username:</label>
@@ -49,7 +52,6 @@ $departments = json_decode($departmentsJson, true);
                 </select>
             </div>
             <div class="flex justify-end">
-                <button type="button" onclick="closeCreateUserModal()" class="bg-gray-500 text-white py-2 px-4 rounded-md hover:bg-gray-600 hover:text-gray-100 transition duration-75 mr-2">Cancel</button>
                 <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 hover:text-gray-100 transition duration-75">Create User</button>
             </div>
         </form>

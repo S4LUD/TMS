@@ -3,32 +3,11 @@ require_once __DIR__ . '/../../config/db.php';
 
 class Auth
 {
-    public static function fetchAll()
-    {
-        global $db;
-
-        $stmt = $db->query("SELECT users.id, users.username, users.createdAt, users.updatedAt, role.role FROM users INNER JOIN role ON users.role_id = role.id");
-        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-        $users = [];
-        foreach ($results as $result) {
-            $users[] = new Users(
-                $result['id'],
-                $result['username'],
-                $result['createdAt'],
-                $result['updatedAt'],
-                $result['role']
-            );
-        }
-
-        return json_encode($users);
-    }
-
     public static function login($username, $password)
     {
         global $db;
 
-        $stmt = $db->prepare("SELECT users.id, users.username, users.password, role.role, department.department, department.abbreviation, permissions.permissions FROM users
+        $stmt = $db->prepare("SELECT users.id, users.username, users.password, role.role, users.auth, department.department, department.abbreviation, permissions.permissions FROM users
                         JOIN role on users.role_id = role.id
                         JOIN department on users.department_id = department.id
                         JOIN permissions on users.id = permissions.user_id
@@ -46,6 +25,7 @@ class Auth
                 'department' => $user['department'],
                 'abbreviation' => $user['abbreviation'],
                 'permissions' => $user['permissions'],
+                'auth' => $user['auth'],
             ]);
         } else {
             return null;
@@ -82,7 +62,6 @@ class Auth
         return json_encode($userData);
     }
 
-
     public static function createUser($username, $password, $departmentId, $roleId)
     {
         global $db;
@@ -110,11 +89,26 @@ class Auth
         // Hash the password before storing it in the database
         $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
+        // Insert user data into the database
         $insertStmt = $db->prepare("INSERT INTO `users`(`username`, `password`, `department_id`, `role_id`) VALUES (?, ?, ?, ?)");
+        $insertSuccess = $insertStmt->execute([$username, $hashedPassword, $departmentId, $roleId]);
 
-        if ($insertStmt->execute([$username, $hashedPassword, $departmentId, $roleId])) {
+        if ($insertSuccess) {
             // Successful registration
-            return json_encode(['message' => 'Registration successful']);
+            $userId = $db->lastInsertId(); // Get the ID of the newly inserted user
+
+            // Insert default permissions for the user
+            $defaultPermissions = '{"account_management":{"enabled":false,"source":{"create_user":false,"roles":false,"departments":false,"delete":false,"view":false,"edit":false,"permissions":false}},"tasks":{"enabled":false,"source":{"create_task":false,"delete":false,"view":false,"edit":false}},"distribute":{"enabled":false,"source":{"assign":false}},"performance":false, "report":false}'; // Define default permissions
+            $insertPermissionStmt = $db->prepare("INSERT INTO `permissions`(`user_id`, `permissions`) VALUES (?, ?)");
+            $insertPermissionSuccess = $insertPermissionStmt->execute([$userId, $defaultPermissions]);
+
+            if ($insertPermissionSuccess) {
+                return json_encode(['message' => 'Registration successful']);
+            } else {
+                // If inserting default permissions fails, remove the user record to maintain consistency
+                $db->prepare("DELETE FROM `users` WHERE `id` = ?")->execute([$userId]);
+                return json_encode(['error' => 'Failed to set permissions']);
+            }
         } else {
             // Registration failed
             return json_encode(['error' => 'Registration failed']);

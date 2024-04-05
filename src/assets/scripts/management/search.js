@@ -2,7 +2,7 @@ const searchButton = document.getElementById("searchButton");
 const clearButton = document.getElementById("clearButton");
 let isSearchPerformed = false;
 
-searchButton.addEventListener("click", function () {
+searchButton.addEventListener("click", async function () {
   const searchAccount = document.getElementById("searchAccount").value;
 
   if (searchAccount === "") {
@@ -10,16 +10,16 @@ searchButton.addEventListener("click", function () {
   }
 
   clearButton.classList.remove("hidden");
-  fetch(`http://localhost/tms/api/fetchallusers?searchaccount=${searchAccount}`)
+  await fetch(`${apiLink}/fetchallusers?searchaccount=${searchAccount}`)
     .then((response) => response.json())
     .then((users) => updateTable(users));
 });
 
-clearButton.addEventListener("click", function () {
+clearButton.addEventListener("click", async function () {
   isSearchPerformed = false;
   document.getElementById("searchAccount").value = "";
   clearButton.classList.add("hidden");
-  fetch(`http://localhost/tms/api/fetchallusers`)
+  await fetch(`${apiLink}/fetchallusers`)
     .then((response) => response.json())
     .then((users) => updateTable(users));
 });

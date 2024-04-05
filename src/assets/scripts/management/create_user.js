@@ -8,7 +8,7 @@ createUserForm.addEventListener("submit", function (event) {
   const departmentId = document.getElementById("createDepartment").value;
   const roleId = document.getElementById("createRole").value;
 
-  const url = `http://localhost/tms/api/register?username=${username}&password=${password}&department_id=${departmentId}&role_id=${roleId}`;
+  const url = `${apiLink}/register?username=${username}&password=${password}&department_id=${departmentId}&role_id=${roleId}`;
 
   fetch(url)
     .then((response) => response.json())
@@ -24,9 +24,6 @@ createUserForm.addEventListener("submit", function (event) {
             background: "#3CA2FA",
           },
         }).showToast();
-        closeCreateUserModal();
-        clearCreateInputs();
-        fetchUsers();
       } else if (result.error) {
         Toastify({
           text: result.error,
@@ -42,5 +39,10 @@ createUserForm.addEventListener("submit", function (event) {
     })
     .catch((error) => {
       console.error("Error:", error);
+    })
+    .finally(() => {
+      closeCreateUserModal();
+      clearCreateInputs();
+      fetchUsers();
     });
 });

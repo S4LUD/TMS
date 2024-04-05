@@ -1,6 +1,9 @@
 <div id="createTask" class="select-none fixed inset-0 bg-gray-500 bg-opacity-50 flex items-center justify-center hidden z-50" onclick="closeCreateTaskModal()">
     <div class="bg-white p-4 rounded shadow-md w-96" onclick="event.stopPropagation();">
-        <h2 class="text-2xl font-medium mb-4">Create Task</h2>
+        <div class="mb-4 flex justify-between">
+            <h2 class="text-xl font-medium">Create Task</h2>
+            <i onclick="closeCreateTaskModal()" class="h-fit fa-solid fa-xmark text-white bg-gray-300 hover:bg-gray-400 py-1 px-1.5 rounded-full cursor-pointer"></i>
+        </div>
         <form id="createTaskForm" method="POST" onsubmit="submitNewTask(event)">
             <div class="mb-4">
                 <label for="task_title" class="block text-gray-700">Title:</label>
@@ -21,7 +24,6 @@
             <div id="filePreview" class="hidden flex gap-1 flex-row overflow-y-auto mt-1"></div>
 
             <div class="mt-4 flex justify-end gap-2">
-                <button type="button" id="cancelButton" class="font-semibold bg-gray-500 text-white py-2 px-4 rounded-md hover:bg-gray-600 hover:text-gray-100 transition duration-75 min-w-50 max-w-50" onclick="closeCreateTaskModal()">Cancel</button>
                 <button type="submit" class="font-semibold bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 hover:text-gray-100 transition duration-75 min-w-50 max-w-50">Create</button>
             </div>
         </form>

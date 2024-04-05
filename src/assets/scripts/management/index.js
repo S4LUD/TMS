@@ -1,7 +1,7 @@
 const userTable = document.getElementById("userTable");
 
-function fetchUsers() {
-  fetch(`http://localhost/tms/api/fetchallusers`)
+async function fetchUsers() {
+  await fetch(`${apiLink}/fetchallusers`)
     .then((response) => response.json())
     .then((users) => updateTable(users));
 }
@@ -20,11 +20,15 @@ async function updateTable(users) {
     userTable.appendChild(row);
   } else {
     for (const user of users) {
-      const row = document.createElement("tr");
+      if (user?.auth === 1) {
+        continue;
+      }
 
+      const row = document.createElement("tr");
       const { account_management: accountManagementPermissions } = JSON.parse(
         localStorage.getItem("permissions")
       );
+
       const { source } = accountManagementPermissions;
 
       row.innerHTML = `
@@ -77,19 +81,21 @@ async function updateTable(users) {
 
       // Add event listeners only if the buttons exist
       if (deleteBtn) {
-        deleteBtn.addEventListener("click", () => console.log(user.id));
+        deleteBtn.addEventListener("click", () => deleteAccount(user.id));
       }
 
       if (viewBtn) {
-        viewBtn.addEventListener("click", () => console.log(user.id));
+        viewBtn.addEventListener("click", () => openViewUserDetailsModal(user.id));
       }
 
       if (editBtn) {
-        editBtn.addEventListener("click", () => console.log(user.id));
+        editBtn.addEventListener("click", () => openUserDetailsModal(user.id));
       }
 
       if (permissionBtn) {
-        permissionBtn.addEventListener("click", () => console.log(user.id));
+        permissionBtn.addEventListener("click", () =>
+          openPermissionsModal(user.id)
+        );
       }
     }
   }
