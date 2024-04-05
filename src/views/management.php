@@ -51,6 +51,7 @@ $permissions = json_decode($userData['permissions'], true);
 <?php include($_SERVER['DOCUMENT_ROOT'] . '/tms/src/components/modals/department_modal.php'); ?>
 <?php include($_SERVER['DOCUMENT_ROOT'] . '/tms/src/components/modals/insert_department_modal.php'); ?>
 <?php include($_SERVER['DOCUMENT_ROOT'] . '/tms/src/components/modals/update_department_modal.php'); ?>
+<?php include($_SERVER['DOCUMENT_ROOT'] . '/tms/src/components/modals/insert_role_modal.php'); ?>
 <script src="/tms/src/assets/scripts/management/index.js"></script>
 <script src="/tms/src/assets/scripts/management/search.js"></script>
 <script src="/tms/src/assets/scripts/management/create_user.js"></script>
@@ -63,3 +64,4 @@ $permissions = json_decode($userData['permissions'], true);
 <script src="/tms/src/assets/scripts/management/insert_department.js"></script>
 <script src="/tms/src/assets/scripts/management/update_department.js"></script>
 <script src="/tms/src/assets/scripts/management/delete_department.js"></script>
+<script src="/tms/src/assets/scripts/management/insert_role.js"></script>

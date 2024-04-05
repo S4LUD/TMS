@@ -138,6 +138,16 @@ class Users
         return json_encode($results);
     }
 
+    public static function  fetchRoles()
+    {
+        global $db;
+
+        $stmt = $db->query("SELECT id, role FROM role");
+        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        return json_encode($results);
+    }
+
     public static function insertDepartment($abbreviation, $department)
     {
         global $db;
@@ -162,6 +172,38 @@ class Users
         } catch (PDOException $e) {
             // Handle database errors
             return "Error inserting department: " . $e->getMessage();
+        }
+    }
+
+    public static function insertRole($role)
+    {
+        global $db;
+        try {
+            // Prepare the SQL statement for insertion
+            $stmt = $db->prepare("INSERT INTO role (role) VALUES (:role)");
+
+            // Bind parameters and execute the statement
+            $stmt->bindParam(':role', $role);
+            $stmt->execute();
+
+            // Check if any rows were affected
+            $rowCount = $stmt->rowCount();
+
+            // Return a success message or the number of affected rows
+            if ($rowCount > 0) {
+                return "Successfully added: $role";
+            } else {
+                return "No rows affected.";
+            }
+        } catch (PDOException $e) {
+            // Handle integrity constraint violation error
+            if ($e->getCode() === '23000') {
+                // Handle duplicate entry error
+                return "Role '$role' already exists.";
+            } else {
+                // Handle other database errors
+                return "Error inserting role: " . $e->getMessage();
+            }
         }
     }
 

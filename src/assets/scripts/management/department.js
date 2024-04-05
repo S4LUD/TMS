@@ -15,7 +15,6 @@ async function fetchDepartments() {
   });
   const result = await response.json();
   return result;
-  //   departmentCount.innerText = Math.ceil(result.length / itemsPerPage);
 }
 
 async function fetchDepartmentsWithPagination(page) {
