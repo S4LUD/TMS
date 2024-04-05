@@ -235,6 +235,33 @@ class Users
         }
     }
 
+    public static function updateRole($roleId, $role)
+    {
+        global $db;
+        try {
+            // Prepare the SQL statement for update
+            $stmt = $db->prepare("UPDATE role SET role = :role WHERE id = :roleId");
+
+            // Bind parameters and execute the statement
+            $stmt->bindParam(':roleId', $roleId);
+            $stmt->bindParam(':role', $role);
+            $stmt->execute();
+
+            // Check if any rows were affected
+            $rowCount = $stmt->rowCount();
+
+            // Return a success message or the number of affected rows
+            if ($rowCount > 0) {
+                return "Successfully updated role";
+            } else {
+                return "No rows affected. Role with ID $roleId not found.";
+            }
+        } catch (PDOException $e) {
+            // Handle database errors
+            return "Error updating role: " . $e->getMessage();
+        }
+    }
+
     public static function countUsers()
     {
         global $db;
@@ -413,6 +440,38 @@ class Users
             // Delete user from the database
             $stmt = $db->prepare("DELETE FROM department WHERE id = :departmentId");
             $stmt->bindParam(':departmentId', $departmentId, PDO::PARAM_INT);
+            $stmt->execute();
+
+
+            // Commit the transaction
+            $db->commit();
+
+            // Check if any rows were affected
+            $rowCount = $stmt->rowCount();
+
+            // Return true if any rows were affected by any of the SQL statements
+            return ($rowCount > 0);
+        } catch (PDOException $e) {
+            // An error occurred, rollback the transaction
+            $db->rollBack();
+
+            // Handle the error
+            // For example, you can throw an exception or return false
+            return false;
+        }
+    }
+
+    public static function deleteRole($roleId)
+    {
+        global $db;
+
+        // Start a transaction
+        $db->beginTransaction();
+
+        try {
+            // Delete user from the database
+            $stmt = $db->prepare("DELETE FROM role WHERE id = :roleId");
+            $stmt->bindParam(':roleId', $roleId, PDO::PARAM_INT);
             $stmt->execute();
 
 
