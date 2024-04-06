@@ -1,3 +1,5 @@
+<?php $userData = json_decode($_SESSION['user'], true); ?>
+
 <div id="createTask" class="select-none fixed inset-0 bg-gray-500 bg-opacity-50 flex items-center justify-center hidden z-50" onclick="closeCreateTaskModal()">
     <div class="bg-white p-4 rounded shadow-md w-96" onclick="event.stopPropagation();">
         <div class="mb-4 flex justify-between">
@@ -5,6 +7,8 @@
             <i onclick="closeCreateTaskModal()" class="h-fit fa-solid fa-xmark text-white bg-gray-300 hover:bg-gray-400 py-1 px-1.5 rounded-full cursor-pointer"></i>
         </div>
         <form id="createTaskForm" method="POST" onsubmit="submitNewTask(event)">
+            <input type="text" value="<?php echo $userData['role']; ?>" name="role" id="role" hidden>
+            <input type="text" value="<?php echo $userData['id']; ?>" name="userId" id="userId" hidden>
             <div class="mb-4">
                 <label for="task_title" class="block text-gray-700">Title:</label>
                 <input type="text" id="task_title" name="title" class="w-full border rounded-md py-2 px-3 focus:outline-none focus:border-blue-500 transition duration-75" required>

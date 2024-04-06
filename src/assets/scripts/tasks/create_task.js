@@ -1,5 +1,3 @@
-
-
 const fileInput = document.getElementById("fileInput");
 const filePreviewContainer = document.getElementById("filePreview");
 const selectedFiles = [];
@@ -38,6 +36,8 @@ async function submitNewTask(event) {
   // Access form fields
   const title = document.getElementById("task_title").value;
   const details = document.getElementById("task_details").value;
+  const role = document.getElementById("role").value;
+  const userId = document.getElementById("userId").value;
 
   // Check if the number of files exceeds the limit
   if (selectedFiles.length > 5) {
@@ -51,6 +51,8 @@ async function submitNewTask(event) {
   // Append form fields to FormData
   formData.append("title", title);
   formData.append("details", details);
+  formData.append("role", role);
+  formData.append("createdBy", userId);
 
   let filesExceedSizeLimit = false;
 

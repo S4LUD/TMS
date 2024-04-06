@@ -1,6 +1,6 @@
 const createUserForm = document.getElementById("createUserForm");
 
-createUserForm.addEventListener("submit", function (event) {
+createUserForm.addEventListener("submit", async function (event) {
   event.preventDefault();
 
   const username = document.getElementById("createUsername").value;
@@ -10,7 +10,7 @@ createUserForm.addEventListener("submit", function (event) {
 
   const url = `${apiLink}/register?username=${username}&password=${password}&department_id=${departmentId}&role_id=${roleId}`;
 
-  fetch(url)
+ await fetch(url)
     .then((response) => response.json())
     .then((result) => {
       if (result.message) {

@@ -66,16 +66,44 @@ class Tasks
         }
     }
 
-    public static function newTask($title, $details)
+    public static function newTask($title, $details, $role, $createdBy)
     {
         global $db;
 
-        $stmt = $db->prepare("INSERT INTO `tasks` (`title`, `detail`) VALUES (:title, :details)");
-        $stmt->bindParam(':title', $title);
-        $stmt->bindParam(':details', $details);
-        $stmt->execute();
-        $taskId = $db->lastInsertId();
-        return (object)['id' => $taskId];
+        try {
+            // Fetch the role name based on role
+            $stmtFetchRole = $db->prepare("SELECT * FROM role WHERE role = :role");
+            $stmtFetchRole->bindParam(':role', $role);
+            $stmtFetchRole->execute();
+            $roleData = $stmtFetchRole->fetch(PDO::FETCH_ASSOC);
+            $roleId = $roleData['id'];
+
+            // Check if the fetched role is a public role
+            $stmtCheckPublicRole = $db->prepare("SELECT COUNT(*) AS count FROM public_role WHERE role_id = :roleId");
+            $stmtCheckPublicRole->bindParam(':roleId', $roleId);
+            $stmtCheckPublicRole->execute();
+            $publicRoleCount = $stmtCheckPublicRole->fetch(PDO::FETCH_ASSOC)['count'];
+
+            // Determine the status ID based on whether the role is public or not
+            $statusId = $publicRoleCount > 0 ? 6 : 4; // Assign status ID 6 for public roles, otherwise default to 4
+
+            // Prepare the SQL statement for insertion
+            $stmt = $db->prepare("INSERT INTO `tasks` (`title`, `detail`, `status_id`, `createdBy`) VALUES (:title, :details, :status_id, :createdBy)");
+            // Bind parameters
+            $stmt->bindParam(':title', $title);
+            $stmt->bindParam(':details', $details);
+            $stmt->bindParam(':status_id', $statusId);
+            $stmt->bindParam(':createdBy', $createdBy);
+            // Execute the statement
+            $stmt->execute();
+            // Get the ID of the inserted task
+            $taskId = $db->lastInsertId();
+            // Return the task ID as an object
+            return (object)['id' => $taskId];
+        } catch (PDOException $e) {
+            // Handle database errors
+            return null; // or throw an exception based on your error handling strategy
+        }
     }
 
     public static function viewTask($task_id)
