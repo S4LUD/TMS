@@ -142,7 +142,7 @@ class Users
     {
         global $db;
 
-        $stmt = $db->query("SELECT id, role, super FROM role");
+        $stmt = $db->query("SELECT * FROM role");
         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         return json_encode($results);
@@ -175,15 +175,16 @@ class Users
         }
     }
 
-    public static function insertRole($role)
+    public static function insertRole($role, $visibility)
     {
         global $db;
         try {
             // Prepare the SQL statement for insertion
-            $stmt = $db->prepare("INSERT INTO role (role) VALUES (:role)");
+            $stmt = $db->prepare("INSERT INTO role (role, visibility) VALUES (:role, :visibility)");
 
             // Bind parameters and execute the statement
             $stmt->bindParam(':role', $role);
+            $stmt->bindParam(':visibility', $visibility);
             $stmt->execute();
 
             // Check if any rows were affected
@@ -235,16 +236,17 @@ class Users
         }
     }
 
-    public static function updateRole($roleId, $role)
+    public static function updateRole($roleId, $role, $visibility)
     {
         global $db;
         try {
             // Prepare the SQL statement for update
-            $stmt = $db->prepare("UPDATE role SET role = :role WHERE id = :roleId");
+            $stmt = $db->prepare("UPDATE role SET role = :role, visibility = :visibility WHERE id = :roleId");
 
             // Bind parameters and execute the statement
             $stmt->bindParam(':roleId', $roleId);
             $stmt->bindParam(':role', $role);
+            $stmt->bindParam(':visibility', $visibility);
             $stmt->execute();
 
             // Check if any rows were affected

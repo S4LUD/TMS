@@ -15,7 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $result = Tasks::fetchPublicUsers($role);
 
         // Return the result as JSON
-        echo json_encode(['count' => $result]);
+        echo json_encode(['visibility' => $result]);
     } else {
         // If the role parameter is not set, return an error message
         echo json_encode(['error' => 'Role parameter is missing']);

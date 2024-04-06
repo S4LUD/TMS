@@ -2,13 +2,14 @@
 require_once '../../src/controllers/Users/index.php';
 
 // Check if all required parameters are set
-if (isset($_GET['roleId'], $_GET['role'])) {
+if (isset($_GET['roleId'], $_GET['role'], $_GET['visibility'])) {
     // Assign values to variables
     $roleId = $_GET['roleId'];
     $role = $_GET['role'];
+    $visibility = $_GET['visibility'];
 
     // Call the updateRole method and store the result
-    $result = Users::updateRole($roleId, $role);
+    $result = Users::updateRole($roleId, $role, $visibility);
 
     // Set the response content type to JSON
     header('Content-Type: application/json');

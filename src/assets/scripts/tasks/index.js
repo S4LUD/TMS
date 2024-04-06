@@ -100,7 +100,7 @@ async function updateTable(tasks) {
       if (!checkPublicRoleResponse.ok) {
         throw new Error(`Failed to fetch public users for role ${role}`);
       }
-      const { count } = await checkPublicRoleResponse.json();
+      const { visibility } = await checkPublicRoleResponse.json();
 
       const { tasks: taskPermissions } = JSON.parse(
         localStorage.getItem("permissions")
@@ -108,7 +108,13 @@ async function updateTable(tasks) {
       const { source } = taskPermissions;
       const formattedDate = formatDate(new Date(task.createdAt));
 
-      const row = createTaskRow(task, viewtask, source, formattedDate, count);
+      const row = createTaskRow(
+        task,
+        viewtask,
+        source,
+        formattedDate,
+        visibility
+      );
       taskTable.appendChild(row);
     } catch (error) {
       console.error("Error updating table:", error.message);
@@ -116,7 +122,7 @@ async function updateTable(tasks) {
   }
 }
 
-function createTaskRow(task, viewtask, source, formattedDate, count) {
+function createTaskRow(task, viewtask, source, formattedDate, visibility) {
   const row = document.createElement("tr");
   row.innerHTML = `
     <td class="whitespace-nowrap py-4 pl-4 pr-3 font-medium text-gray-900 sm:pl-6">
@@ -125,7 +131,8 @@ function createTaskRow(task, viewtask, source, formattedDate, count) {
     <td class="whitespace-nowrap px-3 py-4 text-gray-500">${formattedDate}</td>
     <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right sm:pr-6">
       ${
-        source.delete
+        (source.delete && viewtask.status === "IN_REVIEW") ||
+        visibility !== "PUBLIC"
           ? '<span class="bg-red-500 hover:bg-red-600 text-white hover:text-gray-100 px-2 py-1 rounded delete-btn" style="cursor: pointer"><i class="fa-solid fa-trash-can"></i></span>'
           : ""
       }
@@ -135,13 +142,14 @@ function createTaskRow(task, viewtask, source, formattedDate, count) {
           : ""
       }
       ${
-        (source.edit && viewtask.status === "IN_REVIEW") || !count
+        (source.edit && viewtask.status === "IN_REVIEW") ||
+        visibility !== "PUBLIC"
           ? '<span class="bg-yellow-500 hover:bg-yellow-600 text-white hover:text-gray-100 px-2 py-1 rounded edit-btn" style="cursor: pointer"><i class="fa-solid fa-pen-to-square"></i></span>'
           : ""
       }
     </td>
   `;
-  
+
   // Get the buttons in the row
   let deleteBtn = row.querySelector(".delete-btn");
   let viewBtn = row.querySelector(".view-btn");

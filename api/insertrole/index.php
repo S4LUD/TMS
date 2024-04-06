@@ -2,12 +2,13 @@
 require_once '../../src/controllers/Users/index.php';
 
 // Check if both abbreviation and role parameters are set
-if (isset($_GET['role'])) {
+if (isset($_GET['role'], $_GET['visibility'])) {
     // Assign values to variables
     $role = $_GET['role'];
+    $visibility = $_GET['visibility'];
 
     // Call the insertRole method and store the result
-    $result = Users::insertRole($role);
+    $result = Users::insertRole($role, $visibility);
 
     // Set the response content type to JSON
     header('Content-Type: application/json');

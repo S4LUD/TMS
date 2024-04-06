@@ -19,13 +19,7 @@ class Tasks
             $stmtFetchRole->bindParam(':role', $role);
             $stmtFetchRole->execute();
             $roleData = $stmtFetchRole->fetch(PDO::FETCH_ASSOC);
-            $roleId = $roleData['id'];
-
-            // Check if the fetched role is a public role
-            $stmtCheckPublicRole = $db->prepare("SELECT COUNT(*) AS count FROM public_role WHERE role_id = :roleId");
-            $stmtCheckPublicRole->bindParam(':roleId', $roleId);
-            $stmtCheckPublicRole->execute();
-            $publicRoleCount = $stmtCheckPublicRole->fetch(PDO::FETCH_ASSOC)['count'];
+            $visibility = $roleData['visibility'];
 
             $query = "SELECT * FROM tasks";
 
@@ -35,7 +29,7 @@ class Tasks
             }
 
             // If the role is a public role, add condition to fetch tasks based on user_id or createdBy
-            if ($publicRoleCount == 1) {
+            if ($visibility === "PUBLIC") {
                 // Add WHERE clause if not already present
                 if (!strstr($query, "WHERE")) {
                     $query .= " WHERE";
@@ -57,7 +51,7 @@ class Tasks
             }
 
             // Bind user ID if the role is public
-            if ($publicRoleCount == 1) {
+            if ($visibility === "PUBLIC") {
                 $stmt->bindParam(':userId', $userId, PDO::PARAM_INT);
             }
 
@@ -105,16 +99,10 @@ class Tasks
             $stmtFetchRole->bindParam(':role', $role);
             $stmtFetchRole->execute();
             $roleData = $stmtFetchRole->fetch(PDO::FETCH_ASSOC);
-            $roleId = $roleData['id'];
-
-            // Check if the fetched role is a public role
-            $stmtCheckPublicRole = $db->prepare("SELECT COUNT(*) AS count FROM public_role WHERE role_id = :roleId");
-            $stmtCheckPublicRole->bindParam(':roleId', $roleId);
-            $stmtCheckPublicRole->execute();
-            $publicRoleCount = $stmtCheckPublicRole->fetch(PDO::FETCH_ASSOC)['count'];
+            $visibility = $roleData['visibility'];
 
             // Determine the status ID based on whether the role is public or not
-            $statusId = $publicRoleCount > 0 ? 6 : 4; // Assign status ID 6 for public roles, otherwise default to 4
+            $statusId = $visibility === "PUBLIC" ? 6 : 4; // Assign status ID 6 for public roles, otherwise default to 4
 
             // Prepare the SQL statement for insertion
             $stmt = $db->prepare("INSERT INTO `tasks` (`title`, `detail`, `status_id`, `createdBy`) VALUES (:title, :details, :status_id, :createdBy)");
@@ -341,12 +329,12 @@ class Tasks
         global $db;
 
         // Check if the fetched role is a public role
-        $stmt = $db->prepare("SELECT COUNT(*) AS count FROM `role` JOIN `public_role` ON `role`.`id` = `public_role`.`role_id` WHERE `role`.`role` = :role");
+        $stmt = $db->prepare("SELECT visibility FROM `role` WHERE `role`.`role` = :role");
         $stmt->bindParam(':role', $role);
         $stmt->execute();
 
-        $count = $stmt->fetchColumn(); // Fetch the count value
+        $visibility = $stmt->fetchColumn(); // Fetch the count value
 
-        return $count; // Return the count value, which could be 0 if the role is not found
+        return $visibility; // Return the count value, which could be 0 if the role is not found
     }
 }
