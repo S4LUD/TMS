@@ -12,13 +12,15 @@ function sendResponse($data)
 // Validate and sanitize input parameters
 $startDate = isset($_GET['startDate']) ? $_GET['startDate'] : null;
 $endDate = isset($_GET['endDate']) ? $_GET['endDate'] : null;
+$role = isset($_GET['role']) ? $_GET['role'] : null;
+$userId = isset($_GET['userId']) ? $_GET['userId'] : null;
 
 try {
     // Fetch tasks based on parameters
     if ($startDate !== null && $endDate !== null) {
-        $result = Tasks::fetchAllTasks($startDate, $endDate);
+        $result = Tasks::fetchAllTasks($startDate, $endDate, $role, $userId);
     } else {
-        $result = Tasks::fetchAllTasks(null, null);
+        $result = Tasks::fetchAllTasks(null, null, null, null);
     }
 
     sendResponse($result);

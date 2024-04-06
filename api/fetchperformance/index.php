@@ -13,7 +13,7 @@ function fetchPerformance()
     {
         // Set the timezone to your desired timezone
         date_default_timezone_set('Asia/Manila');
-        
+
         // Get the current date
         $currentDate = new DateTime();
 
@@ -38,7 +38,7 @@ function fetchPerformance()
     // Call the fetchPerformance function from the Tasks controller
     $tasksPerformance = Tasks::fetchPerformance();
 
-    $tasksCount = Tasks::fetchAllTasks(getCurrentWeekDates()['monday'], getCurrentWeekDates()['sunday']);
+    $tasksCount = Tasks::fetchAllTasks(getCurrentWeekDates()['monday'], getCurrentWeekDates()['sunday'], null, null);
 
     // Combine the results into a single response
     if (is_array(json_decode($tasksCount, true))) {

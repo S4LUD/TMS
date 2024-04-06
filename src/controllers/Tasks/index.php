@@ -9,16 +9,40 @@ class Tasks
         return $db;
     }
 
-    public static function fetchAllTasks($startDate, $endDate)
+    public static function fetchAllTasks($startDate, $endDate, $role, $userId)
     {
         global $db;
 
         try {
-            $query = "SELECT id, title, createdAt, task_type, dueAt, user_id, startedAt, endedAt FROM tasks";
+            // Fetch the role name based on role
+            $stmtFetchRole = $db->prepare("SELECT * FROM role WHERE role = :role");
+            $stmtFetchRole->bindParam(':role', $role);
+            $stmtFetchRole->execute();
+            $roleData = $stmtFetchRole->fetch(PDO::FETCH_ASSOC);
+            $roleId = $roleData['id'];
+
+            // Check if the fetched role is a public role
+            $stmtCheckPublicRole = $db->prepare("SELECT COUNT(*) AS count FROM public_role WHERE role_id = :roleId");
+            $stmtCheckPublicRole->bindParam(':roleId', $roleId);
+            $stmtCheckPublicRole->execute();
+            $publicRoleCount = $stmtCheckPublicRole->fetch(PDO::FETCH_ASSOC)['count'];
+
+            $query = "SELECT * FROM tasks";
 
             // Check if date range is provided
             if (!empty($startDate) && !empty($endDate)) {
                 $query .= " WHERE createdAt BETWEEN :startDate AND :endDate";
+            }
+
+            // If the role is a public role, add condition to fetch tasks based on user_id or createdBy
+            if ($publicRoleCount == 1) {
+                // Add WHERE clause if not already present
+                if (!strstr($query, "WHERE")) {
+                    $query .= " WHERE";
+                } else {
+                    $query .= " AND";
+                }
+                $query .= " (user_id = :userId OR createdBy = :userId)";
             }
 
             // Prepare the statement
@@ -30,6 +54,11 @@ class Tasks
                 $endDate .= " 23:59:59";
                 $stmt->bindParam(':startDate', $startDate, PDO::PARAM_STR);
                 $stmt->bindParam(':endDate', $endDate, PDO::PARAM_STR);
+            }
+
+            // Bind user ID if the role is public
+            if ($publicRoleCount == 1) {
+                $stmt->bindParam(':userId', $userId, PDO::PARAM_INT);
             }
 
             // Execute the statement
@@ -305,5 +334,19 @@ class Tasks
             error_log("Error distributing task: " . $e->getMessage());
             return false;
         }
+    }
+
+    public static function fetchPublicUsers($role)
+    {
+        global $db;
+
+        // Check if the fetched role is a public role
+        $stmt = $db->prepare("SELECT COUNT(*) AS count FROM `role` JOIN `public_role` ON `role`.`id` = `public_role`.`role_id` WHERE `role`.`role` = :role");
+        $stmt->bindParam(':role', $role);
+        $stmt->execute();
+
+        $count = $stmt->fetchColumn(); // Fetch the count value
+
+        return $count; // Return the count value, which could be 0 if the role is not found
     }
 }
