@@ -138,7 +138,7 @@ class Users
         return json_encode($results);
     }
 
-    public static function  fetchRoles()
+    public static function fetchRoles()
     {
         global $db;
 

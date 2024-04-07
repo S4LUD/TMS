@@ -9,17 +9,20 @@ class Tasks
         return $db;
     }
 
-    public static function fetchAllTasks($startDate, $endDate, $role, $userId)
+    public static function fetchAllTasks($startDate = "", $endDate = "", $role = null, $userId = null)
     {
         global $db;
 
         try {
-            // Fetch the role name based on role
-            $stmtFetchRole = $db->prepare("SELECT * FROM role WHERE role = :role");
-            $stmtFetchRole->bindParam(':role', $role);
-            $stmtFetchRole->execute();
-            $roleData = $stmtFetchRole->fetch(PDO::FETCH_ASSOC);
-            $visibility = $roleData['visibility'];
+            // If role is provided, fetch visibility
+            if ($role !== null) {
+                // Fetch the role name based on role
+                $stmtFetchRole = $db->prepare("SELECT visibility FROM role WHERE role = :role");
+                $stmtFetchRole->bindParam(':role', $role);
+                $stmtFetchRole->execute();
+                $roleData = $stmtFetchRole->fetch(PDO::FETCH_ASSOC);
+                $visibility = $roleData['visibility'];
+            }
 
             $query = "SELECT * FROM tasks";
 
@@ -29,7 +32,7 @@ class Tasks
             }
 
             // If the role is a public role, add condition to fetch tasks based on user_id or createdBy
-            if ($visibility === "PUBLIC") {
+            if ($role !== null && $visibility === "PUBLIC") {
                 // Add WHERE clause if not already present
                 if (!strstr($query, "WHERE")) {
                     $query .= " WHERE";
@@ -50,8 +53,8 @@ class Tasks
                 $stmt->bindParam(':endDate', $endDate, PDO::PARAM_STR);
             }
 
-            // Bind user ID if the role is public
-            if ($visibility === "PUBLIC") {
+            // Bind user ID if the role is public and user ID is provided
+            if ($role !== null && $userId !== null && $visibility === "PUBLIC") {
                 $stmt->bindParam(':userId', $userId, PDO::PARAM_INT);
             }
 

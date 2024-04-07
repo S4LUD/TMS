@@ -7,7 +7,7 @@ function fetchDataFromAPI(url, callback) {
 }
 
 // API URL
-var apiUrl = `${apiLink}/fetchperformance/`;
+var apiUrl = `${apiLink}/fetchperformance`;
 
 function calculateCompletionRate(apiData) {
   // Get the total number of tasks

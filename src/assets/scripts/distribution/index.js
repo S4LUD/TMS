@@ -14,10 +14,9 @@ async function fetchTasks(startDate = "", endDate = "") {
 
   // Construct query parameters
   const params = new URLSearchParams();
-  if (startDate && endDate) {
-    params.append("startDate", startDate);
-    params.append("endDate", endDate);
-  }
+
+  params.append("startDate", startDate);
+  params.append("endDate", endDate);
 
   // Append query parameters to the URL
   url += "?" + params.toString();
