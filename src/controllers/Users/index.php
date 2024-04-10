@@ -7,6 +7,7 @@ class Users
     public $username;
     public $auth;
     public $department;
+    public $abbreviation;
     public $role;
     public $status;
     public $full_name;
@@ -21,12 +22,13 @@ class Users
         return $db;
     }
 
-    public function __construct($id, $username, $auth, $department, $role, $status, $full_name, $address, $age, $contact, $gender)
+    public function __construct($id, $username, $auth, $department, $abbreviation, $role, $status, $full_name, $address, $age, $contact, $gender)
     {
         $this->id = $id;
         $this->username = $username;
         $this->auth = $auth;
         $this->department = $department;
+        $this->abbreviation = $abbreviation;
         $this->role = $role;
         $this->status = $status;
         $this->full_name = $full_name;
@@ -36,30 +38,50 @@ class Users
         $this->gender = $gender;
     }
 
-    public static function fetchAllUsers($searchTerm  = null)
+    public static function fetchAllUsers($searchTerm = null, $abbreviation = null)
     {
         global $db;
 
         // Initial query without WHERE clause
-        $query = "SELECT users.id, users.username, users.auth, role.role, department.department, user_status.status, user_details.full_name, user_details.address, user_details.age, user_details.contact, user_details.gender
+        $query = "SELECT users.id, users.username, users.auth, role.role, department.department, department.abbreviation, user_status.status, user_details.full_name, user_details.address, user_details.age, user_details.contact, user_details.gender
                 FROM users
                 INNER JOIN role ON users.role_id = role.id
                 INNER JOIN department ON users.department_id = department.id
                 LEFT JOIN user_status ON users.status = user_status.id
                 LEFT JOIN user_details ON users.id = user_details.user_id";
 
-        // Check if $username is provided
+        // Check if $searchTerm is provided
         if (!empty($searchTerm)) {
-            // Append WHERE clause for specific username
+            // Append WHERE clause for specific username or user ID
             $query .= " WHERE BINARY users.username = :searchTerm OR users.id = :searchTerm";
-            $stmt = $db->prepare($query);
-            $stmt->bindParam(':searchTerm', $searchTerm, PDO::PARAM_STR);
-        } else {
-            // No specific username provided, fetch all users
-            $stmt = $db->query($query);
         }
 
+        // Check if $abbreviation is provided
+        if (!empty($abbreviation)) {
+            // Add condition to filter by department abbreviation
+            if (strpos($query, "WHERE") === false) {
+                $query .= " WHERE";
+            } else {
+                $query .= " AND";
+            }
+            $query .= " department.abbreviation = :abbreviation";
+        }
+
+        // Prepare the SQL statement
+        $stmt = $db->prepare($query);
+
+        // Bind parameters if necessary
+        if (!empty($searchTerm)) {
+            $stmt->bindParam(':searchTerm', $searchTerm, PDO::PARAM_STR);
+        }
+        if (!empty($abbreviation)) {
+            $stmt->bindParam(':abbreviation', $abbreviation, PDO::PARAM_STR);
+        }
+
+        // Execute the statement
         $stmt->execute();
+
+        // Fetch the results
         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         $users = [];
@@ -69,6 +91,7 @@ class Users
                 $result['username'],
                 $result['auth'],
                 $result['department'],
+                $abbreviation,
                 $result['role'],
                 $result['status'],
                 $result['full_name'],

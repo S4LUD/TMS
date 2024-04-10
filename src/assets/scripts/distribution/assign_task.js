@@ -4,9 +4,14 @@ let names = []; // Array to hold user names
 
 async function fetchUsers() {
   try {
-    const response = await fetch(`${apiLink}/fetchallusers`);
+    const userDetails = JSON.parse(localStorage.getItem("user"));
+    const abbreviation = userDetails?.abbreviation;
+    const response = await fetch(
+      `${apiLink}/fetchallusers?abbreviation=${abbreviation}`
+    );
     const result = await response.json();
-    names = result; // Update the names array with the fetched user data
+    const employees = result.filter(user => user.role === "EMPLOYEE");
+    names = employees; // Update the names array with the fetched user data
     updateDisplay(""); // Call updateDisplay with an empty query to display all users
   } catch (error) {
     console.error("Error fetching users:", error.message);

@@ -142,7 +142,6 @@ function createTaskRow(task, viewtask, source, formattedDate, visibility) {
           : ""
       }
       ${
-        (source.edit && viewtask.status === "IN_REVIEW") ||
         visibility !== "PUBLIC"
           ? '<span class="bg-yellow-500 hover:bg-yellow-600 text-white hover:text-gray-100 px-2 py-1 rounded edit-btn" style="cursor: pointer"><i class="fa-solid fa-pen-to-square"></i></span>'
           : ""
