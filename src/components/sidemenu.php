@@ -66,7 +66,7 @@ $permissions = json_decode($userData['permissions'], true);
             </li>
         <?php } ?>
         <li class="hover:bg-gray-600 cursor-pointer rounded-md transition duration-75">
-            <div class="flex py-2 pl-2.5 whitespace-nowrap" onclick="openSettingsModal(<?php echo $userData['id'] ?>)">
+            <div class="flex py-2 pl-2.5 whitespace-nowrap" onclick="openSettingsModal()">
                 <div class="min-w-7 flex justify-center items-center mr-1.5"><i class="fa-solid fa-gear text-lg text-gray-200"></i></div>
                 <span class="text-gray-200">Settings</span>
             </div>
@@ -79,4 +79,6 @@ $permissions = json_decode($userData['permissions'], true);
 </aside>
 
 <?php include($_SERVER['DOCUMENT_ROOT'] . '/tms/src/components/modals/settings_modal.php'); ?>
+<?php include($_SERVER['DOCUMENT_ROOT'] . '/tms/src/components/modals/user_information.php'); ?>
+<?php include($_SERVER['DOCUMENT_ROOT'] . '/tms/src/components/modals/change_password_modal.php'); ?>
 <?php include($_SERVER['DOCUMENT_ROOT'] . '/tms/src/components/modals/logout_modal.php'); ?>
