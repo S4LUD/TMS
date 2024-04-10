@@ -10,6 +10,9 @@ const itemsPerPage = 10; // Number of tasks per page
 
 // Function to fetch tasks from the API
 async function fetchTasks(startDate = "", endDate = "") {
+  const userDetails = JSON.parse(localStorage.getItem("user"));
+  const { id, role } = userDetails;
+
   let url = `${apiLink}/fetchalltasks`;
 
   // Construct query parameters
@@ -17,6 +20,8 @@ async function fetchTasks(startDate = "", endDate = "") {
 
   params.append("startDate", startDate);
   params.append("endDate", endDate);
+  params.append("role", role);
+  params.append("userId", id);
 
   // Append query parameters to the URL
   url += "?" + params.toString();
@@ -97,6 +102,7 @@ async function updateTable(tasks) {
       }
       if (task.user_id) {
         userData = await fetchUserData(task.user_id);
+        console.log(userData);
       }
       const { distribute: distributePermissions } = JSON.parse(
         localStorage.getItem("permissions")
@@ -108,7 +114,9 @@ async function updateTable(tasks) {
                 <td class="whitespace-nowrap py-4 pl-4 pr-3 font-medium text-gray-900 sm:pl-6">${
                   task.title
                 }</td>
-                <td class="whitespace-nowrap px-3 py-4 text-gray-500">${userData}</td>
+                <td class="whitespace-nowrap px-3 py-4 text-gray-500">${
+                  userData[0]?.username ? userData[0]?.username : "N/A"
+                }</td>
                 <td class="whitespace-nowrap px-3 py-4 text-gray-500">${
                   task?.task_type ? task?.task_type : "N/A"
                 }</td>

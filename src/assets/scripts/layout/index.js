@@ -47,27 +47,27 @@ function closeLogoutModal() {
 }
 
 // Add an event listener to the input element
-ageSettingsInput.addEventListener("input", function (event) {
-  // Get the current value of the input field
-  let value = event.target.value;
+// ageSettingsInput.addEventListener("input", function (event) {
+//   // Get the current value of the input field
+//   let value = event.target.value;
 
-  // Remove any non-numeric characters from the value
-  value = value.replace(/\D/g, "");
+//   // Remove any non-numeric characters from the value
+//   value = value.replace(/\D/g, "");
 
-  // Update the input field value with the sanitized value
-  event.target.value = value;
-});
+//   // Update the input field value with the sanitized value
+//   event.target.value = value;
+// });
 
-contackSettingsInput.addEventListener("input", function (event) {
-  // Get the current value of the input field
-  let value = event.target.value;
+// contackSettingsInput.addEventListener("input", function (event) {
+//   // Get the current value of the input field
+//   let value = event.target.value;
 
-  // Remove any non-numeric characters from the value
-  value = value.replace(/[^\d]/g, "");
+//   // Remove any non-numeric characters from the value
+//   value = value.replace(/[^\d]/g, "");
 
-  // Update the input field value with the sanitized value
-  event.target.value = value;
-});
+//   // Update the input field value with the sanitized value
+//   event.target.value = value;
+// });
 
 // Function to fetch user data from the API
 async function fetchUserData(userId) {
@@ -121,17 +121,19 @@ async function saveUserDetails() {
 
 async function openSettingsModal(userId) {
   try {
-    const result = await fetchUserData(userId);
+    // const result = await fetchUserData(userId);
 
-    if (result.length > 0) {
-      userIdSettingsInput.value = result[0]?.id;
-      fullnameSettingsInput.value = result[0]?.full_name;
-      addressSettingsInput.value = result[0]?.address;
-      ageSettingsInput.value = result[0]?.age;
-      contackSettingsInput.value = result[0]?.contact;
-      genderSettingsInput.value = result[0]?.gender;
-      document.getElementById("settings_modal").classList.remove("hidden");
-    }
+    // if (result.length > 0) {
+    //   userIdSettingsInput.value = result[0]?.id;
+    //   fullnameSettingsInput.value = result[0]?.full_name;
+    //   addressSettingsInput.value = result[0]?.address;
+    //   ageSettingsInput.value = result[0]?.age;
+    //   contackSettingsInput.value = result[0]?.contact;
+    //   genderSettingsInput.value = result[0]?.gender;
+    //   document.getElementById("settings_modal").classList.remove("hidden");
+    // }
+
+    document.getElementById("settings_modal").classList.remove("hidden");
   } catch (error) {
     console.error(error);
   }

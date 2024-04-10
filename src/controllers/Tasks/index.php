@@ -14,16 +14,6 @@ class Tasks
         global $db;
 
         try {
-            // If role is provided, fetch visibility
-            if ($role !== null) {
-                // Fetch the role name based on role
-                $stmtFetchRole = $db->prepare("SELECT visibility FROM role WHERE role = :role");
-                $stmtFetchRole->bindParam(':role', $role);
-                $stmtFetchRole->execute();
-                $roleData = $stmtFetchRole->fetch(PDO::FETCH_ASSOC);
-                $visibility = $roleData['visibility'];
-            }
-
             $query = "SELECT * FROM tasks";
 
             // Check if date range is provided
@@ -31,15 +21,54 @@ class Tasks
                 $query .= " WHERE createdAt BETWEEN :startDate AND :endDate";
             }
 
-            // If the role is a public role, add condition to fetch tasks based on user_id or createdBy
-            if ($role !== null && $visibility === "PUBLIC") {
-                // Add WHERE clause if not already present
-                if (!strstr($query, "WHERE")) {
-                    $query .= " WHERE";
-                } else {
-                    $query .= " AND";
+            // If role is provided, fetch visibility and adjust query accordingly
+            if ($role !== null) {
+                // Fetch the visibility based on role
+                $stmtFetchRole = $db->prepare("SELECT visibility FROM role WHERE role = :role");
+                $stmtFetchRole->bindParam(':role', $role);
+                $stmtFetchRole->execute();
+                $roleData = $stmtFetchRole->fetch(PDO::FETCH_ASSOC);
+
+                if (!$roleData) {
+                    throw new Exception("Role not found");
                 }
-                $query .= " (user_id = :userId OR createdBy = :userId)";
+
+                $visibility = $roleData['visibility'];
+
+                // If the role is public, add condition to fetch tasks based on user_id or createdBy
+                if ($visibility === "PUBLIC") {
+                    if (strpos($query, "WHERE") === false) {
+                        $query .= " WHERE";
+                    } else {
+                        $query .= " AND";
+                    }
+                    $query .= " (user_id = :userId OR createdBy = :userId)";
+                }
+            }
+
+            // If userId is provided, fetch department ID and adjust query accordingly
+            if ($userId !== null) {
+                // Fetch the department ID based on userId
+                $stmtFetchDepartment = $db->prepare("SELECT department_id FROM users WHERE id = :userId");
+                $stmtFetchDepartment->bindParam(':userId', $userId);
+                $stmtFetchDepartment->execute();
+                $departmentData = $stmtFetchDepartment->fetch(PDO::FETCH_ASSOC);
+
+                if (!$departmentData) {
+                    throw new Exception("User not found");
+                }
+
+                $departmentId = $departmentData['department_id'];
+
+                // Add condition to filter tasks by department ID
+                if ($departmentId !== 26) {
+                    if (strpos($query, "WHERE") === false) {
+                        $query .= " WHERE";
+                    } else {
+                        $query .= " AND";
+                    }
+                    $query .= " department_id = :departmentId";
+                }
             }
 
             // Prepare the statement
@@ -51,6 +80,11 @@ class Tasks
                 $endDate .= " 23:59:59";
                 $stmt->bindParam(':startDate', $startDate, PDO::PARAM_STR);
                 $stmt->bindParam(':endDate', $endDate, PDO::PARAM_STR);
+            }
+
+            // Bind user ID if needed
+            if ($userId !== null && $departmentId !== 26) {
+                $stmt->bindParam(':departmentId', $departmentId, PDO::PARAM_INT);
             }
 
             // Bind user ID if the role is public and user ID is provided
@@ -70,6 +104,10 @@ class Tasks
             // Handle database error
             http_response_code(500); // Internal Server Error
             return json_encode(['error' => $e->getMessage()]);
+        } catch (Exception $ex) {
+            // Handle other exceptions
+            http_response_code(500); // Internal Server Error
+            return json_encode(['error' => $ex->getMessage()]);
         }
     }
 
@@ -97,31 +135,56 @@ class Tasks
         global $db;
 
         try {
-            // Fetch the role name based on role
-            $stmtFetchRole = $db->prepare("SELECT * FROM role WHERE role = :role");
+            // Fetch the visibility based on role
+            $stmtFetchRole = $db->prepare("SELECT visibility FROM role WHERE role = :role");
             $stmtFetchRole->bindParam(':role', $role);
             $stmtFetchRole->execute();
             $roleData = $stmtFetchRole->fetch(PDO::FETCH_ASSOC);
+
+            if (!$roleData) {
+                throw new Exception("Role not found");
+            }
+
             $visibility = $roleData['visibility'];
 
-            // Determine the status ID based on whether the role is public or not
-            $statusId = $visibility === "PUBLIC" ? 6 : 4; // Assign status ID 6 for public roles, otherwise default to 4
+            // Fetch the department ID based on createdBy
+            $stmtFetchDepartment = $db->prepare("SELECT department_id FROM users WHERE id = :userId");
+            $stmtFetchDepartment->bindParam(':userId', $createdBy);
+            $stmtFetchDepartment->execute();
+            $departmentData = $stmtFetchDepartment->fetch(PDO::FETCH_ASSOC);
+
+            if (!$departmentData) {
+                throw new Exception("User not found");
+            }
+
+            $departmentId = $departmentData['department_id'];
+
+            // Determine the status ID based on visibility
+            $statusId = ($visibility === "PUBLIC") ? 6 : 4;
 
             // Prepare the SQL statement for insertion
-            $stmt = $db->prepare("INSERT INTO `tasks` (`title`, `detail`, `status_id`, `createdBy`) VALUES (:title, :details, :status_id, :createdBy)");
+            $stmt = $db->prepare("INSERT INTO `tasks` (`title`, `detail`, `status_id`, `department_id`, `createdBy`) VALUES (:title, :details, :status_id, :department_id, :createdBy)");
+
             // Bind parameters
             $stmt->bindParam(':title', $title);
             $stmt->bindParam(':details', $details);
             $stmt->bindParam(':status_id', $statusId);
+            $stmt->bindParam(':department_id', $departmentId);
             $stmt->bindParam(':createdBy', $createdBy);
+
             // Execute the statement
             $stmt->execute();
+
             // Get the ID of the inserted task
             $taskId = $db->lastInsertId();
+
             // Return the task ID as an object
             return (object)['id' => $taskId];
         } catch (PDOException $e) {
             // Handle database errors
+            return null; // or throw an exception based on your error handling strategy
+        } catch (Exception $ex) {
+            // Handle other exceptions
             return null; // or throw an exception based on your error handling strategy
         }
     }
