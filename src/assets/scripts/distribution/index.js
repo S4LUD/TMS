@@ -102,7 +102,6 @@ async function updateTable(tasks) {
       }
       if (task.user_id) {
         userData = await fetchUserData(task.user_id);
-        console.log(userData);
       }
       const { distribute: distributePermissions } = JSON.parse(
         localStorage.getItem("permissions")
@@ -126,8 +125,13 @@ async function updateTable(tasks) {
                 <td class="whitespace-nowrap px-3 py-4 text-gray-500">${endedAt}</td>
                 <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right sm:pr-6">
                     ${
-                      source.assign
+                      source.assign && !!!userData[0]?.username
                         ? '<span class="bg-blue-500 hover:bg-blue-600 text-white hover:text-gray-100 px-2 py-1 rounded assign-btn" style="cursor: pointer"><i class="fas fa-people-arrows"></i></span>'
+                        : ""
+                    }
+                    ${
+                      userData[0]?.username
+                        ? '<span class="bg-red-500 hover:bg-red-600 text-white hover:text-gray-100 px-2 py-1 rounded unassign-btn" style="cursor: pointer"><i class="fas fa-people-arrows"></i></span>'
                         : ""
                     }
                 </td>
@@ -135,10 +139,17 @@ async function updateTable(tasks) {
       taskTable.appendChild(row);
 
       let assignBtn = row.querySelector(".assign-btn");
+      let unassignBtn = row.querySelector(".unassign-btn");
 
       // Add event listeners only if the buttons exist
       if (assignBtn) {
         assignBtn.addEventListener("click", () => openDistribute(task.id));
+      }
+
+      if (unassignBtn) {
+        unassignBtn.addEventListener("click", () =>
+          handleUnassignTask(task, userData[0]?.username)
+        );
       }
     }
   }

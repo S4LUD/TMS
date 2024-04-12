@@ -70,3 +70,4 @@ $lastDayOfMonthFormatted = $lastDayOfMonth->format('Y-m-d');
 <?php include($_SERVER['DOCUMENT_ROOT'] . '/tms/src/components/modals/distribute_task_modal.php'); ?>
 <script src="/tms/src/assets/scripts/distribution/index.js"></script>
 <script src="/tms/src/assets/scripts/distribution/assign_task.js"></script>
+<script src="/tms/src/assets/scripts/distribution/unassign_task.js"></script>

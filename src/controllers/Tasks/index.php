@@ -313,6 +313,21 @@ class Tasks
         return $rowCount > 0; // Returns true if the task was deleted successfully
     }
 
+    public static function unassignTask($task_id)
+    {
+        global $db;
+
+        // Update task in the database
+        $stmt = $db->prepare("UPDATE tasks SET user_id = NULL, task_type = NULL, dueAt = NULL WHERE id = :task_id");
+        $stmt->bindParam(':task_id', $task_id);
+        $stmt->execute();
+
+        // Check if any rows were affected
+        $rowCount = $stmt->rowCount();
+
+        return $rowCount > 0; // Returns true if the task was updated successfully
+    }
+
     public static function fetchPerformance()
     {
         global $db;

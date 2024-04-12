@@ -10,7 +10,7 @@ async function fetchUsers() {
       `${apiLink}/fetchallusers?abbreviation=${abbreviation}`
     );
     const result = await response.json();
-    const employees = result.filter(user => user.role === "EMPLOYEE");
+    const employees = result.filter((user) => user.role === "EMPLOYEE");
     names = employees; // Update the names array with the fetched user data
     updateDisplay(""); // Call updateDisplay with an empty query to display all users
   } catch (error) {
@@ -105,7 +105,6 @@ async function assigntask(event) {
   const taskType = document.getElementById("taskType").value;
   const taskId = localStorage.getItem("taskId");
   const user_id = localStorage.getItem("userId");
-  console.log({ dueDate, taskType, taskId, user_id });
 
   await fetch(
     `${apiLink}/distributetask?task_type=${taskType}&user_id=${user_id}&dueAt=${dueDate}&task_id=${taskId}`,
