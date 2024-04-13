@@ -14,8 +14,9 @@ class Tasks
         global $db;
 
         try {
-            $query = "SELECT tasks.*, GROUP_CONCAT(users.username SEPARATOR ', ') AS assigned_users FROM tasks ";
+            $query = "SELECT tasks.*, department.department, department.abbreviation, GROUP_CONCAT(users.username SEPARATOR ', ') AS assigned_users FROM tasks ";
             $query .= "LEFT JOIN distributed_tasks ON tasks.id = distributed_tasks.task_id ";
+            $query .= "LEFT JOIN department ON tasks.department_id = department.id ";
             $query .= "LEFT JOIN users ON distributed_tasks.user_id = users.id ";
 
             // Check if date range is provided
@@ -470,5 +471,16 @@ class Tasks
         $visibility = $stmt->fetchColumn(); // Fetch the count value
 
         return $visibility; // Return the count value, which could be 0 if the role is not found
+    }
+
+    public static function updateTaskStatus($taskId, $statusId)
+    {
+        global $db;
+
+        $stmt = $db->prepare("UPDATE tasks SET status_id = :statusId WHERE id = :taskId");
+        $stmt->bindParam(':taskId', $taskId, PDO::PARAM_INT);
+        $stmt->bindParam(':statusId', $statusId);
+
+        return $stmt->execute();
     }
 }

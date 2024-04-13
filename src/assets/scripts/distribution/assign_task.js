@@ -3,22 +3,24 @@ const maxDisplay = 4;
 let names = []; // Array to hold user names
 let selectedUsers = [];
 
-async function fetchUsers() {
+async function fetchUsers(abbreviation) {
   try {
     const userDetails = JSON.parse(localStorage.getItem("user"));
     const role = userDetails?.role;
-    const abbreviation = userDetails?.abbreviation;
+    const empabbreviation = userDetails?.abbreviation;
 
     let response;
     let result;
 
     if (role === "SUPER ADMIN") {
       // Fetch all users
-      response = await fetch(`${apiLink}/fetchallusers`);
+      response = await fetch(
+        `${apiLink}/fetchallusers?abbreviation=${abbreviation}`
+      );
     } else {
       // Fetch only EMPLOYEE users
       response = await fetch(
-        `${apiLink}/fetchallusers?abbreviation=${abbreviation}`
+        `${apiLink}/fetchallusers?abbreviation=${empabbreviation}`
       );
     }
 
@@ -31,10 +33,9 @@ async function fetchUsers() {
   }
 }
 
-fetchUsers();
-
-function openDistribute(task_id) {
-  localStorage.setItem("taskId", task_id);
+function openDistribute(task) {
+  localStorage.setItem("taskId", task?.id);
+  fetchUsers(task?.abbreviation);
   document.getElementById("distributeTask").classList.remove("hidden");
 }
 
@@ -240,7 +241,7 @@ async function assigntask(event) {
     tasks = await fetchTasks();
     taskCount.innerText = Math.ceil(tasks.length / itemsPerPage);
     await updateTableForCurrentPage();
-    fetchUsers();
+    fetchUsers("");
     // Clear selected users after successful assignment
     selectedUsers = [];
     displaySelectedUsers();

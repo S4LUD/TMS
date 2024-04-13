@@ -123,6 +123,10 @@ async function updateTable(tasks) {
 }
 
 function createTaskRow(task, viewtask, source, formattedDate, visibility) {
+  const userDetails = JSON.parse(localStorage.getItem("user"));
+  const { username, id } = userDetails;
+  const assigneeString = task?.assigned_users || "";
+  const isAssignedToMe = assigneeString.includes(username);
   const row = document.createElement("tr");
   row.innerHTML = `
     <td class="whitespace-nowrap py-4 pl-4 pr-3 font-medium text-gray-900 sm:pl-6">
@@ -142,7 +146,9 @@ function createTaskRow(task, viewtask, source, formattedDate, visibility) {
           : ""
       }
       ${
-        visibility !== "PUBLIC"
+        visibility !== "PUBLIC" ||
+        isAssignedToMe ||
+        (task?.createdBy === id && [4, 6].includes(tasks?.status_id))
           ? '<span class="bg-yellow-500 hover:bg-yellow-600 text-white hover:text-gray-100 px-2 py-1 rounded edit-btn" style="cursor: pointer"><i class="fa-solid fa-pen-to-square"></i></span>'
           : ""
       }

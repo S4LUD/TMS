@@ -112,6 +112,14 @@
                         <input type="checkbox" id="assign" disabled>
                         <label for="assign" class="ml-2">Assign</label>
                     </div>
+                    <div class="flex items-center">
+                        <input type="checkbox" id="view_distributed_tasks" class="mr-2">
+                        <label for="view_distributed_tasks">View</label>
+                    </div>
+                    <div class="flex items-center">
+                        <input type="checkbox" id="action_status" class="mr-2">
+                        <label for="action_status">Action Status</label>
+                    </div>
                 </div>
             </div>
         </div>

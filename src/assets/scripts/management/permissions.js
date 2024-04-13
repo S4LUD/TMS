@@ -15,6 +15,10 @@ const viewTaskCheckbox = document.getElementById("view_task");
 const editTaskCheckbox = document.getElementById("edit_task");
 const distributeCheckbox = document.getElementById("distribute");
 const assignCheckbox = document.getElementById("assign");
+const viewDistributedTasksCheckbox = document.getElementById(
+  "view_distributed_tasks"
+);
+const actionStatusCheckbox = document.getElementById("action_status");
 
 // Function to enable or disable child checkboxes based on parent checkbox state
 function handleChildCheckboxes(parentCheckbox, childCheckboxes) {
@@ -50,7 +54,11 @@ tasksCheckbox.addEventListener("change", function () {
 
 // Event listener for distribute checkbox
 distributeCheckbox.addEventListener("change", function () {
-  handleChildCheckboxes(this, [assignCheckbox]);
+  handleChildCheckboxes(this, [
+    assignCheckbox,
+    viewDistributedTasksCheckbox,
+    actionStatusCheckbox,
+  ]);
 });
 
 // Function to clear inputs
@@ -73,6 +81,8 @@ function clearInputs() {
     editTaskCheckbox,
     distributeCheckbox,
     assignCheckbox,
+    viewDistributedTasksCheckbox,
+    actionStatusCheckbox,
   ];
 
   checkboxes.forEach((checkbox) => {
@@ -85,13 +95,10 @@ async function openPermissionsModal(userId) {
   localStorage.setItem("manage_id", userId);
 
   try {
-    const response = await fetch(
-      `${apiLink}/fetchuser?searchTerm=${userId}`,
-      {
-        method: "GET",
-        redirect: "follow",
-      }
-    );
+    const response = await fetch(`${apiLink}/fetchuser?searchTerm=${userId}`, {
+      method: "GET",
+      redirect: "follow",
+    });
     const result = await response.json();
     const permissions = result.permissions;
     if (permissions) {
@@ -116,6 +123,9 @@ async function openPermissionsModal(userId) {
       editTaskCheckbox.checked = permissions.tasks.source.edit;
       distributeCheckbox.checked = permissions.distribute.enabled;
       assignCheckbox.checked = permissions.distribute.source.assign;
+      viewDistributedTasksCheckbox.checked = permissions.distribute.source.view;
+      actionStatusCheckbox.checked =
+        permissions.distribute.source.action_status;
 
       // Enable child checkboxes if parent is checked
       handleChildCheckboxes(accountManagementCheckbox, [
@@ -133,7 +143,11 @@ async function openPermissionsModal(userId) {
         viewTaskCheckbox,
         editTaskCheckbox,
       ]);
-      handleChildCheckboxes(distributeCheckbox, [assignCheckbox]);
+      handleChildCheckboxes(distributeCheckbox, [
+        assignCheckbox,
+        viewDistributedTasksCheckbox,
+        actionStatusCheckbox,
+      ]);
     }
   } catch (error) {
     console.error(error);
@@ -180,6 +194,8 @@ async function savePermissions() {
         enabled: distributeCheckbox.checked,
         source: {
           assign: assignCheckbox.checked,
+          view: viewDistributedTasksCheckbox.checked,
+          action_status: actionStatusCheckbox.checked,
         },
       },
     };
