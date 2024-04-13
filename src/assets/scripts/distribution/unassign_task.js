@@ -46,9 +46,6 @@ async function handleUnassignTask(task, username) {
               fetchUsers();
             });
         }
-      } else {
-        // Task is not assigned yet, no need for confirmation
-        alert("The task is not assigned yet. It's available to unassign.");
       }
     }
   }

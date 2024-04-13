@@ -14,11 +14,13 @@ class Tasks
         global $db;
 
         try {
-            $query = "SELECT * FROM tasks";
+            $query = "SELECT tasks.*, GROUP_CONCAT(users.username SEPARATOR ', ') AS assigned_users FROM tasks ";
+            $query .= "LEFT JOIN distributed_tasks ON tasks.id = distributed_tasks.task_id ";
+            $query .= "LEFT JOIN users ON distributed_tasks.user_id = users.id ";
 
             // Check if date range is provided
             if (!empty($startDate) && !empty($endDate)) {
-                $query .= " WHERE createdAt BETWEEN :startDate AND :endDate";
+                $query .= "WHERE tasks.createdAt BETWEEN :startDate AND :endDate ";
             }
 
             // If role is provided, fetch visibility and adjust query accordingly
@@ -42,7 +44,7 @@ class Tasks
                     } else {
                         $query .= " AND";
                     }
-                    $query .= " (user_id = :userId OR createdBy = :userId)";
+                    $query .= " (tasks.user_id = :userId OR tasks.createdBy = :userId)";
                 }
             }
 
@@ -67,9 +69,12 @@ class Tasks
                     } else {
                         $query .= " AND";
                     }
-                    $query .= " department_id = :departmentId";
+                    $query .= " tasks.department_id = :departmentId";
                 }
             }
+
+            // Group by task ID to avoid duplicate results
+            $query .= " GROUP BY tasks.id";
 
             // Prepare the statement
             $stmt = $db->prepare($query);
@@ -195,25 +200,31 @@ class Tasks
 
         $stmt = $db->prepare(
             "SELECT 
-                tasks.title, 
-                tasks.detail, 
-                CASE WHEN tasks.dueAt IS NULL THEN 'Not Set' ELSE tasks.dueAt END AS dueAt,
-                COALESCE(users.username, 'N/A') AS assigned,
-                tasks.createdAt, 
-                tasks.updatedAt, 
-                tasks.startedAt, 
-                tasks.endedAt,
-                files.id AS file_id,
-                files.filename, 
-                files.file_size, 
-                files.file_destination,
-                task_status.status
-            FROM 
-                tasks 
-                LEFT JOIN files ON tasks.id = files.task_id 
-                JOIN task_status ON tasks.status_id = task_status.id 
-                LEFT JOIN users ON tasks.user_id = users.id
-            WHERE tasks.id = :task_id"
+            tasks.title, 
+            tasks.detail, 
+            CASE WHEN tasks.dueAt IS NULL THEN 'Not Set' ELSE tasks.dueAt END AS dueAt,
+            GROUP_CONCAT(users.username SEPARATOR ', ') AS assigned,
+            tasks.createdAt, 
+            tasks.updatedAt, 
+            tasks.startedAt, 
+            tasks.endedAt,
+            files.id AS file_id,
+            files.filename, 
+            files.file_size, 
+            files.file_destination,
+            task_status.status
+        FROM 
+            tasks 
+            LEFT JOIN files ON tasks.id = files.task_id 
+            JOIN task_status ON tasks.status_id = task_status.id 
+            LEFT JOIN distributed_tasks ON tasks.id = distributed_tasks.task_id 
+            LEFT JOIN users ON distributed_tasks.user_id = users.id
+        WHERE tasks.id = :task_id
+        GROUP BY tasks.id, tasks.title, tasks.detail, tasks.dueAt, 
+                 tasks.createdAt, tasks.updatedAt, tasks.startedAt, tasks.endedAt,
+                 files.id, files.filename, files.file_size, files.file_destination,
+                 task_status.status;
+        "
         );
         $stmt->bindParam(':task_id', $task_id);
         $stmt->execute();
@@ -302,30 +313,54 @@ class Tasks
     {
         global $db;
 
-        // Delete task from the database
-        $stmt = $db->prepare("DELETE FROM tasks WHERE id = :task_id");
-        $stmt->bindParam(':task_id', $task_id, PDO::PARAM_INT);
-        $stmt->execute();
+        try {
+            // Delete task from the database
+            $stmt = $db->prepare("DELETE FROM tasks WHERE id = :task_id");
+            $stmt->bindParam(':task_id', $task_id, PDO::PARAM_INT);
+            $stmt->execute();
 
-        // Check if any rows were affected
-        $rowCount = $stmt->rowCount();
+            // Delete task distribution records
+            $deleteStmt = $db->prepare("DELETE FROM `distributed_tasks` WHERE `task_id` = :task_id");
+            $deleteStmt->bindParam(':task_id', $task_id, PDO::PARAM_INT);
+            $deleteStmt->execute();
 
-        return $rowCount > 0; // Returns true if the task was deleted successfully
+            // Check if any rows were affected by the update and insertion
+            if ($stmt->rowCount() > 0 && $deleteStmt->rowCount() > 0) {
+                return true; // Task successfully distributed
+            } else {
+                return false; // Task not found or no changes made
+            }
+        } catch (PDOException $e) {
+            // Handle database errors
+            error_log("Error deleting task: " . $e->getMessage());
+            return false;
+        }
     }
 
     public static function unassignTask($task_id)
     {
         global $db;
 
-        // Update task in the database
-        $stmt = $db->prepare("UPDATE tasks SET user_id = NULL, task_type = NULL, dueAt = NULL WHERE id = :task_id");
-        $stmt->bindParam(':task_id', $task_id);
-        $stmt->execute();
+        try {
+            // Update task in the database
+            $stmt = $db->prepare("UPDATE tasks SET task_type = NULL, dueAt = NULL WHERE id = :task_id");
+            $stmt->bindParam(':task_id', $task_id);
+            $stmt->execute();
 
-        // Check if any rows were affected
-        $rowCount = $stmt->rowCount();
+            // Delete task distribution records
+            $deleteStmt = $db->prepare("DELETE FROM `distributed_tasks` WHERE `task_id` = :task_id");
+            $deleteStmt->bindParam(':task_id', $task_id, PDO::PARAM_INT);
+            $deleteStmt->execute();
 
-        return $rowCount > 0; // Returns true if the task was updated successfully
+            // Check if any rows were affected
+            $rowCount = $stmt->rowCount();
+
+            return $rowCount > 0; // Returns true if the task was updated successfully
+        } catch (PDOException $e) {
+            // Handle database errors
+            error_log("Error unassigning task: " . $e->getMessage());
+            return false;
+        }
     }
 
     public static function fetchPerformance()
@@ -384,16 +419,21 @@ class Tasks
     {
         global $db;
         try {
-            $stmt = $db->prepare("UPDATE `tasks` SET `user_id`=:user_id, `task_type`=:task_type, `dueAt`=:dueAt WHERE `id`=:taskId");
-            $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
-            $stmt->bindParam(':task_type', $task_type);
-            $stmt->bindParam(':dueAt', $dueAt);
-            $stmt->bindParam(':taskId', $task_id, PDO::PARAM_INT);
+            // Update task details
+            $updateStmt = $db->prepare("UPDATE `tasks` SET `task_type` = :task_type, `dueAt` = :dueAt WHERE `id` = :task_id");
+            $updateStmt->bindParam(':task_type', $task_type);
+            $updateStmt->bindParam(':dueAt', $dueAt);
+            $updateStmt->bindParam(':task_id', $task_id, PDO::PARAM_INT);
+            $updateStmt->execute();
 
-            $stmt->execute();
+            // Insert task distribution record
+            $insertStmt = $db->prepare("INSERT INTO `distributed_tasks` (`task_id`, `user_id`) VALUES (:task_id, :user_id)");
+            $insertStmt->bindParam(':task_id', $task_id, PDO::PARAM_INT);
+            $insertStmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+            $insertStmt->execute();
 
-            // Check if any rows were affected by the update
-            if ($stmt->rowCount() > 0) {
+            // Check if any rows were affected by the update and insertion
+            if ($updateStmt->rowCount() > 0 && $insertStmt->rowCount() > 0) {
                 return true; // Task successfully distributed
             } else {
                 return false; // Task not found or no changes made

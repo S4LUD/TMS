@@ -1,5 +1,3 @@
-
-
 const viewPreviewContainer = document.getElementById("viewFilePreview");
 const viewTask = document.getElementById("viewTask");
 
@@ -39,10 +37,9 @@ async function handleViewTask(taskId) {
       var task_status = document.getElementById("task_status");
       task_status.className = getStatusColor(tasks?.status);
       task_status.innerText = formatStatus(tasks?.status);
-
       var task_assigned = document.getElementById("task_assigned");
       task_assigned.className = "text-sm";
-      task_assigned.innerText = tasks?.assigned;
+      task_assigned.innerText = tasks?.assigned ? tasks?.assigned : "Not Set";
 
       var due_date = document.getElementById("due_date");
       due_date.className = "text-sm";

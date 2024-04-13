@@ -20,7 +20,8 @@
                 <label for="assignTo" class="block text-gray-700">
                     Assign To:
                 </label>
-                <input onclick="openUserDropdown()" placeholder="Click to choose employee" type="text" id="assignTo" name="assignTo" class="cursor-pointer w-full border rounded-md py-2 px-3 focus:outline-none focus:border-blue-500 transition duration-75" required onfocus="this.blur()">
+                <!-- <input onclick="openUserDropdown()" placeholder="Click to choose employee" type="text" id="assignTo" name="assignTo" class="cursor-pointer w-full border rounded-md py-2 px-3 focus:outline-none focus:border-blue-500 transition duration-75" required onfocus="this.blur()"> -->
+                <div onclick="openUserDropdown()" id="selectedUsersContainer" class="cursor-pointer w-full border rounded-md py-2 px-3 focus:outline-none focus:border-blue-500 transition duration-75" onfocus="this.blur()"></div>
                 <div id="userdropdown" class="relative bg-red-500 hidden">
                     <div class="z-10 flex flex-col p-2 gap-2 absolute bg-white top-1 border rounded-md w-full">
                         <input type="text" id="searchUser" name="searchUser" class="w-full border rounded-md py-2 px-3 focus:outline-none focus:border-blue-500 transition duration-75" placeholder="Select employee">

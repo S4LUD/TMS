@@ -361,7 +361,9 @@ class Users
             FROM
                 users
             LEFT JOIN
-                tasks ON users.id = tasks.user_id
+                distributed_tasks ON users.id = distributed_tasks.user_id
+            LEFT JOIN
+                tasks ON distributed_tasks.task_id = tasks.id
             LEFT JOIN task_status ON tasks.status_id = task_status.id
             WHERE DATE(tasks.createdAt) BETWEEN :start_date AND :end_date
             GROUP BY
