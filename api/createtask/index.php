@@ -9,6 +9,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $details = $_POST['details'];
     $role = $_POST['role'];
     $createdBy = $_POST['createdBy'];
+    $department_id = $_POST['department_id'] ?? "";
 
     $uploadDirectory = $_SERVER['DOCUMENT_ROOT'] . '/tms/src/assets/uploads/';
 
@@ -18,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     try {
         // Attempt to create a new task
-        $result = Tasks::newTask($title, $details, $role, $createdBy);
+        $result = Tasks::newTask($title, $details, $department_id, $role, $createdBy);
 
         if ($result && is_object($result) && property_exists($result, 'id')) {
             $taskId = $result->id;

@@ -156,12 +156,14 @@ function displaySelectedUsers() {
 function closeDistribute() {
   document.getElementById("dueDate").value = "";
   document.getElementById("taskType").value = "";
-  // document.getElementById("assignTo").value = "";
   document.getElementById("distributeTask").classList.add("hidden");
   document.getElementById("userdropdown").classList.add("hidden");
   document.getElementById("userdropdownbackdrop").classList.add("hidden");
   localStorage.removeItem("userId");
   localStorage.removeItem("taskId");
+  selectedUsers = [];
+  displaySelectedUsers();
+  updateDisplay("");
 }
 
 async function assigntask(event) {
@@ -186,9 +188,12 @@ async function assigntask(event) {
   }
 
   try {
+    const userDetails = JSON.parse(localStorage.getItem("user"));
+    const { role } = userDetails;
+
     const requests = selectedUsers.map((user) => {
       return fetch(
-        `${apiLink}/distributetask?task_type=${taskType}&user_id=${user.id}&dueAt=${dueDate}&task_id=${taskId}`,
+        `${apiLink}/distributetask?task_type=${taskType}&role=${role}&user_id=${user.id}&dueAt=${dueDate}&task_id=${taskId}`,
         {
           method: "GET",
         }
@@ -236,7 +241,11 @@ async function assigntask(event) {
     taskCount.innerText = Math.ceil(tasks.length / itemsPerPage);
     await updateTableForCurrentPage();
     fetchUsers();
+    // Clear selected users after successful assignment
+    selectedUsers = [];
+    displaySelectedUsers();
     closeDistribute();
+    updateDisplay("");
   } catch (error) {
     console.error("Error:", error);
   }

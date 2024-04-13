@@ -10,14 +10,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $pdo->beginTransaction();
 
     try {
-        if (isset($_GET['task_id']) && isset($_GET['task_type']) && isset($_GET['user_id']) && isset($_GET['dueAt'])) {
+        if (isset($_GET['task_id']) && isset($_GET['task_type']) && isset($_GET['user_id']) && isset($_GET['dueAt']) && isset($_GET['role'])) {
             // Access form fields
             $task_type = $_GET['task_type'];
             $user_id = $_GET['user_id'];
             $dueAt = $_GET['dueAt'];
             $task_id = $_GET['task_id'];
+            $role = $_GET['role'];
 
-            Tasks::distributeTask($task_id, $task_type, $user_id, $dueAt);
+            Tasks::distributeTask($task_id, $role, $task_type, $user_id, $dueAt);
 
             $pdo->commit();
             echo json_encode(['message' => 'Successfully distributed task']);

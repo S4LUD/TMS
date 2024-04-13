@@ -14,8 +14,39 @@ fileInput.addEventListener("change", () =>
 filePreviewContainer.addEventListener("dragover", (e) => handleDragOver(e));
 filePreviewContainer.addEventListener("drop", (e) => handleDrop(e));
 
-function openCreateTaskModal() {
-  document.getElementById("createTask").classList.remove("hidden");
+async function openCreateTaskModal() {
+  const taskDepartmentSelect = document.getElementById("taskDepartment");
+
+  // Fetch departments from the API
+  try {
+    if (taskDepartmentSelect) {
+      const response = await fetch(`${apiLink}/fetchdepartments`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+        redirect: "follow",
+      });
+      const departments = await response.json();
+
+      // Clear any existing options
+      taskDepartmentSelect.innerHTML =
+        '<option value="">--- Select Task Department ---</option>';
+
+      // Populate the select with department options, skipping departments with super true
+      departments.forEach((department) => {
+        if (!department.super) {
+          const option = document.createElement("option");
+          option.value = department.id;
+          option.textContent = department.department;
+          taskDepartmentSelect.appendChild(option);
+        }
+      });
+    }
+
+    // Show the create task modal
+    document.getElementById("createTask").classList.remove("hidden");
+  } catch (error) {
+    console.error(error);
+  }
 }
 
 function closeCreateTaskModal() {
@@ -38,6 +69,11 @@ async function submitNewTask(event) {
   const details = document.getElementById("task_details").value;
   const role = document.getElementById("role").value;
   const userId = document.getElementById("userId").value;
+  let taskDepartment = "";
+
+  if (role === "SUPER ADMIN") {
+    taskDepartment = document.getElementById("taskDepartment").value;
+  }
 
   // Check if the number of files exceeds the limit
   if (selectedFiles.length > 5) {
@@ -53,6 +89,10 @@ async function submitNewTask(event) {
   formData.append("details", details);
   formData.append("role", role);
   formData.append("createdBy", userId);
+
+  if (role === "SUPER ADMIN") {
+    formData.append("department_id", taskDepartment);
+  }
 
   let filesExceedSizeLimit = false;
 

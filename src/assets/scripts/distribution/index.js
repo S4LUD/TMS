@@ -75,7 +75,6 @@ async function updateTable(tasks) {
     // Iterate over tasks and populate the table rows
     for (const task of tasks) {
       const dateCreated = formatDate(new Date(task.createdAt));
-      let userData = "N/A"; // Default value if user_id is null or undefined
       let dueDate = "N/A";
       let startedAt = "N/A";
       let endedAt = "N/A";
@@ -115,10 +114,11 @@ async function updateTable(tasks) {
                         : ""
                     }
                     ${
-                      task?.assigned_users
+                      task?.assigned_users && task?.status_id !== 6
                         ? '<span class="bg-red-500 hover:bg-red-600 text-white hover:text-gray-100 px-2 py-1 rounded unassign-btn" style="cursor: pointer"><i class="fas fa-people-arrows"></i></span>'
                         : ""
-                    }
+                    }   
+                    <span class="bg-green-500 hover:bg-green-600 text-white hover:text-gray-100 px-2 py-1 rounded action-btn" style="cursor: pointer"><i class="fa-solid fa-wrench"></i></span>                                  
                 </td>
             `;
       taskTable.appendChild(row);

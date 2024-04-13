@@ -44,7 +44,7 @@ class Tasks
                     } else {
                         $query .= " AND";
                     }
-                    $query .= " (tasks.user_id = :userId OR tasks.createdBy = :userId)";
+                    $query .= " (distributed_tasks.user_id = :userId OR tasks.createdBy = :userId)";
                 }
             }
 
@@ -135,7 +135,7 @@ class Tasks
         }
     }
 
-    public static function newTask($title, $details, $role, $createdBy)
+    public static function newTask($title, $details, $department_id = "", $role, $createdBy)
     {
         global $db;
 
@@ -152,17 +152,8 @@ class Tasks
 
             $visibility = $roleData['visibility'];
 
-            // Fetch the department ID based on createdBy
-            $stmtFetchDepartment = $db->prepare("SELECT department_id FROM users WHERE id = :userId");
-            $stmtFetchDepartment->bindParam(':userId', $createdBy);
-            $stmtFetchDepartment->execute();
-            $departmentData = $stmtFetchDepartment->fetch(PDO::FETCH_ASSOC);
-
-            if (!$departmentData) {
-                throw new Exception("User not found");
-            }
-
-            $departmentId = $departmentData['department_id'];
+            // Determine the department ID
+            $departmentId = !empty($department_id) ? $department_id : self::getDepartmentId($createdBy);
 
             // Determine the status ID based on visibility
             $statusId = ($visibility === "PUBLIC") ? 6 : 4;
@@ -193,6 +184,24 @@ class Tasks
             return null; // or throw an exception based on your error handling strategy
         }
     }
+
+    // Helper function to get department ID based on user ID
+    private static function getDepartmentId($userId)
+    {
+        global $db;
+
+        $stmtFetchDepartment = $db->prepare("SELECT department_id FROM users WHERE id = :userId");
+        $stmtFetchDepartment->bindParam(':userId', $userId);
+        $stmtFetchDepartment->execute();
+        $departmentData = $stmtFetchDepartment->fetch(PDO::FETCH_ASSOC);
+
+        if (!$departmentData) {
+            throw new Exception("User not found");
+        }
+
+        return $departmentData['department_id'];
+    }
+
 
     public static function viewTask($task_id)
     {
@@ -415,13 +424,17 @@ class Tasks
         }
     }
 
-    public static function distributeTask($task_id, $task_type, $user_id, $dueAt)
+    public static function distributeTask($task_id, $role, $task_type, $user_id, $dueAt)
     {
         global $db;
         try {
+            // Determine the status ID based on the role
+            $status_id = ($role === "SUPER ADMIN" || $role === "DEAN") ? 4 : 6;
+
             // Update task details
-            $updateStmt = $db->prepare("UPDATE `tasks` SET `task_type` = :task_type, `dueAt` = :dueAt WHERE `id` = :task_id");
+            $updateStmt = $db->prepare("UPDATE `tasks` SET `task_type` = :task_type, `status_id` = :status_id, `dueAt` = :dueAt WHERE `id` = :task_id");
             $updateStmt->bindParam(':task_type', $task_type);
+            $updateStmt->bindParam(':status_id', $status_id);
             $updateStmt->bindParam(':dueAt', $dueAt);
             $updateStmt->bindParam(':task_id', $task_id, PDO::PARAM_INT);
             $updateStmt->execute();
