@@ -325,7 +325,7 @@ class Tasks
             $deleteStmt->execute();
 
             // Check if any rows were affected by the update and insertion
-            if ($stmt->rowCount() > 0 && $deleteStmt->rowCount() > 0) {
+            if ($stmt->rowCount() > 0 || $deleteStmt->rowCount() > 0) {
                 return true; // Task successfully distributed
             } else {
                 return false; // Task not found or no changes made
