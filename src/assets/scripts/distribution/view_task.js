@@ -16,7 +16,7 @@ function formatReadableDate(dateString) {
   return date.toLocaleDateString("en-PH", options);
 }
 
-async function handleViewTask(taskId) {
+async function handleDistributedViewTask(taskId) {
   try {
     const response = await fetch(`${apiLink}/viewtask?task_id=${taskId}`);
     const tasks = await response.json();
@@ -72,7 +72,7 @@ async function handleViewTask(taskId) {
   }
 }
 
-function closeViewTaskModal() {
+function closeDistributedViewTaskModal() {
   viewPreviewContainer.innerHTML = "";
   document.getElementById("viewFilePreview").classList.add("hidden");
   document.getElementById("viewTask").classList.add("hidden");

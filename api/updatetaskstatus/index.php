@@ -10,21 +10,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $pdo->beginTransaction();
 
     try {
-        if (isset($_GET['task_id']) && isset($_GET['task_type']) && isset($_GET['user_id']) && isset($_GET['dueAt']) && isset($_GET['role'])) {
-            // Access form fields
-            $task_type = $_GET['task_type'];
-            $user_id = $_GET['user_id'];
-            $dueAt = $_GET['dueAt'];
-            $task_id = $_GET['task_id'];
-            $role = $_GET['role'];
+        if (isset($_GET['taskId']) && isset($_GET['statusId'])) {
+            $taskId = $_GET['taskId'];
+            $statusId = $_GET['statusId'];
 
-            Tasks::distributeTask($task_id, $role, $task_type, $user_id, $dueAt);
+            $result = Tasks::updateTaskStatus($taskId, $statusId);
 
-            $pdo->commit();
-            echo json_encode(['message' => 'Successfully distributed task']);
+            if ($result) {
+                $pdo->commit();
+                echo json_encode(['message' => 'Successfully updated task status']);
+            } else {
+                echo json_encode([
+                    'error' => 'Updating permissions failed',
+                ]);
+            }
         } else {
             echo json_encode([
-                'message' => 'Distributing task failed',
+                'error' => 'userId and permissions parameters are required',
             ]);
         }
     } catch (Exception $e) {

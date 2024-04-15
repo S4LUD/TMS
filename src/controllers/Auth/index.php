@@ -98,7 +98,7 @@ class Auth
             $userId = $db->lastInsertId(); // Get the ID of the newly inserted user
 
             // Insert default permissions for the user
-            $defaultPermissions = '{"account_management":{"enabled":false,"source":{"create_user":false,"roles":false,"departments":false,"delete":false,"view":false,"edit":false,"permissions":false}},"tasks":{"enabled":false,"source":{"create_task":false,"delete":false,"view":false,"edit":false}},"distribute":{"enabled":false,"source":{"assign":false}},"performance":false, "report":false}'; // Define default permissions
+            $defaultPermissions = '{"account_management":{"enabled":false,"source":{"create_user":false,"roles":false,"departments":false,"delete":false,"view":false,"edit":false,"permissions":false}},"tasks":{"enabled":false,"source":{"create_task":false,"delete":false,"view":false,"edit":false}},"distribute":{"enabled":false,"source":{"assign":false}}, "report":false}'; // Define default permissions
             $insertPermissionStmt = $db->prepare("INSERT INTO `permissions`(`user_id`, `permissions`) VALUES (?, ?)");
             $insertPermissionSuccess = $insertPermissionStmt->execute([$userId, $defaultPermissions]);
 
@@ -112,6 +112,40 @@ class Auth
         } else {
             // Registration failed
             return json_encode(['error' => 'Registration failed']);
+        }
+    }
+
+    public static function changePassword($userId, $currentPassword, $newPassword)
+    {
+        global $db;
+
+        try {
+            // Fetch user's current password from the database
+            $stmt = $db->prepare("SELECT id, password FROM users WHERE BINARY id = ?");
+            $stmt->execute([$userId]);
+            $userData = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$userData) {
+                return json_encode(['error' => 'User not found']);
+            }
+
+            // Verify if the provided current password matches the stored password
+            if (!password_verify($currentPassword, $userData['password'])) {
+                return json_encode(['error' => 'Incorrect current password']);
+            }
+
+            // Hash the new password before storing it
+            $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
+
+            // Update the password in the database
+            $updateStmt = $db->prepare("UPDATE users SET password = ? WHERE id = ?");
+            $updateStmt->execute([$hashedPassword, $userId]);
+
+            // Password updated successfully
+            return json_encode(['message' => 'Password changed successfully']);
+        } catch (PDOException $e) {
+            // Handle database errors
+            return json_encode(['error' => 'Database error: ' . $e->getMessage()]);
         }
     }
 }

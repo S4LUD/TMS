@@ -1,16 +1,26 @@
-const createUserForm = document.getElementById("createUserForm");
+async function handleTaskActionStatus(task, status_id) {
+  if (status_id === 1) {
+    if (!task?.assigned_users) {
+      alert("You cannot done a task that haven't assigned yet");
+      return;
+    }
+  }
 
-createUserForm.addEventListener("submit", async function (event) {
-  event.preventDefault();
+  if (status_id === 2) {
+    if (!task?.assigned_users && !task?.dueAt) {
+      alert("You cannot fail a task that haven't started yet");
+      return;
+    }
+  }
 
-  const username = document.getElementById("createUsername").value;
-  const password = document.getElementById("createPassword").value;
-  const departmentId = document.getElementById("createDepartment").value;
-  const roleId = document.getElementById("createRole").value;
-
-  const url = `${apiLink}/register?username=${username}&password=${password}&department_id=${departmentId}&role_id=${roleId}`;
-
- await fetch(url)
+  await fetch(
+    `${apiLink}/updatetaskstatus?taskId=${task?.id}&statusId=${status_id}`,
+    {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+      redirect: "follow",
+    }
+  )
     .then((response) => response.json())
     .then((result) => {
       if (result.message) {
@@ -37,15 +47,19 @@ createUserForm.addEventListener("submit", async function (event) {
         }).showToast();
       }
     })
-    .catch((error) => {
-      console.error("Error:", error);
-    })
+    .catch((error) => console.error(error))
     .finally(async () => {
-      users = await fetchUsers();
-      userCount.innerText = Math.ceil(users.length / itemsPerPage);
+      tasks = await fetchTasks();
+      taskCount.innerText = Math.ceil(tasks.length / itemsPerPage);
       await updateTableForCurrentPage();
-      closeCreateUserModal();
-      clearCreateInputs();
       fetchUsers();
     });
-});
+}
+
+function showMenu() {
+  document.getElementById("actionStatusMenu").classList.remove("hidden");
+}
+
+function hideMenu() {
+  document.getElementById("actionStatusMenu").classList.add("hidden");
+}

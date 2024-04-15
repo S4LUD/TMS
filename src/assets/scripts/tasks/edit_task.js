@@ -1,6 +1,7 @@
 const fileEditInput = document.getElementById("fileEditInput");
 const fileEditPreview = document.getElementById("fileEditPreview");
 const fileDBEditPreview = document.getElementById("fileDBEditPreview");
+const hideThisThing = document.getElementById("hiding-this-btn");
 const selectedEditFiles = [];
 
 fileEditInput.addEventListener("change", () =>
@@ -18,10 +19,12 @@ async function handleEditTask(taskId) {
     if (tasks) {
       const titleElement = document.getElementById("edit_task_title");
       const detailsElement = document.getElementById("edit_task_details");
-
       if (titleElement && detailsElement) {
         titleElement.value = tasks.title;
         detailsElement.value = tasks.detail;
+      }
+      if (tasks?.status !== "PENDING") {
+        hideThisThing.classList.add("hidden");
       }
 
       updateDBFilePreview(tasks.files);
@@ -378,5 +381,49 @@ async function submitEditTask(event) {
       tasks = await fetchTasks();
       taskCount.innerText = Math.ceil(tasks.length / itemsPerPage);
       await updateTableForCurrentPage();
+    });
+}
+
+async function handleTaskActionStatus(event) {
+  event.preventDefault();
+  const taskId = localStorage.getItem("taskId");
+
+  await fetch(`${apiLink}/updatetaskstatus?taskId=${taskId}&statusId=7`, {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+    redirect: "follow",
+  })
+    .then((response) => response.json())
+    .then((result) => {
+      if (result.message) {
+        Toastify({
+          text: result.message,
+          duration: 5000,
+          gravity: "top", // `top` or `bottom`
+          position: "right", // `left`, `center` or `right`
+          stopOnFocus: true, // Prevents dismissing of toast on hover
+          style: {
+            background: "#3CA2FA",
+          },
+        }).showToast();
+      } else if (result.error) {
+        Toastify({
+          text: result.error,
+          duration: 5000,
+          gravity: "top", // `top` or `bottom`
+          position: "right", // `left`, `center` or `right`
+          stopOnFocus: true, // Prevents dismissing of toast on hover
+          style: {
+            background: "#FA3636",
+          },
+        }).showToast();
+      }
+    })
+    .catch((error) => console.error(error))
+    .finally(async () => {
+      tasks = await fetchTasks();
+      taskCount.innerText = Math.ceil(tasks.length / itemsPerPage);
+      await updateTableForCurrentPage();
+      closeEditTaskModal();
     });
 }

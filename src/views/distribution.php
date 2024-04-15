@@ -27,7 +27,7 @@ $lastDayOfMonthFormatted = $lastDayOfMonth->format('Y-m-d');
             <button type="button" id="filterButton" class="h-fit font-semibold bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 hover:text-gray-100 transition duration-75 min-w-50 max-w-50 sm:self-end">Filter</button>
         </div>
     </form>
-    <div class="overflow-x-auto mt-0 sm:mt-4 select-none">
+    <div class="mt-0 sm:mt-4 select-none">
         <div class="md:rounded-lg">
             <table class="min-w-full divide-y divide-gray-300">
                 <thead>
@@ -68,5 +68,9 @@ $lastDayOfMonthFormatted = $lastDayOfMonth->format('Y-m-d');
     </div>
 </div>
 <?php include($_SERVER['DOCUMENT_ROOT'] . '/tms/src/components/modals/distribute_task_modal.php'); ?>
+<?php include($_SERVER['DOCUMENT_ROOT'] . '/tms/src/components/modals/view_distributed_task.php'); ?>
 <script src="/tms/src/assets/scripts/distribution/index.js"></script>
 <script src="/tms/src/assets/scripts/distribution/assign_task.js"></script>
+<script src="/tms/src/assets/scripts/distribution/unassign_task.js"></script>
+<script src="/tms/src/assets/scripts/distribution/view_task.js"></script>
+<script src="/tms/src/assets/scripts/distribution/task_action.js"></script>

@@ -10,6 +10,15 @@
                 <input type="text" id="update_role" name="role" class="w-full border rounded-md py-2 px-3 focus:outline-none focus:border-blue-500 transition duration-75" required>
             </div>
 
+            <div class="mb-4">
+                <label for="update_visibility" class="block text-gray-700">Role:</label>
+                <!-- Dropdown for role selection -->
+                <select id="update_visibility" name="visibility" class="bg-white w-full border rounded-md py-2 px-3 focus:outline-none focus:border-blue-500 transition duration-75" required>
+                    <option value="PUBLIC">PUBLIC</option>
+                    <option value="PRIVATE">PRIVATE</option>
+                </select>
+            </div>
+
             <div class="mt-4 flex justify-end">
                 <button type="submit" onclick="" class="font-semibold bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 hover:text-gray-100 transition duration-75 min-w-50 max-w-50">Save</button>
             </div>

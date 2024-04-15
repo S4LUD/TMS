@@ -1,5 +1,6 @@
 const insertRoleForm = document.getElementById("insertRoleForm");
 const roleInput = document.getElementById("insert_role");
+const visibilityInput = document.getElementById("insert_visibility");
 
 // Function to open the modal
 function openInsertRoleModal() {
@@ -31,13 +32,13 @@ insertRoleForm.addEventListener("submit", async function (event) {
 
   // Validate input fields
   if (!roleInput.value.trim()) {
-    showToast("Please fill in both role and role fields", "#FA3636");
+    showToast("Please fill in role field", "#FA3636");
     return;
   }
 
   try {
     const response = await fetch(
-      `${apiLink}/insertrole?role=${roleInput.value}`,
+      `${apiLink}/insertrole?role=${roleInput.value}&visibility=${visibilityInput.value}`,
       {
         method: "GET",
       }

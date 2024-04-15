@@ -9,11 +9,6 @@
         <!-- Container for checkboxes -->
         <div id="permissionsContainer">
             <div class="mb-4">
-                <!-- Performance -->
-                <div class="flex items-center">
-                    <input type="checkbox" id="performance">
-                    <label for="performance" class="ml-2">Performance</label>
-                </div>
 
                 <!-- Report -->
                 <div class="flex items-center">
@@ -111,6 +106,14 @@
                     <div class="flex items-center">
                         <input type="checkbox" id="assign" disabled>
                         <label for="assign" class="ml-2">Assign</label>
+                    </div>
+                    <div class="flex items-center">
+                        <input type="checkbox" id="view_distributed_tasks" class="mr-2">
+                        <label for="view_distributed_tasks">View</label>
+                    </div>
+                    <div class="flex items-center">
+                        <input type="checkbox" id="action_status" class="mr-2">
+                        <label for="action_status">Action Status</label>
                     </div>
                 </div>
             </div>

@@ -34,7 +34,8 @@
                 <div id="fileDBEditPreview" class="flex gap-1 flex-row overflow-y-auto mt-1"></div>
             </div>
 
-            <div class="mt-4 flex justify-end">
+            <div class="mt-4 flex justify-end gap-1">
+                <button onclick="handleTaskActionStatus(event)" id="hiding-this-btn" class="font-semibold bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 hover:text-gray-100 transition duration-75 min-w-50 max-w-50">Begin Task</button>
                 <button type="submit" class="font-semibold bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 hover:text-gray-100 transition duration-75 min-w-50 max-w-50">Save</button>
             </div>
         </form>

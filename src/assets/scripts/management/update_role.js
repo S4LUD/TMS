@@ -1,5 +1,6 @@
 const updateRoleForm = document.getElementById("updateRoleForm");
 const roleUpdateInput = document.getElementById("update_role");
+const visibilityUpdateInput = document.getElementById("update_visibility");
 
 // Function to open the modal
 async function openupdateRoleModal() {
@@ -9,7 +10,9 @@ async function openupdateRoleModal() {
   const result = rolesList.filter((role) => role.id === Number(roleId));
 
   if (result) {
+    console.log(result);
     roleUpdateInput.value = result[0].role;
+    visibilityUpdateInput.value = result[0].visibility;
   }
 
   document.getElementById("updateroleModalOverlay").classList.remove("hidden");
@@ -42,8 +45,8 @@ updateRoleForm.addEventListener("submit", async function (event) {
   const roleId = localStorage.getItem("roleId");
 
   // Validate input fields
-  const abbreviation = abbreviationUpdateInput.value.trim();
   const role = roleUpdateInput.value.trim();
+  const visibility = visibilityUpdateInput.value;
   if (!role) {
     showToast("Please fill in role field", "#FA3636");
     return;
@@ -52,7 +55,7 @@ updateRoleForm.addEventListener("submit", async function (event) {
   try {
     // Send update request to the server
     const response = await fetch(
-      `${apiLink}/updaterole?roleId=${roleId}&role=${role}`,
+      `${apiLink}/updaterole?roleId=${roleId}&role=${role}&visibility=${visibility}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },

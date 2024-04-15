@@ -1,11 +1,31 @@
 const userContainer = document.getElementById("user_list_container");
 const maxDisplay = 4;
 let names = []; // Array to hold user names
+let selectedUsers = [];
 
-async function fetchUsers() {
+async function fetchUsers(abbreviation) {
   try {
-    const response = await fetch(`${apiLink}/fetchallusers`);
-    const result = await response.json();
+    const userDetails = JSON.parse(localStorage.getItem("user"));
+    const role = userDetails?.role;
+    const empabbreviation = userDetails?.abbreviation;
+
+    let response;
+    let result;
+
+    if (role === "SUPER ADMIN") {
+      // Fetch all users
+      response = await fetch(
+        `${apiLink}/fetchallusers?abbreviation=${abbreviation}`
+      );
+    } else {
+      // Fetch only EMPLOYEE users
+      response = await fetch(
+        `${apiLink}/fetchallusers?abbreviation=${empabbreviation}`
+      );
+    }
+
+    result = await response.json();
+
     names = result; // Update the names array with the fetched user data
     updateDisplay(""); // Call updateDisplay with an empty query to display all users
   } catch (error) {
@@ -13,10 +33,9 @@ async function fetchUsers() {
   }
 }
 
-fetchUsers();
-
-function openDistribute(task_id) {
-  localStorage.setItem("taskId", task_id);
+function openDistribute(task) {
+  localStorage.setItem("taskId", task?.id);
+  fetchUsers(task?.abbreviation);
   document.getElementById("distributeTask").classList.remove("hidden");
 }
 
@@ -32,15 +51,31 @@ function updateDisplay(query) {
   let found = false; // Flag to track if any user is found
 
   for (const user of names) {
-    // If the query is empty or the username contains the query
     if (!query || user.username.toLowerCase().includes(query.toLowerCase())) {
       const listItem = document.createElement("div");
       listItem.classList =
-        "w-full border rounded-md py-2 px-3 hover:border-blue-200 transition duration-75 cursor-pointer";
-      listItem.textContent = user.username;
-      listItem.addEventListener("click", () => {
-        selectUser(user.id, user.username);
+        "w-full border rounded-md py-2 px-3 focus:outline-none focus:border-blue-500 transition duration-75";
+
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.value = user.id;
+      checkbox.classList = "mr-2";
+
+      // Check if user is already selected
+      const isSelected = selectedUsers.some((u) => u.id === user.id);
+      if (isSelected) {
+        checkbox.checked = true; // Set the checkbox to checked if user is selected
+      }
+
+      checkbox.addEventListener("click", () => {
+        selectUser(user.username, user.id);
       });
+      listItem.appendChild(checkbox);
+
+      const label = document.createElement("label");
+      label.textContent = user.username;
+      listItem.appendChild(label);
+
       userContainer.appendChild(listItem);
 
       displayed++; // Increment the displayed count
@@ -75,23 +110,61 @@ function closeUserDropdown() {
   updateDisplay("");
 }
 
-function selectUser(user_id, username) {
-  localStorage.setItem("userId", user_id);
-  const assignTo = document.getElementById("assignTo");
-  assignTo.value = username;
-  updateDisplay("");
-  closeUserDropdown();
+function selectUser(username, id) {
+  const user = { username, id };
+  const index = selectedUsers.findIndex((u) => u.id === id); // Check if user is already selected
+
+  if (index === -1) {
+    // If user is not already selected, push it into the array
+    selectedUsers.push(user);
+  } else {
+    // If user is already selected, remove it from the array
+    selectedUsers.splice(index, 1);
+  }
+
+  // Display selected usernames
+  displaySelectedUsers();
+}
+
+function displaySelectedUsers() {
+  const selectedUsersContainer = document.getElementById(
+    "selectedUsersContainer"
+  );
+  selectedUsersContainer.innerHTML = ""; // Clear previous content
+
+  if (selectedUsers.length > 0) {
+    // If there are selected users, display them
+    selectedUsers.forEach((user) => {
+      const usernameElement = document.createElement("span");
+      usernameElement.textContent = user.username;
+      selectedUsersContainer.appendChild(usernameElement);
+
+      // Add a comma and space after each username except the last one
+      if (selectedUsers.indexOf(user) !== selectedUsers.length - 1) {
+        const comma = document.createElement("span");
+        comma.textContent = ", ";
+        selectedUsersContainer.appendChild(comma);
+      }
+    });
+  } else {
+    // If no users are selected, prompt the user to select users first
+    const promptMessage = document.createElement("span");
+    promptMessage.textContent = "Click here to select users";
+    selectedUsersContainer.appendChild(promptMessage);
+  }
 }
 
 function closeDistribute() {
   document.getElementById("dueDate").value = "";
   document.getElementById("taskType").value = "";
-  document.getElementById("assignTo").value = "";
   document.getElementById("distributeTask").classList.add("hidden");
   document.getElementById("userdropdown").classList.add("hidden");
   document.getElementById("userdropdownbackdrop").classList.add("hidden");
   localStorage.removeItem("userId");
   localStorage.removeItem("taskId");
+  selectedUsers = [];
+  displaySelectedUsers();
+  updateDisplay("");
 }
 
 async function assigntask(event) {
@@ -99,50 +172,91 @@ async function assigntask(event) {
   const dueDate = document.getElementById("dueDate").value;
   const taskType = document.getElementById("taskType").value;
   const taskId = localStorage.getItem("taskId");
-  const user_id = localStorage.getItem("userId");
-  console.log({ dueDate, taskType, taskId, user_id });
 
-  await fetch(
-    `${apiLink}/distributetask?task_type=${taskType}&user_id=${user_id}&dueAt=${dueDate}&task_id=${taskId}`,
-    {
-      method: "GET",
-    }
-  )
-    .then((response) => response.json())
-    .then((result) => {
-      if (result.message) {
-        Toastify({
-          text: result.message,
-          duration: 5000,
-          gravity: "top", // `top` or `bottom`
-          position: "right", // `left`, `center` or `right`
-          stopOnFocus: true, // Prevents dismissing of toast on hover
-          style: {
-            background: "#3CA2FA",
-          },
-        }).showToast();
-      } else if (result.error) {
-        Toastify({
-          text: result.error,
-          duration: 5000,
-          gravity: "top", // `top` or `bottom`
-          position: "right", // `left`, `center` or `right`
-          stopOnFocus: true, // Prevents dismissing of toast on hover
-          style: {
-            background: "#FA3636",
-          },
-        }).showToast();
-      }
-    })
-    .catch((error) => {
-      // Handle errors
-      console.error("Error:", error);
-    })
-    .finally(async () => {
-      tasks = await fetchTasks();
-      taskCount.innerText = Math.ceil(tasks.length / itemsPerPage);
-      await updateTableForCurrentPage();
-      fetchUsers();
-      closeDistribute();
+  // Check if there are selected users
+  if (selectedUsers.length === 0) {
+    Toastify({
+      text: "No users selected",
+      duration: 5000,
+      gravity: "top",
+      position: "right",
+      stopOnFocus: true,
+      style: {
+        background: "#FA3636",
+      },
+    }).showToast();
+    return;
+  }
+
+  try {
+    const userDetails = JSON.parse(localStorage.getItem("user"));
+    const { role } = userDetails;
+
+    const requests = selectedUsers.map((user) => {
+      return fetch(
+        `${apiLink}/distributetask?task_type=${taskType}&role=${role}&user_id=${user.id}&dueAt=${dueDate}&task_id=${taskId}`,
+        {
+          method: "GET",
+        }
+      );
     });
+
+    const responses = await Promise.all(requests);
+
+    let allSuccessful = true;
+
+    responses.forEach(async (response) => {
+      const result = await response.json();
+
+      if (!result.message) {
+        allSuccessful = false;
+      }
+    });
+
+    if (allSuccessful) {
+      Toastify({
+        text: "All tasks assigned successfully",
+        duration: 5000,
+        gravity: "top",
+        position: "right",
+        stopOnFocus: true,
+        style: {
+          background: "#3CA2FA",
+        },
+      }).showToast();
+    } else {
+      Toastify({
+        text: "Failed to assign tasks",
+        duration: 5000,
+        gravity: "top",
+        position: "right",
+        stopOnFocus: true,
+        style: {
+          background: "#FA3636",
+        },
+      }).showToast();
+    }
+
+    // Perform other tasks after all API requests are completed
+    tasks = await fetchTasks();
+    taskCount.innerText = Math.ceil(tasks.length / itemsPerPage);
+    await updateTableForCurrentPage();
+    fetchUsers("");
+    // Clear selected users after successful assignment
+    selectedUsers = [];
+    displaySelectedUsers();
+    closeDistribute();
+    updateDisplay("");
+  } catch (error) {
+    console.error("Error:", error);
+  }
 }
+
+document.addEventListener("DOMContentLoaded", function () {
+  // Load selected users from wherever you store them initially
+  // For example, if selectedUsers is initially populated from an API response
+  // or some other data source, you can skip this step.
+
+  // Display the selected users initially
+  displaySelectedUsers();
+});

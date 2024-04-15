@@ -4,39 +4,10 @@
             <h2 class="text-md font-medium text-gray-500">Settings</h2>
             <i onclick="closeSettingsModal()" class="fa-solid fa-xmark text-white bg-gray-300 hover:bg-gray-400 py-1 px-1.5 rounded-full cursor-pointer"></i>
         </div>
-        <input type="text" id="settings_userId" hidden>
-        <div class="mb-4">
-            <label for="settings_edit_fullname" class="block text-gray-700">Fullname:</label>
-            <input type="text" id="settings_edit_fullname" name="fullname" class="w-full border rounded-md py-2 px-3 focus:outline-none focus:border-blue-500 transition duration-75">
-        </div>
 
-        <div class="mb-4">
-            <label for="settings_edit_address" class="block text-gray-700">Address:</label>
-            <input type="text" id="settings_edit_address" name="address" class="w-full border rounded-md py-2 px-3 focus:outline-none focus:border-blue-500 transition duration-75">
-        </div>
-
-        <div class="mb-4">
-            <label for="settings_edit_age" class="block text-gray-700">Age:</label>
-            <input type="number" id="settings_edit_age" name="age" class="w-full border rounded-md py-2 px-3 focus:outline-none focus:border-blue-500 transition duration-75">
-        </div>
-
-        <div class="mb-4">
-            <label for="settings_edit_contact" class="block text-gray-700">Contact:</label>
-            <input type="text" id="settings_edit_contact" name="contact" class="w-full border rounded-md py-2 px-3 focus:outline-none focus:border-blue-500 transition duration-75">
-        </div>
-
-        <div class="mb-4">
-            <label for="settings_edit_gender" class="block text-gray-700">Gender:</label>
-            <select id="settings_edit_gender" name="gender" class="bg-white w-full border rounded-md py-2 px-3 focus:outline-none focus:border-blue-500 transition duration-75">
-                <option value="">---select---</option>
-                <option value="male">Male</option>
-                <option value="female">Female</option>
-                <option value="other">Other</option>
-            </select>
-        </div>
-
-        <div class="mt-4 flex justify-end">
-            <button type="submit" onclick="saveUserDetails()" class="font-semibold bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 hover:text-gray-100 transition duration-75 min-w-50 max-w-50">Save</button>
+        <div class="mt-4 flex flex-col gap-1">
+            <button onclick="openUserInformationModal()" class="font-semibold bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 hover:text-gray-100 transition duration-75 min-w-50 max-w-50">Update Information</button>
+            <button onclick="openChangePasswordModal()" class="font-semibold bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 hover:text-gray-100 transition duration-75 min-w-50 max-w-50">Change Password</button>
         </div>
     </div>
 </div>

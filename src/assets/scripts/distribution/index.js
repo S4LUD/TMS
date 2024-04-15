@@ -10,14 +10,18 @@ const itemsPerPage = 10; // Number of tasks per page
 
 // Function to fetch tasks from the API
 async function fetchTasks(startDate = "", endDate = "") {
+  const userDetails = JSON.parse(localStorage.getItem("user"));
+  const { id, role } = userDetails;
+
   let url = `${apiLink}/fetchalltasks`;
 
   // Construct query parameters
   const params = new URLSearchParams();
-  if (startDate && endDate) {
-    params.append("startDate", startDate);
-    params.append("endDate", endDate);
-  }
+
+  params.append("startDate", startDate);
+  params.append("endDate", endDate);
+  params.append("role", role);
+  params.append("userId", id);
 
   // Append query parameters to the URL
   url += "?" + params.toString();
@@ -58,18 +62,6 @@ function formatDate(date) {
   return new Intl.DateTimeFormat("en-PH", options).format(date);
 }
 
-// Function to fetch user data from the API
-async function fetchUserData(userId) {
-  const response = await fetch(
-    `${apiLink}/fetchallusers?searchaccount=${userId}`
-  );
-  if (!response.ok) {
-    throw new Error(`Failed to fetch user data: ${response.statusText}`);
-  }
-  const userData = await response.json();
-  return userData[0].username; // Assuming username is needed
-}
-
 async function updateTable(tasks) {
   // Clear existing table content
   taskTable.innerHTML = "";
@@ -83,7 +75,6 @@ async function updateTable(tasks) {
     // Iterate over tasks and populate the table rows
     for (const task of tasks) {
       const dateCreated = formatDate(new Date(task.createdAt));
-      let userData = "N/A"; // Default value if user_id is null or undefined
       let dueDate = "N/A";
       let startedAt = "N/A";
       let endedAt = "N/A";
@@ -96,20 +87,20 @@ async function updateTable(tasks) {
       if (task?.endedAt) {
         endedAt = formatDate(new Date(task?.endedAt));
       }
-      if (task.user_id) {
-        userData = await fetchUserData(task.user_id);
-      }
       const { distribute: distributePermissions } = JSON.parse(
         localStorage.getItem("permissions")
       );
       const { source } = distributePermissions;
 
       const row = document.createElement("tr");
+      
       row.innerHTML = `
                 <td class="whitespace-nowrap py-4 pl-4 pr-3 font-medium text-gray-900 sm:pl-6">${
                   task.title
                 }</td>
-                <td class="whitespace-nowrap px-3 py-4 text-gray-500">${userData}</td>
+                <td class="whitespace-nowrap px-3 py-4 text-gray-500">${
+                  task?.assigned_users ? task?.assigned_users : "N/A"
+                }</td>
                 <td class="whitespace-nowrap px-3 py-4 text-gray-500">${
                   task?.task_type ? task?.task_type : "N/A"
                 }</td>
@@ -118,20 +109,93 @@ async function updateTable(tasks) {
                 <td class="whitespace-nowrap px-3 py-4 text-gray-500">${startedAt}</td>
                 <td class="whitespace-nowrap px-3 py-4 text-gray-500">${endedAt}</td>
                 <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right sm:pr-6">
-                    ${
-                      source.assign
-                        ? '<span class="bg-blue-500 hover:bg-blue-600 text-white hover:text-gray-100 px-2 py-1 rounded assign-btn" style="cursor: pointer"><i class="fas fa-people-arrows"></i></span>'
-                        : ""
-                    }
-                </td>
+                  ${
+                    source?.assign &&
+                    !!!task?.assigned_users &&
+                    ![1, 2, 3, 5, 7].includes(task?.status_id)
+                      ? '<span class="bg-blue-500 hover:bg-blue-600 text-white hover:text-gray-100 px-2 py-1 rounded assign-btn" style="cursor: pointer"><i class="fas fa-people-arrows"></i></span>'
+                      : ""
+                  }
+                  ${
+                    source?.view
+                      ? '<span class="bg-blue-500 hover:bg-blue-600 text-white hover:text-gray-100 px-2 py-1 rounded view-btn" style="cursor: pointer"><i class="fa-solid fa-eye"></i></span>'
+                      : ""
+                  }
+                  ${
+                    task?.assigned_users &&
+                    task?.status_id !== 6 &&
+                    ![1, 2, 3, 5, 7].includes(task?.status_id)
+                      ? '<span class="bg-red-500 hover:bg-red-600 text-white hover:text-gray-100 px-2 py-1 rounded unassign-btn" style="cursor: pointer"><i class="fas fa-people-arrows"></i></span>'
+                      : ""
+                  }
+                  ${
+                    source?.action_status &&
+                    ![1, 2, 3, 5, 7].includes(task?.status_id)
+                      ? `<div class="relative inline-block group overflow-visible">
+                      <span
+                          class="bg-green-500 hover:bg-green-600 text-white hover:text-gray-100 px-2 py-1 rounded cursor-pointer"
+                      >
+                          <i class="fa-solid fa-wrench"></i>
+                      </span>
+                  
+                      <!-- Dropdown Menu -->
+                      <div
+                          class="absolute hidden bg-white rounded-lg shadow-lg mt-2 right-0 bottom-0 origin-top-right z-10 group-hover:block"
+                      >
+                          <!-- Menu Items -->
+                          <div class="flex flex-col p-2 gap-1">
+                              <button class="done-btn rounded block w-full text-white text-left px-4 py-2 hover:bg-green-600 bg-green-500">DONE</button>
+                              <button class="fail-btn rounded block w-full text-white text-left px-4 py-2 hover:bg-red-600 bg-red-500">FAIL</button>
+                              <button class="reject-btn rounded block w-full text-white text-left px-4 py-2 hover:bg-red-700 bg-red-600">REJECT</button>
+                          </div>
+                      </div>
+                  </div>`
+                      : ""
+                  }               
+              </td>
             `;
       taskTable.appendChild(row);
 
       let assignBtn = row.querySelector(".assign-btn");
+      let viewBtn = row.querySelector(".view-btn");
+      let unassignBtn = row.querySelector(".unassign-btn");
+      let doneBtn = row.querySelector(".done-btn");
+      let failBtn = row.querySelector(".fail-btn");
+      let rejectBtn = row.querySelector(".reject-btn");
+
+      if (doneBtn) {
+        doneBtn.addEventListener("click", () =>
+          handleTaskActionStatus(task, 1)
+        );
+      }
+
+      if (failBtn) {
+        failBtn.addEventListener("click", () =>
+          handleTaskActionStatus(task, 2)
+        );
+      }
+
+      if (rejectBtn) {
+        rejectBtn.addEventListener("click", () =>
+          handleTaskActionStatus(task, 3)
+        );
+      }
 
       // Add event listeners only if the buttons exist
       if (assignBtn) {
-        assignBtn.addEventListener("click", () => openDistribute(task.id));
+        assignBtn.addEventListener("click", () => openDistribute(task));
+      }
+
+      if (viewBtn) {
+        viewBtn.addEventListener("click", () =>
+          handleDistributedViewTask(task.id)
+        );
+      }
+
+      if (unassignBtn) {
+        unassignBtn.addEventListener("click", () =>
+          handleUnassignTask(task, task?.assigned_users)
+        );
       }
     }
   }
