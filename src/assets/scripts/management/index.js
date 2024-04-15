@@ -16,7 +16,7 @@ async function fetchUsers() {
   if (!response.ok) {
     throw new Error(`Failed to fetch users: ${response.statusText}`);
   }
-
+  
   // Parse response data as JSON and return
   return response.json();
 }
