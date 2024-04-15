@@ -49,14 +49,6 @@ $permissions = json_decode($userData['permissions'], true);
                 </a>
             </li>
         <?php } ?>
-        <?php if ($permissions['performance']) { ?>
-            <li class="hover:bg-gray-600 cursor-pointer rounded-md transition duration-75 <?php echo isCurrentPage('performance'); ?>">
-                <a href="/tms/performance" class="flex py-2 pl-2.5 whitespace-nowrap">
-                    <div class="min-w-7 flex justify-center items-center mr-1.5"><i class="fas fa-chart-line text-lg text-gray-200"></i></div>
-                    <span class="text-gray-200">Employees Performance</span>
-                </a>
-            </li>
-        <?php } ?>
         <?php if ($permissions['report']) { ?>
             <li class="hover:bg-gray-600 cursor-pointer rounded-md transition duration-75 <?php echo isCurrentPage('report'); ?>">
                 <a href="/tms/report" class="flex py-2 pl-2.5 whitespace-nowrap">

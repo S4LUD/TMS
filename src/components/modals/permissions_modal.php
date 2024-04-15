@@ -9,11 +9,6 @@
         <!-- Container for checkboxes -->
         <div id="permissionsContainer">
             <div class="mb-4">
-                <!-- Performance -->
-                <div class="flex items-center">
-                    <input type="checkbox" id="performance">
-                    <label for="performance" class="ml-2">Performance</label>
-                </div>
 
                 <!-- Report -->
                 <div class="flex items-center">

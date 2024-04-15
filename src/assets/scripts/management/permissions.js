@@ -1,4 +1,3 @@
-const performanceCheckbox = document.getElementById("performance");
 const reportCheckbox = document.getElementById("report");
 const accountManagementCheckbox = document.getElementById("account_management");
 const createUserCheckbox = document.getElementById("create_user");
@@ -64,7 +63,6 @@ distributeCheckbox.addEventListener("change", function () {
 // Function to clear inputs
 function clearInputs() {
   const checkboxes = [
-    performanceCheckbox,
     reportCheckbox,
     accountManagementCheckbox,
     createUserCheckbox,
@@ -102,7 +100,6 @@ async function openPermissionsModal(userId) {
     const result = await response.json();
     const permissions = result.permissions;
     if (permissions) {
-      performanceCheckbox.checked = permissions.performance;
       reportCheckbox.checked = permissions.report;
       accountManagementCheckbox.checked =
         permissions.account_management.enabled;
@@ -167,7 +164,6 @@ async function savePermissions() {
   const manageId = localStorage.getItem("manage_id");
   try {
     const permissions = {
-      performance: performanceCheckbox.checked,
       report: reportCheckbox.checked,
       account_management: {
         enabled: accountManagementCheckbox.checked,

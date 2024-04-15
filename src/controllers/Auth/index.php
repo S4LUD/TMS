@@ -98,7 +98,7 @@ class Auth
             $userId = $db->lastInsertId(); // Get the ID of the newly inserted user
 
             // Insert default permissions for the user
-            $defaultPermissions = '{"account_management":{"enabled":false,"source":{"create_user":false,"roles":false,"departments":false,"delete":false,"view":false,"edit":false,"permissions":false}},"tasks":{"enabled":false,"source":{"create_task":false,"delete":false,"view":false,"edit":false}},"distribute":{"enabled":false,"source":{"assign":false}},"performance":false, "report":false}'; // Define default permissions
+            $defaultPermissions = '{"account_management":{"enabled":false,"source":{"create_user":false,"roles":false,"departments":false,"delete":false,"view":false,"edit":false,"permissions":false}},"tasks":{"enabled":false,"source":{"create_task":false,"delete":false,"view":false,"edit":false}},"distribute":{"enabled":false,"source":{"assign":false}}, "report":false}'; // Define default permissions
             $insertPermissionStmt = $db->prepare("INSERT INTO `permissions`(`user_id`, `permissions`) VALUES (?, ?)");
             $insertPermissionSuccess = $insertPermissionStmt->execute([$userId, $defaultPermissions]);
 
