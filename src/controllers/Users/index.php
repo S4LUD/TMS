@@ -580,4 +580,31 @@ class Users
             return "Error updating user details for user with ID: $userId - " . $e->getMessage();
         }
     }
+
+    public static function unblockUser($userId)
+    {
+        global $db;
+
+        try {
+            // Prepare the SQL statement for update
+            $stmt = $db->prepare("UPDATE users SET status = 1 WHERE id = :userId");
+
+            // Bind parameters and execute the statement
+            $stmt->bindParam(':userId', $userId);
+            $stmt->execute();
+
+            // Check if any rows were affected
+            $rowCount = $stmt->rowCount();
+
+            // Return a success message or the number of affected rows
+            if ($rowCount > 0) {
+                return "Successfully unblocked user";
+            } else {
+                return "No rows affected. User with ID $userId not found.";
+            }
+        } catch (PDOException $e) {
+            // Handle database errors
+            return "Error updating department: " . $e->getMessage();
+        }
+    }
 }

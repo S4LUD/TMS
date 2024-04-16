@@ -16,7 +16,7 @@ async function fetchUsers() {
   if (!response.ok) {
     throw new Error(`Failed to fetch users: ${response.statusText}`);
   }
-  
+
   // Parse response data as JSON and return
   return response.json();
 }
@@ -61,6 +61,11 @@ async function updateTable(users) {
             </td>
             <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right sm:pr-6">
                 ${
+                  user.status === "LOCKED"
+                    ? '<span class="bg-red-500 hover:bg-red-600 text-white hover:text-gray-100 px-2 py-1 rounded locked-btn" style="cursor: pointer"><i class="fa-solid fa-user-large-slash"></i></span>'
+                    : ""
+                }
+                ${
                   source.delete
                     ? '<span class="bg-red-500 hover:bg-red-600 text-white hover:text-gray-100 px-2 py-1 rounded delete-btn" style="cursor: pointer"><i class="fa-solid fa-trash-can"></i></span>'
                     : ""
@@ -89,6 +94,7 @@ async function updateTable(users) {
       let viewBtn = row.querySelector(".view-btn");
       let editBtn = row.querySelector(".edit-btn");
       let permissionBtn = row.querySelector(".permission-btn");
+      let lockedBtn = row.querySelector(".locked-btn");
 
       // Add event listeners only if the buttons exist
       if (deleteBtn) {
@@ -109,6 +115,10 @@ async function updateTable(users) {
         permissionBtn.addEventListener("click", () =>
           openPermissionsModal(user.id)
         );
+      }
+
+      if (lockedBtn) {
+        lockedBtn.addEventListener("click", () => handleUnblock(user.id));
       }
     }
   }
