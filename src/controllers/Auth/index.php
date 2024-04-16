@@ -8,28 +8,38 @@ class Auth
         global $db;
 
         $stmt = $db->prepare("SELECT users.id, users.username, users.password, users.status, role.role, users.auth, department.department, department.abbreviation, permissions.permissions FROM users
-                        JOIN role on users.role_id = role.id
-                        JOIN department on users.department_id = department.id
-                        JOIN permissions on users.id = permissions.user_id
-                        WHERE BINARY users.username = ?");
+                    JOIN role on users.role_id = role.id
+                    JOIN department on users.department_id = department.id
+                    JOIN permissions on users.id = permissions.user_id
+                    WHERE BINARY users.username = ?");
 
         $stmt->execute([$username]);
 
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if ($user && password_verify($password, $user['password'])) {
-            return json_encode([
-                'id' => $user['id'],
-                'username' => $user['username'],
-                'status' => $user['status'],
-                'role' => $user['role'],
-                'department' => $user['department'],
-                'abbreviation' => $user['abbreviation'],
-                'permissions' => $user['permissions'],
-                'auth' => $user['auth'],
-            ]);
+        if ($user) {
+            if ($user['status'] === 2) {
+                return json_encode([
+                    'status' => $user['status'],
+                ]);
+            }
+
+            if (password_verify($password, $user['password'])) {
+                return json_encode([
+                    'id' => $user['id'],
+                    'username' => $user['username'],
+                    'status' => $user['status'],
+                    'role' => $user['role'],
+                    'department' => $user['department'],
+                    'abbreviation' => $user['abbreviation'],
+                    'permissions' => $user['permissions'],
+                    'auth' => $user['auth'],
+                ]);
+            } else {
+                return null;
+            }
         } else {
-            return null;
+            return json_encode(['error' => 'Username not found']);
         }
     }
 

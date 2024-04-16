@@ -10,7 +10,11 @@ if (isset($_SESSION['user'])) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $loginResult = Auth::login($_POST['username'], $_POST['password']);
     if ($loginResult !== null) {
-        if (json_decode($loginResult, true)['status'] === 2) {
+        $decodedResult = json_decode($loginResult, true);
+
+        if (isset($decodedResult['error']) && $decodedResult['error'] === "Username not found") {
+            echo '<script>alert("Invalid credentials.");</script>';
+        } elseif (isset($decodedResult['status']) && $decodedResult['status'] === 2) {
             echo '<script>alert("Your account is currently blocked. Please contact your higher-ups to unblock it.");</script>';
         } else {
             $_SESSION['user'] = $loginResult;
