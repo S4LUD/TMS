@@ -186,7 +186,6 @@ class Tasks
         }
     }
 
-    // Helper function to get department ID based on user ID
     private static function getDepartmentId($userId)
     {
         global $db;
@@ -202,7 +201,6 @@ class Tasks
 
         return $departmentData['department_id'];
     }
-
 
     public static function viewTask($task_id)
     {
@@ -482,5 +480,24 @@ class Tasks
         $stmt->bindParam(':statusId', $statusId);
 
         return $stmt->execute();
+    }
+
+    public static function fetchNotifications($user_id)
+    {
+        global $db;
+
+        $stmt = $db->prepare("SELECT `title`, `users`.`username`, `task_type`, `dueAt`, `task_status`.`status` 
+                            FROM `tasks`
+                            LEFT JOIN `task_status` ON `tasks`.`status_id` = `task_status`.`id`
+                            LEFT JOIN `distributed_tasks` ON `tasks`.`id` = `distributed_tasks`.`task_id`
+                            LEFT JOIN `users` ON `distributed_tasks`.`user_id` = `users`.`id`
+                            WHERE `distributed_tasks`.`user_id` = :user_id
+                            AND `task_status`.`status` NOT IN ('FAILED', 'DONE', 'REJECTED')        
+                        ");
+        $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+        $stmt->execute();
+        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        return json_encode($results);
     }
 }

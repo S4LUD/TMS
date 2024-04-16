@@ -15,7 +15,10 @@ $permissions = json_decode($userData['permissions'], true);
         <?php if ($userData['auth']) { ?>
             <span class="font-semibold text-gray-200"><?php echo $userData['username'] . " | " . $userData['role'] ?></span>
         <?php } else { ?>
-            <span class="font-semibold text-gray-200"><?php echo $userData['username'] . " | " . $userData['abbreviation'] . " | " . $userData['role'] ?></span>
+            <div class="flex flex-col">
+                <span class="font-semibold text-gray-200"><?php echo $userData['username']; ?></span>
+                <span class="font-semibold text-gray-200"><?php echo $userData['abbreviation'] . " | " .  $userData['role']; ?></span>
+            </div>
         <?php } ?>
     </div>
     <ul class="p-2">
