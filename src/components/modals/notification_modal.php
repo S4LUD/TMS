@@ -1,5 +1,5 @@
 <div id="notification_modal" class="select-none fixed inset-0 bg-gray-500 bg-opacity-50 flex items-center justify-center z-50 hidden" onclick="closeNotificationModal()">
-    <div class="bg-white p-4 rounded shadow-md w-6/12 h-3/4" onclick="event.stopPropagation();">
+    <div class="bg-white p-4 rounded shadow-md w-6/12 h-3/4 overflow-y-scroll" onclick="event.stopPropagation();">
         <div class="mb-4 flex justify-between">
             <h2 class="text-md font-medium text-gray-500">Today's Task Summary</h2>
             <i onclick="closeNotificationModal()" class="fa-solid fa-xmark text-white bg-gray-300 hover:bg-gray-400 py-1 px-1.5 rounded-full cursor-pointer"></i>

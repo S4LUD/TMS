@@ -51,6 +51,8 @@ if (!isset($_SESSION['user'])) {
         </div>
     </div>
     <script src="/tms/src/assets/scripts/layout/index.js"></script>
+    <?php include($_SERVER['DOCUMENT_ROOT'] . '/tms/src/components/modals/notification_modal.php'); ?>
+    <script src="/tms/src/assets/scripts/dashboard/index.js"></script>
 </body>
 
 </html>

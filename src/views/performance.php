@@ -63,6 +63,4 @@ function getCurrentWeekDates()
     </div>
 </div>
 
-<?php include($_SERVER['DOCUMENT_ROOT'] . '/tms/src/components/modals/notification_modal.php'); ?>
 <script src="/tms/src/assets/scripts/performance/index.js"></script>
-<script src="/tms/src/assets/scripts/dashboard/index.js"></script>
