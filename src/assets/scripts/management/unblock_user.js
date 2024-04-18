@@ -7,7 +7,7 @@ async function handleUnblock(userId) {
       return;
     }
 
-    const url = `http://localhost/tms/api/unblockuser?userId=${userId}`;
+    const url = `${apiLink}/unblockuser?userId=${userId}`;
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
 
