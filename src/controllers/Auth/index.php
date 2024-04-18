@@ -7,7 +7,7 @@ class Auth
     {
         global $db;
 
-        $stmt = $db->prepare("SELECT users.id, users.username, users.password, users.status, role.role, users.auth, department.department, department.abbreviation, permissions.permissions FROM users
+        $stmt = $db->prepare("SELECT users.id, users.username, users.password, users.status, role.role, role.visibility, users.auth, department.department, department.abbreviation, permissions.permissions FROM users
                     JOIN role on users.role_id = role.id
                     JOIN department on users.department_id = department.id
                     JOIN permissions on users.id = permissions.user_id
@@ -30,6 +30,7 @@ class Auth
                     'username' => $user['username'],
                     'status' => $user['status'],
                     'role' => $user['role'],
+                    'visibility' => $user['visibility'],
                     'department' => $user['department'],
                     'abbreviation' => $user['abbreviation'],
                     'permissions' => $user['permissions'],

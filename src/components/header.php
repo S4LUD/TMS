@@ -10,7 +10,7 @@ $userData = json_decode($_SESSION['user'], true);
         <button id="toggleFullscreen" class="hidden sm:block ml-2 focus:outline-none">
             <i class="fas fa-expand text-lg text-gray-600 hover:text-gray-800 transition duration-300"></i>
         </button>
-        <?php if ($userData['role'] === "EMPLOYEE") { ?>
+        <?php if ($userData['role'] === "EMPLOYEE" && $userData['visibility'] === "PUBLIC") { ?>
             <button onclick="openNotificationModal()" class="focus:outline-none">
                 <i class="fa-solid fa-bell text-lg text-blue-600 hover:text-blue-800 transition duration-300"></i>
             </button>

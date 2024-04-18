@@ -7,11 +7,11 @@ function closeNotificationModal() {
   document.getElementById("notification_modal").classList.add("hidden");
 }
 
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", async function () {
   const userDetails = JSON.parse(localStorage.getItem("user"));
-  const { role } = userDetails;
-
-  if (role === "EMPLOYEE") {
+  const { role, visibility } = userDetails;
+  
+  if (role === "EMPLOYEE" && visibility === "PUBLIC") {
     const modalOpened = localStorage.getItem("modalOpened");
     if (!modalOpened) {
       populateTables();
