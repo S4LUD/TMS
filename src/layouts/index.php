@@ -1,4 +1,5 @@
 <?php
+date_default_timezone_set('Asia/Manila');
 
 if (!isset($_SESSION['user'])) {
     header('Location: /tms/login/');

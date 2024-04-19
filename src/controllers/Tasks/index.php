@@ -117,6 +117,68 @@ class Tasks
         }
     }
 
+    public static function GenerateTaskReport($startDate, $endDate, $statusFilter, $usernames)
+    {
+        global $db;
+
+        try {
+            // Construct the SQL query to fetch tasks
+            $query = "SELECT `tasks`.`title`, `tasks`.`detail`, `task_status`.`status`, `users`.`username` FROM `tasks`
+            LEFT JOIN `task_status` ON `tasks`.`status_id` = `task_status`.`id`
+            LEFT JOIN `distributed_tasks` ON `tasks`.`id` = `distributed_tasks`.`task_id`
+            LEFT JOIN `users` ON `distributed_tasks`.`user_id` = `users`.`id` ";
+
+            // Add condition for date range if both start date and end date are provided
+            if (!empty($startDate) && !empty($endDate)) {
+                $query .= "WHERE DATE(`tasks`.`createdAt`) BETWEEN :startDate AND :endDate ";
+            }
+
+            // Add condition for status filter if provided
+            if (!empty($statusFilter)) {
+                $query .= "AND `task_status`.`status` = :statusFilter ";
+            }
+
+            // Add condition for usernames filter if provided
+            if (!empty($usernames)) {
+                // Split usernames into an array and surround each username with single quotes
+                $usernamesArray = explode(',', $usernames);
+                $usernamesString = "'" . implode("','", $usernamesArray) . "'";
+                $query .= "AND `users`.`username` IN ($usernamesString) ";
+            }
+
+            // Prepare the statement
+            $stmt = $db->prepare($query);
+
+            // Bind parameters if date range is provided
+            if (!empty($startDate) && !empty($endDate)) {
+                $stmt->bindParam(':startDate', $startDate, PDO::PARAM_STR);
+                $stmt->bindParam(':endDate', $endDate, PDO::PARAM_STR);
+            }
+
+            // Bind status filter parameter if provided
+            if (!empty($statusFilter)) {
+                $stmt->bindParam(':statusFilter', $statusFilter, PDO::PARAM_STR);
+            }
+
+            // Execute the statement
+            $stmt->execute();
+
+            // Fetch the results
+            $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            // Return JSON-encoded results
+            return json_encode($results);
+        } catch (PDOException $e) {
+            // Handle database error
+            http_response_code(500); // Internal Server Error
+            return json_encode(['error' => $e->getMessage()]);
+        } catch (Exception $ex) {
+            // Handle other exceptions
+            http_response_code(500); // Internal Server Error
+            return json_encode(['error' => $ex->getMessage()]);
+        }
+    }
+
     public static function newFile($filename, $file_size, $destination,  $task_id)
     {
         global $db;

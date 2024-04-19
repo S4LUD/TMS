@@ -171,6 +171,17 @@ class Users
         return json_encode($results);
     }
 
+    public static function fetchTaskStatuses()
+    {
+
+        global $db;
+
+        $stmt = $db->query("SELECT * FROM task_status");
+        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        return json_encode($results);
+    }
+
     public static function insertDepartment($abbreviation, $department)
     {
         global $db;
