@@ -27,7 +27,7 @@ $lastDayOfMonthFormatted = $lastDayOfMonth->format('Y-m-d');
             <button type="button" id="filterButton" class="h-fit font-semibold bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 hover:text-gray-100 transition duration-75 min-w-50 max-w-50 sm:self-end">Filter</button>
         </div>
     </form>
-    <div class="mt-0 sm:mt-4 select-none">
+    <div class="overflow-x-auto mt-0 sm:mt-4 select-none">
         <div class="md:rounded-lg">
             <table class="min-w-full divide-y divide-gray-300">
                 <thead>
