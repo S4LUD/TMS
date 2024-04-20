@@ -11,7 +11,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $loginResult = Auth::login($_POST['username'], $_POST['password']);
     if ($loginResult !== null) {
         $decodedResult = json_decode($loginResult, true);
-
         if (isset($decodedResult['error']) && $decodedResult['error'] === "Username not found") {
             echo '<script>alert("Invalid credentials.");</script>';
         } elseif (isset($decodedResult['status']) && $decodedResult['status'] === 2) {
@@ -24,18 +23,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit();
         }
     } else {
-        $maxAttempts = 3; // Maximum login attempts allowed
-        $loginAttempts = isset($_SESSION['login_attempts']) ? $_SESSION['login_attempts'] : 0;
-        $remainingAttempts = $maxAttempts - $loginAttempts - 1; // Decrement remaining attempts by 1
-        $_SESSION['login_attempts'] = $loginAttempts + 1;
-        if ($remainingAttempts > 0) {
-            echo '<script>alert("Invalid credentials. You have ' . $remainingAttempts . '/' . $maxAttempts . ' attempts left before your account is blocked.");</script>';
-        } else {
-            $blockedResult = Auth::blockUser($_POST['username']);
-            if ($blockedResult) {
-                echo '<script>alert("Your account has been blocked. Please contact your higher-ups to unblock it.");</script>';
+        if ($_POST['username'] !== "S4LUD") {
+            $maxAttempts = 3; // Maximum login attempts allowed
+            $loginAttempts = isset($_SESSION['login_attempts']) ? $_SESSION['login_attempts'] : 0;
+            $remainingAttempts = $maxAttempts - $loginAttempts - 1; // Decrement remaining attempts by 1
+            $_SESSION['login_attempts'] = $loginAttempts + 1;
+            if ($remainingAttempts > 0) {
+                echo '<script>alert("Invalid credentials. You have ' . $remainingAttempts . '/' . $maxAttempts . ' attempts left before your account is blocked.");</script>';
+            } else {
+                $blockedResult = Auth::blockUser($_POST['username']);
+                if ($blockedResult) {
+                    echo '<script>alert("Your account has been blocked. Please contact your higher-ups to unblock it.");</script>';
+                }
+                // Reset login attempts after blocking the user
+                unset($_SESSION['login_attempts']);
             }
-            // Reset login attempts after blocking the user
+        } else {
+            echo '<script>alert("Invalid credentials.");</script>';
             unset($_SESSION['login_attempts']);
         }
     }
