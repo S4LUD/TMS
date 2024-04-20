@@ -11,7 +11,11 @@ async function fetchUsers() {
     // Fetch all users
     response = await fetch(`${apiLink}/fetchallusers`);
     result = await response.json();
-    names = result; // Update the names array with the fetched user data
+
+    // Filter out users with auth equal to 1
+    const filteredUsers = result.filter((user) => user.auth !== 1);
+
+    names = filteredUsers; // Update the names array with the filtered user data
     updateDisplay(""); // Call updateDisplay with an empty query to display all users
   } catch (error) {
     console.error("Error fetching users:", error.message);
