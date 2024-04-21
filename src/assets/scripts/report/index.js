@@ -158,8 +158,6 @@ document.addEventListener("DOMContentLoaded", async function () {
       });
     })
     .catch((error) => console.error(error));
-  //   createdBy.value = "SUPER ADMIN";
-  //   currentDate.value = new Date().toISOString().slice(0, 10);
 
   // Get current date
   const currentDate = new Date();
