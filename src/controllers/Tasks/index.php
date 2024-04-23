@@ -485,12 +485,12 @@ class Tasks
         }
     }
 
-    public static function distributeTask($task_id, $role, $task_type, $user_id, $dueAt)
+    public static function distributeTask($task_id, $role, $task_type, $user_id, $dueAt, $visibility)
     {
         global $db;
         try {
             // Determine the status ID based on the role
-            $status_id = ($role === "SUPER ADMIN" || $role === "DEAN") ? 4 : 6;
+            $status_id = ($role === "SUPER ADMIN" || $visibility === "PRIVATE") ? 4 : 6;
 
             // Update task details
             $updateStmt = $db->prepare("UPDATE `tasks` SET `task_type` = :task_type, `status_id` = :status_id, `dueAt` = :dueAt WHERE `id` = :task_id");

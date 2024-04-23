@@ -190,11 +190,11 @@ async function assigntask(event) {
 
   try {
     const userDetails = JSON.parse(localStorage.getItem("user"));
-    const { role } = userDetails;
+    const { role, visibility } = userDetails;
 
     const requests = selectedUsers.map((user) => {
       return fetch(
-        `${apiLink}/distributetask?task_type=${taskType}&role=${role}&user_id=${user.id}&dueAt=${dueDate}&task_id=${taskId}`,
+        `${apiLink}/distributetask?task_type=${taskType}&role=${role}&user_id=${user.id}&dueAt=${dueDate}&task_id=${taskId}&visibility=${visibility}`,
         {
           method: "GET",
         }
