@@ -537,10 +537,28 @@ class Tasks
     {
         global $db;
 
-        $stmt = $db->prepare("UPDATE tasks SET status_id = :statusId WHERE id = :taskId");
+        $beginstatus = [7];
+        $endstatus = [1, 2, 3, 5];
+
+        // Check if statusId is in beginstatus or endstatus
+        if (in_array($statusId, $beginstatus)) {
+            // Update startedAt and status_id
+            $stmt = $db->prepare("UPDATE tasks SET startedAt = :startedAt, status_id = :statusId WHERE id = :taskId");
+            $stmt->bindParam(':startedAt', date('Y-m-d H:i:s')); // Current date and time
+        } elseif (in_array($statusId, $endstatus)) {
+            // Update endedAt and status_id
+            $stmt = $db->prepare("UPDATE tasks SET endedAt = :endedAt, status_id = :statusId WHERE id = :taskId");
+            $stmt->bindParam(':endedAt', date('Y-m-d H:i:s')); // Current date and time
+        } else {
+            // Only update status_id
+            $stmt = $db->prepare("UPDATE tasks SET status_id = :statusId WHERE id = :taskId");
+        }
+
+        // Bind parameters
         $stmt->bindParam(':taskId', $taskId, PDO::PARAM_INT);
         $stmt->bindParam(':statusId', $statusId);
 
+        // Execute the query
         return $stmt->execute();
     }
 
