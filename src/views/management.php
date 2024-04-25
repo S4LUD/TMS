@@ -88,3 +88,4 @@ $permissions = json_decode($userData['permissions'], true);
 <script src="/tms/src/assets/scripts/management/insert_role.js"></script>
 <script src="/tms/src/assets/scripts/management/update_role.js"></script>
 <script src="/tms/src/assets/scripts/management/delete_role.js"></script>
+<script src="/tms/src/assets/scripts/management/unblock_user.js"></script>

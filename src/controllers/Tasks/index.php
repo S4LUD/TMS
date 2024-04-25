@@ -117,6 +117,68 @@ class Tasks
         }
     }
 
+    public static function GenerateTaskReport($startDate, $endDate, $statusFilter, $usernames)
+    {
+        global $db;
+
+        try {
+            // Construct the SQL query to fetch tasks
+            $query = "SELECT `tasks`.`title`, `tasks`.`detail`, `task_status`.`status`, `users`.`username` FROM `tasks`
+            LEFT JOIN `task_status` ON `tasks`.`status_id` = `task_status`.`id`
+            LEFT JOIN `distributed_tasks` ON `tasks`.`id` = `distributed_tasks`.`task_id`
+            LEFT JOIN `users` ON `distributed_tasks`.`user_id` = `users`.`id` ";
+
+            // Add condition for date range if both start date and end date are provided
+            if (!empty($startDate) && !empty($endDate)) {
+                $query .= "WHERE DATE(`tasks`.`createdAt`) BETWEEN :startDate AND :endDate ";
+            }
+
+            // Add condition for status filter if provided
+            if (!empty($statusFilter)) {
+                $query .= "AND `task_status`.`status` = :statusFilter ";
+            }
+
+            // Add condition for usernames filter if provided
+            if (!empty($usernames)) {
+                // Split usernames into an array and surround each username with single quotes
+                $usernamesArray = explode(',', $usernames);
+                $usernamesString = "'" . implode("','", $usernamesArray) . "'";
+                $query .= "AND `users`.`username` IN ($usernamesString) ";
+            }
+
+            // Prepare the statement
+            $stmt = $db->prepare($query);
+
+            // Bind parameters if date range is provided
+            if (!empty($startDate) && !empty($endDate)) {
+                $stmt->bindParam(':startDate', $startDate, PDO::PARAM_STR);
+                $stmt->bindParam(':endDate', $endDate, PDO::PARAM_STR);
+            }
+
+            // Bind status filter parameter if provided
+            if (!empty($statusFilter)) {
+                $stmt->bindParam(':statusFilter', $statusFilter, PDO::PARAM_STR);
+            }
+
+            // Execute the statement
+            $stmt->execute();
+
+            // Fetch the results
+            $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            // Return JSON-encoded results
+            return json_encode($results);
+        } catch (PDOException $e) {
+            // Handle database error
+            http_response_code(500); // Internal Server Error
+            return json_encode(['error' => $e->getMessage()]);
+        } catch (Exception $ex) {
+            // Handle other exceptions
+            http_response_code(500); // Internal Server Error
+            return json_encode(['error' => $ex->getMessage()]);
+        }
+    }
+
     public static function newFile($filename, $file_size, $destination,  $task_id)
     {
         global $db;
@@ -186,7 +248,6 @@ class Tasks
         }
     }
 
-    // Helper function to get department ID based on user ID
     private static function getDepartmentId($userId)
     {
         global $db;
@@ -202,7 +263,6 @@ class Tasks
 
         return $departmentData['department_id'];
     }
-
 
     public static function viewTask($task_id)
     {
@@ -373,7 +433,7 @@ class Tasks
         }
     }
 
-    public static function fetchPerformance()
+    public static function fetchPerformance($user_id = null)
     {
         global $db;
 
@@ -391,22 +451,36 @@ class Tasks
         try {
             $weekDates = getCurrentWeekDates();
 
-            $stmt = $db->prepare("SELECT
-            task_status.status,
-            COUNT(*) AS status_count
-        FROM
-            tasks
-        LEFT JOIN
-            task_status ON tasks.status_id = task_status.id
-        WHERE
-            DATE(tasks.createdAt) BETWEEN :start_date AND :end_date
-        GROUP BY
-            task_status.status
-        ORDER BY
-            task_status.status");
+            $query = "SELECT
+                    task_status.status,
+                    COUNT(*) AS status_count
+                FROM
+                    tasks
+                LEFT JOIN
+                    task_status ON tasks.status_id = task_status.id
+                LEFT JOIN
+                    distributed_tasks ON tasks.id = distributed_tasks.task_id
+                WHERE
+                    DATE(tasks.createdAt) BETWEEN :start_date AND :end_date";
+
+            if ($user_id !== null) {
+                $query .= " AND distributed_tasks.user_id = :user_id";
+            }
+
+            $query .= " GROUP BY
+                        task_status.status
+                    ORDER BY
+                        task_status.status";
+
+            $stmt = $db->prepare($query);
 
             $stmt->bindParam(':start_date', $weekDates['monday']);
             $stmt->bindParam(':end_date', $weekDates['sunday']);
+
+            if ($user_id !== null) {
+                $stmt->bindParam(':user_id', $user_id);
+            }
+
             $stmt->execute();
             $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -425,12 +499,12 @@ class Tasks
         }
     }
 
-    public static function distributeTask($task_id, $role, $task_type, $user_id, $dueAt)
+    public static function distributeTask($task_id, $role, $task_type, $user_id, $dueAt, $visibility)
     {
         global $db;
         try {
             // Determine the status ID based on the role
-            $status_id = ($role === "SUPER ADMIN" || $role === "DEAN") ? 4 : 6;
+            $status_id = ($role === "SUPER ADMIN" || $visibility === "PRIVATE") ? 4 : 6;
 
             // Update task details
             $updateStmt = $db->prepare("UPDATE `tasks` SET `task_type` = :task_type, `status_id` = :status_id, `dueAt` = :dueAt WHERE `id` = :task_id");
@@ -477,10 +551,47 @@ class Tasks
     {
         global $db;
 
-        $stmt = $db->prepare("UPDATE tasks SET status_id = :statusId WHERE id = :taskId");
+        $beginstatus = [7];
+        $endstatus = [1, 2, 3, 5];
+
+        // Check if statusId is in beginstatus or endstatus
+        if (in_array($statusId, $beginstatus)) {
+            // Update startedAt and status_id
+            $stmt = $db->prepare("UPDATE tasks SET startedAt = :startedAt, status_id = :statusId WHERE id = :taskId");
+            $stmt->bindParam(':startedAt', date('Y-m-d H:i:s')); // Current date and time
+        } elseif (in_array($statusId, $endstatus)) {
+            // Update endedAt and status_id
+            $stmt = $db->prepare("UPDATE tasks SET endedAt = :endedAt, status_id = :statusId WHERE id = :taskId");
+            $stmt->bindParam(':endedAt', date('Y-m-d H:i:s')); // Current date and time
+        } else {
+            // Only update status_id
+            $stmt = $db->prepare("UPDATE tasks SET status_id = :statusId WHERE id = :taskId");
+        }
+
+        // Bind parameters
         $stmt->bindParam(':taskId', $taskId, PDO::PARAM_INT);
         $stmt->bindParam(':statusId', $statusId);
 
+        // Execute the query
         return $stmt->execute();
+    }
+
+    public static function fetchNotifications($user_id)
+    {
+        global $db;
+
+        $stmt = $db->prepare("SELECT `title`, `users`.`username`, `task_type`, `dueAt`, `task_status`.`status` 
+                            FROM `tasks`
+                            LEFT JOIN `task_status` ON `tasks`.`status_id` = `task_status`.`id`
+                            LEFT JOIN `distributed_tasks` ON `tasks`.`id` = `distributed_tasks`.`task_id`
+                            LEFT JOIN `users` ON `distributed_tasks`.`user_id` = `users`.`id`
+                            WHERE `distributed_tasks`.`user_id` = :user_id
+                            AND `task_status`.`status` NOT IN ('FAILED', 'DONE', 'REJECTED')        
+                        ");
+        $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+        $stmt->execute();
+        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        return json_encode($results);
     }
 }

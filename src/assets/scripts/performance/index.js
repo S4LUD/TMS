@@ -6,16 +6,21 @@ function fetchDataFromAPI(url, callback) {
     .catch((error) => console.error("Error fetching data:", error));
 }
 
+const userDetails = JSON.parse(localStorage.getItem("user"));
+const { visibility, id } = userDetails;
+
 // API URL
-var apiUrl = `${apiLink}/fetchperformance`;
+let apiUrl;
+
+if (visibility === "PUBLIC") {
+  apiUrl = `${apiLink}/fetchperformance?user_id=${id}`;
+} else {
+  apiUrl = `${apiLink}/fetchperformance`;
+}
 
 function calculateCompletionRate(apiData) {
   // Get the total number of tasks
   const totalTasks = apiData.tasks_count;
-
-  // Get the total number of completed tasks
-  const totalCompletedTasks =
-    apiData.tasks_performance.DONE + apiData.tasks_performance.LATE;
 
   const totlaNotCompletedTask =
     apiData.tasks_performance.PENDING +
@@ -120,8 +125,10 @@ function displayStars(rating) {
 // Fetch data from the API
 fetchDataFromAPI(apiUrl, function (apiData) {
   const completionData = calculateCompletionRate(apiData);
-  renderCompletionRate(completionData.completionRate);
-  renderCompletionData(completionData);
+  if (visibility === "PRIVATE") {
+    renderCompletionRate(completionData.completionRate);
+    renderCompletionData(completionData);
+  }
 
   const usersStars = calculateStars(
     apiData.users_performance,
@@ -134,42 +141,83 @@ fetchDataFromAPI(apiUrl, function (apiData) {
   function generateUserStarsHTML(usersStars) {
     let html =
       '<ul class="list-none flex flex-col gap-2 divide-y divide-gray-200">';
+
     usersStars.forEach((user) => {
+      // Define the legend and its corresponding color based on star count
+      let legend = "";
+      let legendColor = "";
+      if (user.stars <= 1) {
+        legend = "Poor";
+        legendColor = "text-red-500"; // Red for Poor
+      } else if (user.stars <= 2) {
+        legend = "Fair";
+        legendColor = "text-yellow-500"; // Yellow for Fair
+      } else if (user.stars <= 3) {
+        legend = "Good";
+        legendColor = "text-yellow-300"; // Light Yellow for Good
+      } else if (user.stars <= 4) {
+        legend = "Very Good";
+        legendColor = "text-green-500"; // Green for Very Good
+      } else {
+        legend = "Excellent";
+        legendColor = "text-green-800"; // Dark Green for Excellent
+      }
+
       html += `<li class="flex flex-row justify-between lg:w-full min-w-72 py-2">
-        <div class="flex flex-col">
-          <span>${user.username}</span>
-          <div>${displayStars(user.stars)}</div>
+      <div class="flex flex-col">
+        <span>${user.username}</span>
+        <div class="flex items-center justify-center gap-2">
+          <span>${displayStars(user.stars)}</span>
+          <span class="text-sm ${legendColor}">${legend}</span> <!-- Display legend with color -->
         </div>
-        <div class="flex gap-1">
-          <div class="flex justify-center items-center bg-green-500 h-fit w-6 h-5 text-sm text-white rounded">
-          ${user.done}
-          </div>
-          <div class="flex justify-center items-center bg-yellow-500 h-fit w-6 h-5 text-sm text-white rounded">
-          ${user.late}
-          </div>
-          <div class="flex justify-center items-center bg-red-500 h-fit w-6 h-5 text-sm text-white rounded">
-          ${user.failed}
-          </div>
+      </div>
+      <div class="flex gap-1">
+        <div class="flex justify-center items-center bg-green-500 h-fit w-6 h-5 text-sm text-white rounded">
+        ${user.done}
         </div>
-      </li>`;
+        <div class="flex justify-center items-center bg-yellow-500 h-fit w-6 h-5 text-sm text-white rounded">
+        ${user.late}
+        </div>
+        <div class="flex justify-center items-center bg-red-500 h-fit w-6 h-5 text-sm text-white rounded">
+        ${user.failed}
+        </div>
+      </div>
+    </li>`;
     });
+
     html += "</ul>";
     return html;
   }
 
   // Update the users_list div with the generated HTML
-  userListDiv.innerHTML = generateUserStarsHTML(usersStars);
+  if (userListDiv) {
+    userListDiv.innerHTML = generateUserStarsHTML(usersStars);
+  }
 
   var tasksPerformance = apiData.tasks_performance || {};
 
-  // Prepare data for Chart.js
-  var taskLabels = Object.keys(tasksPerformance);
-  var taskValues = Object.values(tasksPerformance);
+  let filteredStatus = {};
 
+  if (visibility === "PUBLIC") {
+    // If visibility is PUBLIC, filter to display only DONE, PENDING, and FAILED
+    filteredStatus = {
+      DONE: tasksPerformance.DONE || 0,
+      PENDING: tasksPerformance.PENDING || 0,
+      FAILED: tasksPerformance.FAILED || 0,
+    };
+  } else {
+    // If visibility is not PUBLIC, keep the original tasksPerformance object
+    filteredStatus = tasksPerformance;
+  }
+
+  // Prepare data for Chart.js
+  var taskLabels = Object.keys(filteredStatus);
+  var taskValues = Object.values(filteredStatus);
   // Get reference to canvas element
   var ctx = document.getElementById("tasksChart").getContext("2d");
 
   // Create Chart.js chart
+
   var tasksChart = new Chart(ctx, {
     type: "bar",
     data: {

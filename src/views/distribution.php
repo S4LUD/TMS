@@ -13,7 +13,7 @@ $firstDayOfMonthFormatted = $firstDayOfMonth->format('Y-m-d');
 $lastDayOfMonthFormatted = $lastDayOfMonth->format('Y-m-d');
 ?>
 
-<div class="bg-white p-4 mt-4 border rounded">
+<div class="overflow-x-auto bg-white p-4 mt-4 border rounded">
     <form id="searchForm" onsubmit="return false;" class="flex flex-col md:flex-row gap-1 select-none">
         <div class="flex flex-col">
             <label for="startDate">From Date:</label>

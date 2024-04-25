@@ -7,28 +7,40 @@ class Auth
     {
         global $db;
 
-        $stmt = $db->prepare("SELECT users.id, users.username, users.password, role.role, users.auth, department.department, department.abbreviation, permissions.permissions FROM users
-                        JOIN role on users.role_id = role.id
-                        JOIN department on users.department_id = department.id
-                        JOIN permissions on users.id = permissions.user_id
-                        WHERE BINARY users.username = ?");
+        $stmt = $db->prepare("SELECT users.id, users.username, users.password, users.status, role.role, role.visibility, users.auth, department.department, department.abbreviation, permissions.permissions FROM users
+                    JOIN role on users.role_id = role.id
+                    JOIN department on users.department_id = department.id
+                    JOIN permissions on users.id = permissions.user_id
+                    WHERE BINARY users.username = ?");
 
         $stmt->execute([$username]);
 
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if ($user && password_verify($password, $user['password'])) {
-            return json_encode([
-                'id' => $user['id'],
-                'username' => $user['username'],
-                'role' => $user['role'],
-                'department' => $user['department'],
-                'abbreviation' => $user['abbreviation'],
-                'permissions' => $user['permissions'],
-                'auth' => $user['auth'],
-            ]);
+        if ($user) {
+            if ($user['status'] === 2) {
+                return json_encode([
+                    'status' => $user['status'],
+                ]);
+            }
+
+            if (password_verify($password, $user['password'])) {
+                return json_encode([
+                    'id' => $user['id'],
+                    'username' => $user['username'],
+                    'status' => $user['status'],
+                    'role' => $user['role'],
+                    'visibility' => $user['visibility'],
+                    'department' => $user['department'],
+                    'abbreviation' => $user['abbreviation'],
+                    'permissions' => $user['permissions'],
+                    'auth' => $user['auth'],
+                ]);
+            } else {
+                return null;
+            }
         } else {
-            return null;
+            return json_encode(['error' => 'Username not found']);
         }
     }
 
@@ -146,6 +158,28 @@ class Auth
         } catch (PDOException $e) {
             // Handle database errors
             return json_encode(['error' => 'Database error: ' . $e->getMessage()]);
+        }
+    }
+
+    public static function blockUser($username)
+    {
+        global $db;
+
+        try {
+            // Prepare the SQL statement for update
+            $stmt = $db->prepare("UPDATE users SET status = 2 WHERE username = :username");
+
+            // Bind parameters and execute the statement
+            $stmt->bindParam(':username', $username);
+            $stmt->execute();
+
+            // Check if any rows were affected
+            $rowCount = $stmt->rowCount();
+
+            return $rowCount > 0;
+        } catch (PDOException $e) {
+            // Handle database errors
+            return "Error updating department: " . $e->getMessage();
         }
     }
 }

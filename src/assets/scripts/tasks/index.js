@@ -92,15 +92,7 @@ async function updateTable(tasks) {
       const viewtask = await response.json();
 
       const userDetails = JSON.parse(localStorage.getItem("user"));
-      const { role } = userDetails;
-
-      const checkPublicRoleResponse = await fetch(
-        `${apiLink}/fetchpublicusers?role=${role}`
-      );
-      if (!checkPublicRoleResponse.ok) {
-        throw new Error(`Failed to fetch public users for role ${role}`);
-      }
-      const { visibility } = await checkPublicRoleResponse.json();
+      const { visibility } = userDetails;
 
       const { tasks: taskPermissions } = JSON.parse(
         localStorage.getItem("permissions")

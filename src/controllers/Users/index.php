@@ -171,6 +171,17 @@ class Users
         return json_encode($results);
     }
 
+    public static function fetchTaskStatuses()
+    {
+
+        global $db;
+
+        $stmt = $db->query("SELECT * FROM task_status");
+        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        return json_encode($results);
+    }
+
     public static function insertDepartment($abbreviation, $department)
     {
         global $db;
@@ -433,9 +444,20 @@ class Users
             $stmt1->execute();
 
             // Update other tasks
-            $stmt2 = $db->prepare("UPDATE tasks SET task_type = NULL, dueAt = NULL, user_id = NULL WHERE user_id = :userId");
+            $stmt2 = $db->prepare("UPDATE tasks
+                                LEFT JOIN distributed_tasks ON tasks.id = distributed_tasks.task_id
+                                SET tasks.status_id = 6,
+                                    tasks.task_type = NULL,
+                                    tasks.dueAt = NULL
+                                WHERE distributed_tasks.user_id = :userId
+                                ");
             $stmt2->bindParam(':userId', $userId, PDO::PARAM_INT);
             $stmt2->execute();
+
+            // delete distributed tasks
+            $stmt3 = $db->prepare("DELETE FROM distributed_tasks WHERE user_id = :userId");
+            $stmt3->bindParam(':userId', $userId, PDO::PARAM_INT);
+            $stmt3->execute();
 
             // Commit the transaction
             $db->commit();
@@ -443,9 +465,10 @@ class Users
             // Check if any rows were affected
             $rowCount1 = $stmt1->rowCount();
             $rowCount2 = $stmt2->rowCount();
+            $rowCount3 = $stmt3->rowCount();
 
             // Return true if any rows were affected by any of the SQL statements
-            return ($rowCount1 > 0 || $rowCount2 > 0);
+            return ($rowCount1 > 0 || $rowCount2 > 0 || $rowCount3 > 0);
         } catch (PDOException $e) {
             // An error occurred, rollback the transaction
             $db->rollBack();
@@ -578,6 +601,33 @@ class Users
         } catch (PDOException $e) {
             // Handle database errors
             return "Error updating user details for user with ID: $userId - " . $e->getMessage();
+        }
+    }
+
+    public static function unblockUser($userId)
+    {
+        global $db;
+
+        try {
+            // Prepare the SQL statement for update
+            $stmt = $db->prepare("UPDATE users SET status = 1 WHERE id = :userId");
+
+            // Bind parameters and execute the statement
+            $stmt->bindParam(':userId', $userId);
+            $stmt->execute();
+
+            // Check if any rows were affected
+            $rowCount = $stmt->rowCount();
+
+            // Return a success message or the number of affected rows
+            if ($rowCount > 0) {
+                return "Successfully unblocked user";
+            } else {
+                return "No rows affected. User with ID $userId not found.";
+            }
+        } catch (PDOException $e) {
+            // Handle database errors
+            return "Error updating department: " . $e->getMessage();
         }
     }
 }
