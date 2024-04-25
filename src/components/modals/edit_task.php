@@ -40,7 +40,7 @@
                 </div>
                 <div class="flex justify-end gap-1">
                     <button onclick="handleTaskActionStatus(event)" id="hiding-this-btn" class="font-semibold bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 hover:text-gray-100 transition duration-75 min-w-50 max-w-50">Begin Task</button>
-                    <button type="submit" class="font-semibold bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 hover:text-gray-100 transition duration-75 min-w-50 max-w-50">Save</button>
+                    <button type="submit" id="submit_edit_task" class="font-semibold bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 hover:text-gray-100 transition duration-75 min-w-50 max-w-50">Save</button>
                 </div>
             </div>
         </form>
