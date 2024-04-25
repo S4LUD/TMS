@@ -16,10 +16,10 @@ async function handleEditTask(taskId) {
   try {
     const response = await fetch(`${apiLink}/viewtask?task_id=${taskId}`);
     const tasks = await response.json();
-
     if (tasks) {
       const titleElement = document.getElementById("edit_task_title");
       const detailsElement = document.getElementById("edit_task_details");
+      const submit_edit_task = document.getElementById("submit_edit_task");
       if (titleElement && detailsElement) {
         titleElement.value = tasks.title;
         detailsElement.value = tasks.detail;
@@ -34,6 +34,16 @@ async function handleEditTask(taskId) {
         hideSubmitTask.classList.remove("hidden");
       } else {
         hideSubmitTask.classList.add("hidden");
+      }
+
+      const userDetails = JSON.parse(localStorage.getItem("user"));
+      const { visibility } = userDetails;
+
+      if (tasks?.assigned && visibility === "PUBLIC") {
+        titleElement.disabled = true;
+        detailsElement.disabled = true;
+        submit_edit_task.disabled = true;
+        submit_edit_task.style.display = "none";
       }
 
       updateDBFilePreview(tasks.files);
