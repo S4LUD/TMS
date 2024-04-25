@@ -433,7 +433,7 @@ class Tasks
         }
     }
 
-    public static function fetchPerformance()
+    public static function fetchPerformance($user_id = null)
     {
         global $db;
 
@@ -451,22 +451,36 @@ class Tasks
         try {
             $weekDates = getCurrentWeekDates();
 
-            $stmt = $db->prepare("SELECT
-            task_status.status,
-            COUNT(*) AS status_count
-        FROM
-            tasks
-        LEFT JOIN
-            task_status ON tasks.status_id = task_status.id
-        WHERE
-            DATE(tasks.createdAt) BETWEEN :start_date AND :end_date
-        GROUP BY
-            task_status.status
-        ORDER BY
-            task_status.status");
+            $query = "SELECT
+                    task_status.status,
+                    COUNT(*) AS status_count
+                FROM
+                    tasks
+                LEFT JOIN
+                    task_status ON tasks.status_id = task_status.id
+                LEFT JOIN
+                    distributed_tasks ON tasks.id = distributed_tasks.task_id
+                WHERE
+                    DATE(tasks.createdAt) BETWEEN :start_date AND :end_date";
+
+            if ($user_id !== null) {
+                $query .= " AND distributed_tasks.user_id = :user_id";
+            }
+
+            $query .= " GROUP BY
+                        task_status.status
+                    ORDER BY
+                        task_status.status";
+
+            $stmt = $db->prepare($query);
 
             $stmt->bindParam(':start_date', $weekDates['monday']);
             $stmt->bindParam(':end_date', $weekDates['sunday']);
+
+            if ($user_id !== null) {
+                $stmt->bindParam(':user_id', $user_id);
+            }
+
             $stmt->execute();
             $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 

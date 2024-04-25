@@ -7,7 +7,7 @@ require_once '../../src/controllers/Tasks/index.php';
 
 
 // Define the endpoint function
-function fetchPerformance()
+function fetchPerformance($user_id = null)
 {
     function getCurrentWeekDates()
     {
@@ -36,7 +36,7 @@ function fetchPerformance()
     $usersPerformance = Users::fetchPerformance();
 
     // Call the fetchPerformance function from the Tasks controller
-    $tasksPerformance = Tasks::fetchPerformance();
+    $tasksPerformance = Tasks::fetchPerformance($user_id);
 
     $tasksCount = Tasks::fetchAllTasks(getCurrentWeekDates()['monday'], getCurrentWeekDates()['sunday'], null, null);
 
@@ -67,8 +67,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     // Set the HTTP response header to indicate JSON content
     header('Content-Type: application/json');
 
-    // Call the fetchPerformance function and echo the result
-    echo fetchPerformance();
+    // Check if user_id is provided in the query parameters
+    if (isset($_GET['user_id'])) {
+        $user_id = $_GET['user_id'];
+        // Call the fetchPerformance function with the provided user_id and echo the result
+        echo fetchPerformance($user_id);
+    } else {
+        // Call the fetchPerformance function without user_id and echo the result
+        echo fetchPerformance();
+    }
 } else {
     // If the request method is not GET, return a 405 Method Not Allowed error
     http_response_code(405);
