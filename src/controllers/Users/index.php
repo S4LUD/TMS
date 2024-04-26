@@ -355,7 +355,7 @@ class Users
         return json_encode($results);
     }
 
-    public static function fetchPerformance()
+    public static function fetchPerformance($user_id = null, $departmentId = null)
     {
         global $db;
 
@@ -364,30 +364,50 @@ class Users
             $weekDates = getCurrentWeekDates();
 
             // Prepare the SQL query with placeholders for start_date and end_date
-            $sql = "SELECT
-                users.username,
-                SUM(CASE WHEN task_status.status = 'DONE' THEN 1 ELSE 0 END) AS done,
-                SUM(CASE WHEN task_status.status = 'LATE' THEN 1 ELSE 0 END) AS late,
-                SUM(CASE WHEN task_status.status = 'FAILED' THEN 1 ELSE 0 END) AS failed
-            FROM
-                users
-            LEFT JOIN
-                distributed_tasks ON users.id = distributed_tasks.user_id
-            LEFT JOIN
-                tasks ON distributed_tasks.task_id = tasks.id
-            LEFT JOIN task_status ON tasks.status_id = task_status.id
-            WHERE DATE(tasks.createdAt) BETWEEN :start_date AND :end_date
-            GROUP BY
-                users.username
-            ORDER BY done DESC
-            LIMIT 5"; // Add LIMIT and OFFSET clauses
+            $query = "SELECT
+                        task_status.status,
+                        users.username,
+                        SUM(CASE WHEN task_status.status = 'DONE' THEN 1 ELSE 0 END) AS done,
+                        SUM(CASE WHEN task_status.status = 'LATE' THEN 1 ELSE 0 END) AS late,
+                        SUM(CASE WHEN task_status.status = 'FAILED' THEN 1 ELSE 0 END) AS failed
+                    FROM
+                        users
+                    LEFT JOIN
+                        distributed_tasks ON users.id = distributed_tasks.user_id
+                    LEFT JOIN
+                        tasks ON distributed_tasks.task_id = tasks.id
+                    LEFT JOIN
+                        task_status ON tasks.status_id = task_status.id
+                    WHERE
+                        DATE(tasks.createdAt) BETWEEN :start_date AND :end_date";
+
+            if ($user_id !== null) {
+                $query .= " AND users.id = :user_id";
+            }
+
+            if ($departmentId !== null) {
+                $query .=  " AND users.department_id = :departmentId";
+            }
+
+            $query .= " GROUP BY
+                            users.username
+                        ORDER BY done DESC
+                        LIMIT 5"; // Add LIMIT and OFFSET clauses
 
             // Prepare the statement
-            $stmt = $db->prepare($sql);
+            $stmt = $db->prepare($query);
 
             // Bind the parameters
             $stmt->bindParam(':start_date', $weekDates['monday']);
             $stmt->bindParam(':end_date', $weekDates['sunday']);
+
+            if ($user_id !== null) {
+                $stmt->bindParam(':user_id', $user_id);
+            }
+
+            if ($departmentId !== null) {
+                $stmt->bindParam(':departmentId', $departmentId);
+            }
 
             // Execute the statement
             $stmt->execute();

@@ -7,7 +7,7 @@ require_once '../../src/controllers/Tasks/index.php';
 
 
 // Define the endpoint function
-function fetchPerformance($user_id = null)
+function fetchPerformance($user_id = null, $departmentId = null)
 {
     function getCurrentWeekDates()
     {
@@ -33,30 +33,34 @@ function fetchPerformance($user_id = null)
     }
 
     // Call the fetchPerformance function from the Users controller
-    $usersPerformance = Users::fetchPerformance();
+    $usersPerformance = Users::fetchPerformance($user_id, $departmentId);
 
     // Call the fetchPerformance function from the Tasks controller
-    $tasksPerformance = Tasks::fetchPerformance($user_id);
+    $tasksPerformance = Tasks::fetchPerformance($user_id, $departmentId);
 
-    $tasksCount = Tasks::fetchAllTasks(getCurrentWeekDates()['monday'], getCurrentWeekDates()['sunday'], null, null);
+    // $tasksCount = Tasks::fetchAllTasks(getCurrentWeekDates()['monday'], getCurrentWeekDates()['sunday'], null, $user_id);
 
-    // Combine the results into a single response
-    if (is_array(json_decode($tasksCount, true))) {
-        $response = [
-            'tasks_count' => count(json_decode($tasksCount, true)),
-            'users_performance' => json_decode($usersPerformance, true),
-            'tasks_performance' => json_decode($tasksPerformance, true)
-        ];
-    } else {
-        // Handle the case where $tasksCount is not an array
-        // For example, you can set 'tasks_count' to 0 or display an error message
-        $response = [
-            'tasks_count' => 0,
-            'users_performance' => json_decode($usersPerformance, true),
-            'tasks_performance' => json_decode($tasksPerformance, true)
-            // You can add additional error handling here if needed
-        ];
+    $statusCounts = json_decode($tasksPerformance, true);
+
+    // Array of statuses to include in the total count
+    $statusesToCount = ["DONE", "PENDING", "FAILED", "REJECTED", "LATE", "IN_REVIEW", "IN_PROGRESS"];
+
+    // Initialize total count
+    $totalCount = 0;
+
+    // Loop through each status and add its count to the total
+    foreach ($statusesToCount as $status) {
+        if (isset($statusCounts[$status])) {
+            $totalCount += $statusCounts[$status];
+        }
     }
+
+    $response = [
+        'tasks_count' => $totalCount,
+        'users_performance' => json_decode($usersPerformance, true),
+        'tasks_performance' => json_decode($tasksPerformance, true)
+    ];
+
 
     // Return the combined response
     return json_encode($response);
@@ -71,10 +75,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     if (isset($_GET['user_id'])) {
         $user_id = $_GET['user_id'];
         // Call the fetchPerformance function with the provided user_id and echo the result
-        echo fetchPerformance($user_id);
+        echo fetchPerformance($user_id, null);
+    } elseif (isset($_GET['departmentId'])) {
+        $departmentId = $_GET['departmentId'];
+        // Call the fetchPerformance function with the provided user_id and echo the result
+        echo fetchPerformance(null, $departmentId);
     } else {
         // Call the fetchPerformance function without user_id and echo the result
-        echo fetchPerformance();
+        echo fetchPerformance(null, null);
     }
 } else {
     // If the request method is not GET, return a 405 Method Not Allowed error

@@ -433,7 +433,7 @@ class Tasks
         }
     }
 
-    public static function fetchPerformance($user_id = null)
+    public static function fetchPerformance($user_id = null, $departmentId = null)
     {
         global $db;
 
@@ -452,25 +452,31 @@ class Tasks
             $weekDates = getCurrentWeekDates();
 
             $query = "SELECT
-                    task_status.status,
-                    COUNT(*) AS status_count
-                FROM
-                    tasks
-                LEFT JOIN
-                    task_status ON tasks.status_id = task_status.id
-                LEFT JOIN
-                    distributed_tasks ON tasks.id = distributed_tasks.task_id
-                WHERE
-                    DATE(tasks.createdAt) BETWEEN :start_date AND :end_date";
+                        task_status.status,
+                        COUNT(*) AS status_count
+                    FROM
+                        tasks
+                    LEFT JOIN
+                        task_status ON tasks.status_id = task_status.id
+                    LEFT JOIN
+                        distributed_tasks ON tasks.id = distributed_tasks.task_id
+                    LEFT JOIN
+                        users ON distributed_tasks.user_id = users.id
+                    WHERE
+                        DATE(tasks.createdAt) BETWEEN :start_date AND :end_date";
 
             if ($user_id !== null) {
                 $query .= " AND distributed_tasks.user_id = :user_id";
             }
 
+            if ($departmentId !== null) {
+                $query .=  " AND users.department_id = :departmentId";
+            }
+
             $query .= " GROUP BY
-                        task_status.status
-                    ORDER BY
-                        task_status.status";
+                            task_status.status
+                        ORDER BY
+                            task_status.status";
 
             $stmt = $db->prepare($query);
 
@@ -479,6 +485,10 @@ class Tasks
 
             if ($user_id !== null) {
                 $stmt->bindParam(':user_id', $user_id);
+            }
+
+            if ($departmentId !== null) {
+                $stmt->bindParam(':departmentId', $departmentId);
             }
 
             $stmt->execute();

@@ -7,15 +7,17 @@ function fetchDataFromAPI(url, callback) {
 }
 
 const userDetails = JSON.parse(localStorage.getItem("user"));
-const { visibility, id } = userDetails;
+const { visibility, id, role, department_id } = userDetails;
 
 // API URL
 let apiUrl;
-
-if (visibility === "PUBLIC") {
-  apiUrl = `${apiLink}/fetchperformance?user_id=${id}`;
-} else {
+console.log(userDetails);
+if (role === "SUPER ADMIN") {
   apiUrl = `${apiLink}/fetchperformance`;
+} else if (visibility === "PUBLIC") {
+  apiUrl = `${apiLink}/fetchperformance?user_id=${id}`;
+} else if (visibility === "PRIVATE") {
+  apiUrl = `${apiLink}/fetchperformance?departmentId=${department_id}`;
 }
 
 function calculateCompletionRate(apiData) {
@@ -124,11 +126,10 @@ function displayStars(rating) {
 
 // Fetch data from the API
 fetchDataFromAPI(apiUrl, function (apiData) {
+  console.log(apiData);
   const completionData = calculateCompletionRate(apiData);
-  if (visibility === "PRIVATE") {
-    renderCompletionRate(completionData.completionRate);
-    renderCompletionData(completionData);
-  }
+  renderCompletionRate(completionData.completionRate);
+  renderCompletionData(completionData);
 
   const usersStars = calculateStars(
     apiData.users_performance,
@@ -218,48 +219,87 @@ fetchDataFromAPI(apiUrl, function (apiData) {
 
   // Create Chart.js chart
 
-  var tasksChart = new Chart(ctx, {
-    type: "bar",
-    data: {
-      labels: taskLabels,
-      datasets: [
-        {
-          label: "Tasks Performance",
-          data: taskValues,
-          backgroundColor: [
-            statusColors["DONE"][0],
-            statusColors["FAILED"][0],
-            statusColors["REJECTED"][0],
-            statusColors["PENDING"][0],
-            statusColors["LATE"][0],
-            statusColors["IN REVIEW"][0],
-            statusColors["IN PROGRESS"][0],
-          ],
-          borderColor: [
-            "rgba(0, 0, 0, 0)",
-            "rgba(0, 0, 0, 0)",
-            "rgba(0, 0, 0, 0)",
-            "rgba(0, 0, 0, 0)",
-            "rgba(0, 0, 0, 0)",
-            "rgba(0, 0, 0, 0)",
-            "rgba(0, 0, 0, 0)",
-          ],
-          borderWidth: 1,
+  if (visibility === "PUBLIC") {
+    var tasksChart = new Chart(ctx, {
+      type: "bar",
+      data: {
+        labels: taskLabels,
+        datasets: [
+          {
+            label: "Tasks Performance",
+            data: taskValues,
+            backgroundColor: [
+              statusColors["DONE"][0],
+              statusColors["PENDING"][0],
+              statusColors["FAILED"][0],
+            ],
+            borderColor: [
+              "rgba(0, 0, 0, 0)",
+              "rgba(0, 0, 0, 0)",
+              "rgba(0, 0, 0, 0)",
+            ],
+            borderWidth: 1,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            display: false,
+          },
         },
-      ],
-    },
-    options: {
-      responsive: true,
-      plugins: {
-        legend: {
-          display: false,
+        scales: {
+          y: {
+            ticks: { stepSize: 5 },
+          },
         },
       },
-      scales: {
-        y: {
-          ticks: { stepSize: 5 },
+    });
+  } else {
+    var tasksChart = new Chart(ctx, {
+      type: "bar",
+      data: {
+        labels: taskLabels,
+        datasets: [
+          {
+            label: "Tasks Performance",
+            data: taskValues,
+            backgroundColor: [
+              statusColors["DONE"][0],
+              statusColors["FAILED"][0],
+              statusColors["REJECTED"][0],
+              statusColors["PENDING"][0],
+              statusColors["LATE"][0],
+              statusColors["IN REVIEW"][0],
+              statusColors["IN PROGRESS"][0],
+            ],
+            borderColor: [
+              "rgba(0, 0, 0, 0)",
+              "rgba(0, 0, 0, 0)",
+              "rgba(0, 0, 0, 0)",
+              "rgba(0, 0, 0, 0)",
+              "rgba(0, 0, 0, 0)",
+              "rgba(0, 0, 0, 0)",
+              "rgba(0, 0, 0, 0)",
+            ],
+            borderWidth: 1,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            display: false,
+          },
+        },
+        scales: {
+          y: {
+            ticks: { stepSize: 5 },
+          },
         },
       },
-    },
-  });
+    });
+  }
 });
